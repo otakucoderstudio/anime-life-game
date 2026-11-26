@@ -101,64 +101,49 @@ func wire(a:Vector3,b:Vector3,sag:float):
 	for i in range(1,5):
 		var t=i/4.0; var p=a.lerp(b,t); p.y-=sag*sin(t*PI)
 		line(prev,p,0.015,Color(0.12,0.12,0.15)); prev=p
+
+var pshader:Shader
+var pmats:={}
+var pmeshes:={}
+func pmat(tint:Color,acc:Color)->Material:
+	var key:=str([tint,acc])
+	if pmats.has(key): return pmats[key]
+	if pshader==null: pshader=load("res://prop.gdshader")
+	var m:=ShaderMaterial.new(); m.shader=pshader
+	m.set_shader_parameter("tint",Vector3(tint.r,tint.g,tint.b)); m.set_shader_parameter("accent",Vector3(acc.r,acc.g,acc.b))
+	var o:=ShaderMaterial.new(); o.shader=outl; o.set_shader_parameter("thickness",0.035); m.next_pass=o
+	pmats[key]=m; return m
+func pglb(name:String,pos:Vector3,ry:float,tint:=Color(1,1,1),acc:=Color(1,1,1)):
+	if not pmeshes.has(name):
+		var inst:Node=(load("res://props/"+name+".glb") as PackedScene).instantiate()
+		var f:={}; _collect(inst,f); pmeshes[name]=(f.values()[0] as MeshInstance3D).mesh; inst.free()
+	var xf:=Transform3D(Basis(Vector3.UP,deg_to_rad(ry)),pos); var mt:=pmat(tint,acc)
+	if batching:
+		if not batches.has(mt): batches[mt]=SurfaceTool.new()
+		batches[mt].append_from(pmeshes[name],0,xf)
+	else:
+		var n:=MeshInstance3D.new(); n.mesh=pmeshes[name]; n.material_override=mt; n.transform=xf; add_child(n)
 func pole(p:Vector3):
-	box(self,Vector3(0.28,9.0,0.28),Color(0.45,0.42,0.42),p+Vector3(0,4.5,0),true)
-	box(self,Vector3(0.12,0.12,2.2),Color(0.35,0.3,0.3),p+Vector3(0,8.4,0),false)
-	box(self,Vector3(0.12,0.12,2.0),Color(0.35,0.3,0.3),p+Vector3(0,7.6,0),false)
-	box(self,Vector3(0.5,0.8,0.5),Color(0.5,0.55,0.5),p+Vector3(0.3,6.2,0),true)
+	pglb("pole",p,0.0)
+
 func bike(p:Vector3,ry:float,c:Color):
-	var n:=Node3D.new(); n.position=p; n.rotation_degrees.y=ry; add_child(n)
-	for z in [-0.55,0.55]:
-		var t:=TorusMesh.new(); t.inner_radius=0.3; t.outer_radius=0.36
-		mesh_xf(n,t,Color(0.15,0.15,0.2),Transform3D(Basis(Vector3(0,0,1),PI/2),Vector3(0,0.36,z)),false)
-	box(n,Vector3(0.06,0.06,1.1),c,Vector3(0,0.65,0),false)
-	box(n,Vector3(0.06,0.5,0.06),c,Vector3(0,0.85,0.5),false)
-	box(n,Vector3(0.4,0.05,0.06),Color(0.2,0.2,0.2),Vector3(0,1.1,0.52),false)
-	box(n,Vector3(0.2,0.05,0.35),Color(0.2,0.2,0.2),Vector3(0,0.95,-0.35),false)
+	pglb("bike",p-Vector3(0,0.2,0),ry,Color(1,1,1),c)
+
 func vending(p:Vector3,ry:float,c:Color):
-	var n:=Node3D.new(); n.position=p; n.rotation_degrees.y=ry; add_child(n)
-	box(n,Vector3(0.9,1.8,0.8),c,Vector3(0,0.9,0),true)
-	box(n,Vector3(0.7,0.9,0.05),Color(0.95,0.98,1),Vector3(0,1.15,0.4),false)
-	for i in range(6): box(n,Vector3(0.1,0.18,0.03),[Color(1,0.3,0.3),Color(0.3,0.7,1),Color(1,0.85,0.3)][i%3],Vector3(-0.25+(i%3)*0.25,1.4-(i/3)*0.4,0.43),false)
+	pglb("vending",p-Vector3(0,0.2,0),ry,Color(1,1,1),c)
+
 func shop(side:int,z:float,kind:int):
 	var fx=side*(13.5-3.55)
-	var glass:=Color(0.85,0.95,1.0)
-	box(self,Vector3(0.2,2.6,5.6),Color(0.35,0.55,0.7),Vector3(fx+side*0.05,1.5,z),false)
-	box(self,Vector3(0.12,2.2,5.2),glass,Vector3(fx-side*0.03,1.5,z),false)
-	var cols=[Color(0.95,0.3,0.3),Color(0.25,0.55,0.95),Color(0.35,0.75,0.5),Color(0.95,0.7,0.2)]
-	var sc:Color=cols[kind%4]
-	box(self,Vector3(0.9,0.5,6.2),sc,Vector3(fx-side*0.35,3.0,z),true)
-	box(self,Vector3(1.2,0.12,6.2),Color(1,1,1),Vector3(fx-side*0.5,2.7,z),false)
-	var jps=["コンビニ 24","ラーメン","本屋","カフェ"]; var ars=["كونبيني ٢٤ ساعة","مطعم رامن","مكتبة","كافيه"]
 	var ry=90.0 if side<0 else -90.0
 	if kind%2==0:
-		tag(jps[kind%4],Vector3(fx-side*0.85,3.05,z),ry,0.011,Color(1,1,1),jp)
-		tag(ars[kind%4],Vector3(fx-side*0.85,2.5,z),ry,0.008,Color(1,0.95,0.7),ar)
-	# hanging side sign (perpendicular), like the reference
-	box(self,Vector3(0.1,2.6,1.0),Color(1,1,1),Vector3(fx-side*1.0,4.8,z-2.7),true)
+		tag(["コンビニ 24","ラーメン","本屋","カフェ"][kind%4],Vector3(fx-side*0.85,3.05,z),ry,0.011,Color(1,1,1),jp)
+		tag(["كونبيني ٢٤ ساعة","مطعم رامن","مكتبة","كافيه"][kind%4],Vector3(fx-side*0.85,2.5,z),ry,0.008,Color(1,0.95,0.7),ar)
 
 func building(side:int,z:float,h:float,c:Color,i:int):
-	var w=7.0; var cx=side*13.5
-	box(self,Vector3(w,h,8.6),c,Vector3(cx,h/2,z))
-	box(self,Vector3(w+0.5,0.45,9.0),c.darkened(0.25),Vector3(cx,h+0.22,z))
-	var fx=cx-side*(w/2+0.06)
-	var ry=90.0 if side<0 else -90.0
-	for f in range(1,int((h-3.2)/2.6)+1):
-		var y=3.6+(f-1)*2.6
-		box(self,Vector3(0.08,0.3,8.6),c.darkened(0.12),Vector3(fx,y-1.15,z),false)
-		for k in range(3):
-			var wz=z+(k-1)*2.6
-			var lit=(f+k+i)%4==0
-			box(self,Vector3(0.1,1.5,1.7),Color(0.3,0.38,0.5),Vector3(fx,y,wz),false)
-			box(self,Vector3(0.12,1.3,1.5),Color(1,0.93,0.62) if lit else Color(0.62,0.82,0.95),Vector3(fx-side*0.02,y,wz),false)
-			box(self,Vector3(0.14,0.06,1.5),Color(0.9,0.9,0.95),Vector3(fx-side*0.03,y,wz),false)
-		if (f+i)%2==0:
-			box(self,Vector3(1.2,0.1,5.6),Color(0.82,0.82,0.85),Vector3(fx-side*0.6,y-0.8,z),false)
-			box(self,Vector3(0.06,0.9,5.6),Color(0.35,0.4,0.45),Vector3(fx-side*1.18,y-0.4,z),false)
-			box(self,Vector3(0.7,0.55,0.7),Color(0.9,0.9,0.92),Vector3(fx-side*0.4,y-0.55,z+1.3),true)
-	box(self,Vector3(1.6,1.4,1.6),Color(0.7,0.74,0.78),Vector3(cx,h+1.1,z-1.5),true)
-	for k in range(3): box(self,Vector3(0.9,0.5,0.6),Color(0.8,0.82,0.85),Vector3(cx-side*1.5,h+0.7,z+k*1.7-1.7),false)
-	line(Vector3(fx-side*0.25,h,z-3.8),Vector3(fx-side*0.25,0.3,z-3.8),0.07,Color(0.5,0.5,0.55))
+	var cols=[Color(0.95,0.3,0.3),Color(0.25,0.55,0.95),Color(0.35,0.75,0.5),Color(0.95,0.7,0.2)]
+	var kind:=i+(1 if side>0 else 0)
+	var vi:int=clampi(int(round((h-7.0)/2.2)),0,4)
+	pglb("bld_"+str(vi),Vector3(side*13.5,0,z),0.0 if side<0 else 180.0,c,cols[kind%4])
 
 func build_street():
 	batching=true
@@ -204,13 +189,7 @@ func lamp(p:Vector3):
 	var m:=mesh(self,sph(0.28),Color(1,0.9,0.6),p+Vector3(0,3.5,0),false)
 
 func sakura(p:Vector3,i:int):
-	var t:=Node3D.new(); t.position=p; add_child(t)
-	mesh(t,cap(0.22,3.2),Color(0.45,0.3,0.3),Vector3(0,1.6,0),true,0.03)
-	var pk=[Color(1,0.72,0.82),Color(1,0.8,0.88),Color(0.98,0.65,0.78)]
-	for k in range(4):
-		var a=k*1.57+i
-		mesh(t,sph(1.1),pk[(k+i)%3],Vector3(cos(a)*0.9,3.6+(k%2)*0.5,sin(a)*0.9),true,0.03)
-	mesh(t,sph(1.3),pk[i%3],Vector3(0,4.4,0),true,0.03)
+	pglb("sakura_"+str(i%3),p,float(i*47))
 
 func limb(parent:Node,pos:Vector3,len:float,r:float,c:Color)->Node3D:
 	var pivot:=Node3D.new(); pivot.position=pos; parent.add_child(pivot)
