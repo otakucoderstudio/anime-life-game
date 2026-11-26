@@ -732,7 +732,7 @@ func update_peds(dt:float):
 
 var save_t:=0.0
 func save_game():
-	var d={'stats':stats,'inv':inv,'aff':aff,'aff_day':aff_day,'rel_seen':rel_seen,'min':hud_min,'outfit':outfit_i,'qday':qday,'qp':qp,'qdone':qdone,'year':year_shown,'owned':owned.keys(),'energy':energy,'who':who_pick,'read':read_ids.keys()}
+	var d={'stats':stats,'inv':inv,'aff':aff,'aff_day':aff_day,'rel_seen':rel_seen,'min':hud_min,'outfit':outfit_i,'qday':qday,'qp':qp,'qdone':qdone,'year':year_shown,'owned':owned.keys(),'energy':energy,'who':who_pick,'read':read_ids.keys(),'px':(street_ret.x if in_room!='' else player.position.x),'pz':(street_ret.z if in_room!='' else player.position.z)}
 	var f=FileAccess.open('user://save.json',FileAccess.WRITE)
 	if f: f.store_string(JSON.stringify(d))
 func load_game():
@@ -743,7 +743,8 @@ func load_game():
 	for k in d.get('inv',{}): inv[k]=int(d.inv[k])
 	for k in d.get('aff',{}): aff[k]=int(d.aff[k])
 	aff_day=d.get('aff_day',{}); rel_seen=d.get('rel_seen',{})
-	hud_min=float(d.get('min',hud_min)); energy=int(d.get('energy',energy))
+	hud_min=float(d.get('min',hud_min)); if d.has('px') and in_room=='': player.position=Vector3(clampf(float(d.px),-8.0,60.0),0,clampf(float(d.pz),-118.0,4.0))
+	energy=int(d.get('energy',energy))
 	for k in d.get('read',[]): read_ids[k]=true
 	qday=int(d.get('qday',-1)); qp=d.get('qp',{}); qdone=d.get('qdone',{}); year_shown=bool(d.get('year',false))
 	for k in d.get('owned',[]): owned[int(k)]=true
