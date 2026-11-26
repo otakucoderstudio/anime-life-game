@@ -659,7 +659,11 @@ func update_cars(dt:float):
 		var pp:float=player.position.z if st[0] else player.position.x
 		var lat:float=absf((player.position.x-st[1]) if st[0] else (player.position.z-st[1]))
 		var ahead:float=(pp-c.t)*c.dir
-		if in_room=='' and lat<4.0 and ahead>0.0 and ahead<9.0: sp=0.0
+		if in_room=='' and lat<4.0 and ahead>0.0 and ahead<9.0:
+			sp=0.0
+			c['hk']=c.get('hk',0.0)+dt
+			if c['hk']>1.6 and c['hk']-dt<=1.6 and player.position.distance_to(c.n.position)<14.0: sfx('horn',0.95+randf()*0.2)
+		else: c['hk']=0.0
 		c.t+=c.dir*sp*dt
 		if c.t>hi: c.t=lo
 		if c.t<lo: c.t=hi
@@ -1432,7 +1436,7 @@ func show_settings():
 var mus:AudioStreamPlayer; var amb:AudioStreamPlayer; var sfxp:Array=[]; var sfx_i:=0; var snd:={}
 var foot_t:=0.0
 func build_audio():
-	for n in ["music_street","music_cafe","amb_cafe","amb_street","foot","bong","click1","click2","open"]:
+	for n in ["music_street","music_cafe","amb_cafe","amb_street","foot","bong","click1","click2","open","horn"]:
 		var st=load("res://audio/%s.ogg"%n)
 		if st==null: continue
 		if n.begins_with("music") or n.begins_with("amb"): st.loop=true
