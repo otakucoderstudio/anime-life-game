@@ -217,7 +217,46 @@ func limb(parent:Node,pos:Vector3,len:float,r:float,c:Color)->Node3D:
 	mesh(pivot,cap(r,len),c,Vector3(0,-len/2,0),true,0.02)
 	return pivot
 
+
+var cshader:Shader
+var cmats:={}
+func cmat(skin:Color,hair:Color,top:Color,bot:Color,acc:Color,iris:Color)->Material:
+	var key:=str([skin,hair,top,bot,acc,iris])
+	if cmats.has(key): return cmats[key]
+	if cshader==null: cshader=load("res://char.gdshader")
+	var m:=ShaderMaterial.new(); m.shader=cshader
+	m.set_shader_parameter("p_skin",Vector3(skin.r,skin.g,skin.b)); m.set_shader_parameter("p_hair",Vector3(hair.r,hair.g,hair.b))
+	m.set_shader_parameter("p_top",Vector3(top.r,top.g,top.b)); m.set_shader_parameter("p_bot",Vector3(bot.r,bot.g,bot.b))
+	m.set_shader_parameter("p_acc",Vector3(acc.r,acc.g,acc.b)); m.set_shader_parameter("p_iris",Vector3(iris.r,iris.g,iris.b))
+	var o:=ShaderMaterial.new(); o.shader=outl; o.set_shader_parameter("thickness",0.02); m.next_pass=o
+	cmats[key]=m; return m
+func load_char(kind:String,mt:Material)->Dictionary:
+	var ps:PackedScene=load("res://chars/"+kind+".glb")
+	var inst:Node3D=ps.instantiate()
+	var root:=Node3D.new(); var d:={}
+	var found:={}
+	_collect(inst,found)
+	for k in found.keys():
+		var mi:MeshInstance3D=found[k]
+		mi.get_parent().remove_child(mi)
+		mi.material_override=mt
+		root.add_child(mi)
+		mi.transform=Transform3D(Basis(),mi.position) if false else mi.transform
+		d[k]=mi
+	inst.free()
+	d.root=root
+	return d
+func _collect(n:Node,out:Dictionary):
+	if n is MeshInstance3D: out[String(n.name)]=n
+	for c in n.get_children(): _collect(c,out)
 func make_girl(skin:Color,hair:Color,top:Color,skirtc:Color,ribbon:Color,long_hair:=true)->Dictionary:
+	var iris:=Color(0.35,0.2,0.65) if hair.v<0.5 else Color(0.2,0.45,0.7)
+	return load_char("girl_long" if long_hair else "girl_bob",cmat(skin,hair,top,skirtc,ribbon,iris))
+func make_boy(skin:Color,hair:Color,spiky:bool,tie:=Color(0.7,0.1,0.15))->Dictionary:
+	var iris:=Color(0.25,0.35,0.2) if spiky else Color(0.2,0.25,0.55)
+	return load_char("boy_spiky" if spiky else "boy_soft",cmat(skin,hair,Color(0.14,0.22,0.45),Color(0.5,0.52,0.56),tie,iris))
+
+func make_girl_old(skin:Color,hair:Color,top:Color,skirtc:Color,ribbon:Color,long_hair:=true)->Dictionary:
 	var root:=Node3D.new()
 	var sock=Color(0.97,0.97,1)
 	var d:={}
@@ -253,7 +292,7 @@ func make_girl(skin:Color,hair:Color,top:Color,skirtc:Color,ribbon:Color,long_ha
 	d.root=root
 	return d
 
-func make_boy(skin:Color,hair:Color,spiky:bool,tie:=Color(0.7,0.1,0.15))->Dictionary:
+func make_boy_old(skin:Color,hair:Color,spiky:bool,tie:=Color(0.7,0.1,0.15))->Dictionary:
 	var root:=Node3D.new(); var d:={}
 	var navy=Color(0.17,0.3,0.6); var grey=Color(0.5,0.52,0.56)
 	d.legl=limb(root,Vector3(-0.14,0.95,0),0.95,0.09,grey); d.legr=limb(root,Vector3(0.14,0.95,0),0.95,0.09,grey)
@@ -315,15 +354,13 @@ func spawn_npcs():
 		var gl:=TorusMesh.new(); gl.inner_radius=0.075; gl.outer_radius=0.095
 		var gm:=mesh(ay.root,gl,Color(0.2,0.1,0.3),Vector3(sx*0.15,1.98,0.35),false); gm.rotation_degrees.x=90
 	add_npc(ay.root,Vector3(-1.5,0,-26),"gate","",[["أياني","صباح الخير. انت الطالب الجديد؟ أنا أياني، رئيسة الفصل.","rana_calm"],["أياني","الفصل كله بيتقيّم بالنقاط. خلي بالك، أنا مش هسيبك تسبقني بسهولة.","rana_close"],["أياني","بس لو احتجت حاجة قولي. يلا بينا نشوف المدرسة.","rana_smile",[["أرد بثقة","العلاقات",5],["أسكت وأمشي","الدراسة",3]]]])
-	var ka:=make_boy(Color(0.82,0.58,0.4),Color(0.42,0.24,0.12),true)
+	var ka:=make_boy(Color(0.9,0.68,0.52),Color(0.42,0.24,0.12),true)
 	add_npc(ka.root,Vector3(1.5,0,-58),"front","",[["كايتو","يا باشا! أنا كايتو، قاعد جنبك في الفصل.","youssef_laugh"],["كايتو","متقلقش، هعرّفك على كل حاجة. أول حاجة: الكافيه بعد المدرسة عليّ!","youssef_smile"],["كايتو","بس أياني دي شكلها هتبقى منافستك الأولى، خلي بالك 😄","youssef_joy"]])
-	var ka2:=make_boy(Color(0.82,0.58,0.4),Color(0.42,0.24,0.12),true)
+	var ka2:=make_boy(Color(0.9,0.68,0.52),Color(0.42,0.24,0.12),true)
 	add_npc(ka2.root,Vector3(-1.5,0,-73),"cafe","",[["كايتو","ده كافيه الهدوء. أحلى قهوة في ساكورا هيل. تحب نقعد؟","youssef_joy",[["نقعد ونتكلم","العلاقات",10],["نذاكر سوا","الدراسة",10]]]])
 	var ay2:=make_girl(Color(1,0.88,0.8),Color(0.45,0.2,0.65),Color(0.17,0.3,0.6),Color(0.5,0.52,0.56),Color(0.85,0.1,0.15),true)
 	add_npc(ay2.root,Vector3(1.5,0,-88),"class","",[["أياني","ده فصلنا. أول امتحان بعد أسبوع، استعد.","rana_think",[["أذاكر معاها","الدراسة",10],["أنا هتصرف","الصحة",3]]]])
-	var cat:=Node3D.new()
-	mesh(cat,sph(0.22),Color(1,0.95,0.9),Vector3(0,0.22,0)); mesh(cat,sph(0.15),Color(1,0.95,0.9),Vector3(0,0.42,0.2))
-	for sx in [-1,1]: mesh(cat,sph(0.05),Color(1,0.7,0.5),Vector3(sx*0.09,0.58,0.2))
+	var cat:Node3D=load_char("cat",cmat(Color(1,0.95,0.9),Color(0.95,0.6,0.35),Color(1,1,1),Color(1,1,1),Color(1,1,1),Color(0.3,0.6,0.35))).root
 	add_npc(cat,Vector3(1.8,0,-12),"momo","",[["مومو","مياو! 🐱 (القطة مومو بتحك نفسها في رجلك)","youssef_joy",[["أحضنها","الصحة",5],["أديها أكل","العلاقات",4]]]])
 	no_outline=false
 func _nox():
@@ -560,6 +597,13 @@ func _physics_process(_d):
 		if frames==40 and 'stats' in OS.get_cmdline_user_args(): advance(); choose(0); mode='stats'; stats_layer.visible=true; stats_layer.get_meta('pc').queue_redraw()
 		if frames==59 and "front" in OS.get_cmdline_user_args():
 			cam.position=player.position+Vector3(0.9,2.0,-3.0); cam.fov=40; cam.look_at(player.position+Vector3(0,1.7,0)); get_tree().root.set_meta('x',true); player.rotation.y=2.9
+		if frames==30 and 'cast' in OS.get_cmdline_user_args():
+			var ni:=1 if 'k1' in OS.get_cmdline_user_args() else (4 if 'k4' in OS.get_cmdline_user_args() else 0)
+			var tp:Vector3=npcs[ni].n.position; player.position=tp+Vector3(0,0,9); scene_layer.visible=false; mode='play'
+		if frames>=50 and frames<=59 and 'cast' in OS.get_cmdline_user_args():
+			var ni2:=1 if 'k1' in OS.get_cmdline_user_args() else (4 if 'k4' in OS.get_cmdline_user_args() else 0)
+			var nn:Node3D=npcs[ni2].n; nn.rotation.y=0; player.visible=false; get_tree().root.set_meta("x",true)
+			cam.position=nn.position+Vector3(0.6,2.0,3.6); cam.fov=40; cam.look_at(nn.position+Vector3(0,1.45,0))
 		if frames==40 and 'map' in OS.get_cmdline_user_args(): mode='play'; open_map()
 		if frames==40 and 'phone' in OS.get_cmdline_user_args(): mode='play'; open_phone()
 		if frames==40 and 'msgs' in OS.get_cmdline_user_args(): mode='play'; open_msgs()
@@ -851,7 +895,7 @@ func room_extras(kind:String):
 	no_outline=false
 	match kind:
 		'cafe':
-			var ka:=make_boy(Color(0.82,0.58,0.4),Color(0.42,0.24,0.12),true)
+			var ka:=make_boy(Color(0.9,0.68,0.52),Color(0.42,0.24,0.12),true)
 			spawn_room_npc(kind,ka.root,Vector3(-3.2,0,1.8),"r_cafe_k",[["كايتو","اتأخرت! اقعد، النهاردة عليّ. تحب تشتغل ورديّة هنا بعد القهوة؟","youssef_joy",[["أقعد معاه","العلاقات",8,-1],["أشتغل ورديّة باريستا","الفلوس",15,-2]]]],3.14)
 		'konbini','store':
 			var cs:=make_girl(Color(1,0.88,0.8),Color(0.3,0.25,0.2),Color(0.2,0.6,0.35),Color(0.2,0.6,0.35),Color(1,1,1),false)
