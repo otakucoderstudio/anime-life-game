@@ -651,6 +651,7 @@ func update_peds(dt:float):
 func _process(dt):
 	for n in npcs: n.n.visible=in_room=='' and player.position.distance_to(n.n.position)<14.0
 	if peds.size()>0: update_peds(dt)
+	if city_map and city_map.visible and map_layer.visible: city_dot.queue_redraw()
 	if mode!='play':
 		if mode=='scene': return
 		return
@@ -717,6 +718,7 @@ func _physics_process(_d):
 			var nn:Node3D=npcs[ni2].n; nn.rotation.y=0; player.visible=false; get_tree().root.set_meta("x",true)
 			cam.position=nn.position+Vector3(0.6,2.0,3.6); cam.fov=40; cam.look_at(nn.position+Vector3(0,1.45,0))
 		if frames==40 and 'map' in OS.get_cmdline_user_args(): mode='play'; open_map()
+		if frames==42 and 'city' in OS.get_cmdline_user_args(): city_map.visible=true; player.position=Vector3(0,0,-60)
 		if frames==40 and 'phone' in OS.get_cmdline_user_args(): mode='play'; open_phone()
 		if frames==40 and 'msgs' in OS.get_cmdline_user_args(): mode='play'; open_msgs()
 		for rk in ['cafe','konbini','home','class','store']:
@@ -744,7 +746,7 @@ var street_ret:=Vector3.ZERO
 var street_npcs:=[]
 var exit_btn:Button
 var hearts:Control
-var phone_layer:Control; var map_layer:Control; var msg_layer:Control; var phone_btn:Control; var badge:Label
+var city_map:TextureRect; var city_dot:Control; var phone_layer:Control; var map_layer:Control; var msg_layer:Control; var phone_btn:Control; var badge:Label
 var msgs:=[]
 var read_ids:={}
 var travel_note:Label
@@ -798,6 +800,20 @@ func build_phone():
 		for st in ["normal","hover","pressed"]: b.add_theme_stylebox_override(st,sbm)
 		for st in ["font_color","font_hover_color","font_pressed_color"]: b.add_theme_color_override(st,Color(0.15,0.08,0.2))
 		var key:String=p[1]; b.pressed.connect(func(): travel(key)); map_layer.add_child(b)
+	# city grid minimap
+	var cm:=TextureRect.new(); cm.texture=img_tex("res://art/citymap.png"); cm.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+	var cw:=vs.x-40.0; var ch:=cw*0.6
+	cm.size=Vector2(cw,ch); cm.position=Vector2(20,(vs.y-ch)/2+20); cm.visible=false; map_layer.add_child(cm); city_map=cm
+	var dot:=Control.new(); dot.size=cm.size; dot.mouse_filter=Control.MOUSE_FILTER_IGNORE; cm.add_child(dot); city_dot=dot
+	dot.draw.connect(func():
+		var px:=(player.position.x+116.0)/232.0*dot.size.x
+		var pz:=(8.0-player.position.z)/232.0/0.99*dot.size.x
+		dot.draw_circle(Vector2(px,pz),dot.size.x*0.012+3,Color(1,1,1)); dot.draw_circle(Vector2(px,pz),dot.size.x*0.009,Color(1,0.2,0.35)))
+	var names=[["شارع الساكورا",0.0,-60.0],["شارع الأمل",-70.0,-60.0],["شارع النور",70.0,-60.0]]
+	for nm in names:
+		var l:=lbl(nm[0],22,Vector2((nm[1]+116.0)/232.0*cw-70,ch*0.015),Color(0.25,0.1,0.3)); l.size=Vector2(140,30); l.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER; cm.add_child(l)
+	var tg:=Button.new(); tg.text="مدينتي"; tg.size=Vector2(170,52); tg.position=Vector2(vs.x-200,10); tg.add_theme_font_override("font",ar); tg.add_theme_font_size_override("font_size",26)
+	tg.pressed.connect(func(): city_map.visible=not city_map.visible; tg.text=("الأماكن" if city_map.visible else "مدينتي")); map_layer.add_child(tg)
 	var back:=Button.new(); back.text="رجوع"; back.size=Vector2(140,52); back.position=Vector2(30,10); back.add_theme_font_override("font",ar); back.add_theme_font_size_override("font_size",26)
 	back.pressed.connect(func(): map_layer.visible=false; phone_layer.visible=true; mode='phone'); map_layer.add_child(back)
 	# messages
