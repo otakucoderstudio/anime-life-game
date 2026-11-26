@@ -655,7 +655,12 @@ func spawn_cars():
 func update_cars(dt:float):
 	for c in cars:
 		var st:Array=ped_streets[c.si]; var lo:float=minf(st[2],st[3]); var hi:float=maxf(st[2],st[3])
-		c.t+=c.dir*7.0*dt
+		var sp:=7.0
+		var pp:float=player.position.z if st[0] else player.position.x
+		var lat:float=absf((player.position.x-st[1]) if st[0] else (player.position.z-st[1]))
+		var ahead:float=(pp-c.t)*c.dir
+		if in_room=='' and lat<4.0 and ahead>0.0 and ahead<9.0: sp=0.0
+		c.t+=c.dir*sp*dt
 		if c.t>hi: c.t=lo
 		if c.t<lo: c.t=hi
 		var off:float=2.3*c.dir*(1.0 if st[0] else -1.0)
