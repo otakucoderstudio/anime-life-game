@@ -711,6 +711,17 @@ func update_peds(dt:float):
 				if d>1e8: pass
 		place_ped(p)
 		n.visible=in_room=='' and player.position.distance_to(n.position)<32.0
+		if not p.has("bub"):
+			var lb:=Label3D.new(); lb.font=ar; lb.font_size=64; lb.pixel_size=0.007; lb.billboard=BaseMaterial3D.BILLBOARD_ENABLED; lb.no_depth_test=true; lb.modulate=Color(1,1,1); lb.outline_modulate=Color(0.25,0.1,0.2); lb.outline_size=14; lb.position=Vector3(0,2.9,0); lb.visible=false; n.add_child(lb); p["bub"]=lb; p["bt"]=0.0; p["gday"]=-1
+		var bl:Label3D=p.bub
+		if p.bt>0.0:
+			p.bt-=dt
+			if p.bt<=0.0: bl.visible=false
+		elif in_room=='' and mode=='play' and player.position.distance_to(n.position)<2.6:
+			var gd:=int(hud_min/1440.0)
+			var greets=["صباح الخير!","أهلاً يا جميل","يوم حلو النهاردة","مساء الخير","منور الحي!","سلام!"]
+			bl.text=greets[randi()%greets.size()]; bl.visible=true; p.bt=2.5
+			if p.gday!=gd: p.gday=gd; stats['المجتمع']=clampi(stats['المجتمع']+1,0,100)
 		var sw:=sin(Time.get_ticks_msec()*0.006+p.ph)*0.6
 		var dd2:Dictionary=p.d
 		dd2.legl.rotation.x=sw; dd2.legr.rotation.x=-sw; dd2.arml.rotation.x=-sw*0.8; dd2.armr.rotation.x=sw*0.8
@@ -824,6 +835,7 @@ func _physics_process(_d):
 		if frames==20 and 'newst' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(-68.5,0,-14); player.rotation.y=PI
 		if frames==20 and 'snow' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20); hud_min=21*1440.0+600.0
 		if frames==20 and 'cars' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-22); cars[0].t=-30.0; cars[1].t=-34.0
+		if frames==20 and 'greet' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; peds[0].si=0; peds[0].off=7.5; peds[0].t=-20.0; player.position=Vector3(7.5,0,-16.5)
 		if frames==20 and 'street' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20)
 		if frames==20 and 'park' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(34.5,0,-4.5)
 		if frames==20 and 'world' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-30)
