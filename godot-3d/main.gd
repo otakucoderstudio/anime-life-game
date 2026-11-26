@@ -789,7 +789,7 @@ func _physics_process(_d):
 		if frames==40 and 'phone7' in OS.get_cmdline_user_args(): mode='play'; open_phone()
 		if frames==42 and 'city' in OS.get_cmdline_user_args(): city_map.visible=true; player.position=Vector3(0,0,-60)
 		if frames==40 and 'phone' in OS.get_cmdline_user_args(): mode='play'; open_phone()
-		if frames==40 and 'msgs' in OS.get_cmdline_user_args(): mode='play'; open_msgs()
+		if frames==40 and 'msgs' in OS.get_cmdline_user_args(): mode='play'; hud_min=30300.0; open_msgs()
 		for rk in ['cafe','konbini','home','class','store']:
 			if frames==36 and rk in OS.get_cmdline_user_args(): mode='play'; scene_done.clear(); travel({'class':'school'}.get(rk,rk))
 			if frames==50 and rk in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'
@@ -898,7 +898,12 @@ func build_phone():
 	msgs=[
 	{"id":"m1","from":"كايتو","text":"تيجي الكافيه بعد المدرسة؟ أنا حاجز لنا الترابيزة اللي جنب الشباك","after":0,"face":"youssef_smile","bg":"in_cafe","lines":[["كايتو","أخيراً جيت! اطلب أي حاجة، النهاردة عليّ.","youssef_joy",[["أطلب قهوة وأقعد معاه","العلاقات",8,-1],["أسأله لو في شغل هنا","الفلوس",5,-1]]]]},
 	{"id":"m2","from":"أياني","text":"تنبيه مذاكرة: الامتحان بعد أسبوع. مش هسيبك تسبقني.","after":720,"face":"rana_think","bg":"school_hall","lines":[["أياني","فاكر الامتحان؟ أنا بذاكر من ٣ أيام.","rana_think",[["أذاكر معاها","الدراسة",10,-1],["أنا هتصرف","الصحة",3,0]]]]},
-	{"id":"m3","from":"مومو","text":"مياو! القطة مومو واقفة قدام البيت وعايزة أكل","after":1500,"face":"youssef_joy","bg":"in_room","lines":[["أنا","مومو جت تسلم عليا. هديها شوية لبن.","%s","[]"]]}]
+	{"id":"m3","from":"مومو","text":"مياو! القطة مومو واقفة قدام البيت وعايزة أكل","after":1500,"face":"youssef_joy","bg":"in_room","lines":[["أنا","مومو جت تسلم عليا. هديها شوية لبن.","%s","[]"]]},
+	{"id":"m4","from":"أياني","text":"مهرجان المدرسة الأسبوع الجاي! محتاجة حد يساعدني في الزينة","after":4320,"face":"rana_smile","bg":"school_hall","lines":[["أياني","المهرجان بعد أسبوع، وأنا مسؤولة عن الزينة. مش هقدر أعملها لوحدي.","rana_calm"],["أياني","ممكن تساعدني؟ مش تفتكر إني محتاجاك، بس الشغل كتير.","rana_smile",[["أساعدها في الزينة","العلاقات",10],["أراجع للامتحان","الدراسة",8]]]]},
+	{"id":"m5","from":"كايتو","text":"الصيف جه! تعالى نروح نلعب كورة في الحديقة","after":10080,"face":"youssef_joy","bg":"ex_hill","lines":[["كايتو","الصيف بدأ يا باشا! الجو حر بس الحديقة حلوة.","youssef_laugh"],["كايتو","هات مية وتعالى نلعب شوية.","youssef_joy",[["أروح ألعب","الصحة",10],["أقعد في الكافيه","العلاقات",6]]]]},
+	{"id":"m6","from":"هدى","text":"وصل كتب جديدة في مكتبة النور. تعالى شوفهم","after":14400,"face":"rana_calm","bg":"in_room","lines":[["هدى","وصلتني كتب جديدة النهاردة، بتاعة حكايات وقصص.","rana_calm"],["هدى","لو جيت المكتبة هسيبلك تقرا الأول.","rana_smile",[["أروح أقرا","الدراسة",8],["بعدين","المجتمع",2]]]]},
+	{"id":"m7","from":"مومو","text":"مياو مياو! مومو ضاعت في الخريف وسط الورق!","after":18000,"face":"youssef_joy","bg":"in_room","lines":[["أنا","مومو مش في مكانها. دورت عليها في الورق الأحمر والبرتقالي.","%s"],["أنا","لقيتها نايمة تحت الشجرة! 🐱","%s",[["أحملها وأرجعها","الصحة",6],["أصورها","المجتمع",5]]]]},
+	{"id":"m8","from":"أياني","text":"أول تلج النهاردة! تعالى المدرسة نعمل رجل تلج","after":30240,"face":"rana_smile","bg":"school_front","lines":[["أياني","التلج نزل! أول مرة أشوفه بالشكل ده في ساكورا هيل.","rana_smile"],["أياني","تعالى نعمل رجل تلج قدام المدرسة، من غير ما حد يشوفنا 😄","rana_smile",[["أروح معاها","العلاقات",10],["أستنى جوا","الصحة",3]]]]}]
 	refresh_badge()
 func new_msgs()->Array:
 	var out:=[]
@@ -920,9 +925,12 @@ func open_msgs():
 	for c in msg_layer.get_children():
 		if c.has_meta("row"): c.queue_free()
 	var vs:=get_viewport().get_visible_rect().size; var y:=90.0
+	var shown:=[]
 	for m in msgs:
-		if hud_min<480+m.after: continue
-		var b:=Button.new(); b.set_meta("row",true); b.size=Vector2(vs.x-120,92); b.position=Vector2(60,y); y+=104
+		if hud_min>=480+m.after: shown.append(m)
+	shown.reverse(); shown=shown.slice(0,5)
+	for m in shown:
+		var b:=Button.new(); b.set_meta("row",true); b.size=Vector2(vs.x-120,74); b.position=Vector2(60,y); y+=84
 		var done=read_ids.has(m.id)
 		b.text=m.from+": "+m.text+("" if done else "  ●")
 		b.add_theme_font_override("font",ar); b.add_theme_font_size_override("font_size",24); b.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
