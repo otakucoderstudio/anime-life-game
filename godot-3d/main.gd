@@ -751,7 +751,15 @@ func _process(dt):
 	if mode=='play' and not ('shot' in OS.get_cmdline_user_args()):
 		save_t+=dt
 		if save_t>15.0: save_t=0.0; save_game()
-	for n in npcs: n.n.visible=in_room=='' and player.position.distance_to(n.n.position)<14.0
+	for n in npcs:
+		n.n.visible=in_room=='' and player.position.distance_to(n.n.position)<14.0
+		if n.n.visible and n.key!='momo':
+			var ph:float=float(n.n.get_instance_id()%97)
+			var tt:float=Time.get_ticks_msec()*0.0021+ph
+			n.n.scale=Vector3(1.0,1.0+0.012*sin(tt),1.0)
+			var al=n.n.get_node_or_null("arml"); var ar2=n.n.get_node_or_null("armr")
+			if al: al.rotation.z=0.06+0.05*sin(tt+0.8)
+			if ar2: ar2.rotation.z=-0.06-0.05*sin(tt+0.8)
 	if peds.size()>0: update_peds(dt)
 	if cars.size()>0: update_cars(dt)
 	if city_map and city_map.visible and map_layer.visible: city_dot.queue_redraw()
