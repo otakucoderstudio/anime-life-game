@@ -249,9 +249,9 @@ func load_char(kind:String,mt:Material)->Dictionary:
 func _collect(n:Node,out:Dictionary):
 	if n is MeshInstance3D: out[String(n.name)]=n
 	for c in n.get_children(): _collect(c,out)
-func make_girl(skin:Color,hair:Color,top:Color,skirtc:Color,ribbon:Color,long_hair:=true)->Dictionary:
+func make_girl(skin:Color,hair:Color,top:Color,skirtc:Color,ribbon:Color,long_hair:=true,glasses:=false)->Dictionary:
 	var iris:=Color(0.35,0.2,0.65) if hair.v<0.5 else Color(0.2,0.45,0.7)
-	return load_char("girl_long" if long_hair else "girl_bob",cmat(skin,hair,top,skirtc,ribbon,iris))
+	return load_char(("girl_long" if long_hair else "girl_bob")+("_g" if glasses else ""),cmat(skin,hair,top,skirtc,ribbon,iris))
 func make_boy(skin:Color,hair:Color,spiky:bool,tie:=Color(0.7,0.1,0.15))->Dictionary:
 	var iris:=Color(0.25,0.35,0.2) if spiky else Color(0.2,0.25,0.55)
 	return load_char("boy_spiky" if spiky else "boy_soft",cmat(skin,hair,Color(0.14,0.22,0.45),Color(0.5,0.52,0.56),tie,iris))
@@ -332,11 +332,8 @@ func build_player():
 	no_outline=true
 	yo_ref=make_boy(Color(0.82,0.58,0.4),Color(0.42,0.24,0.12),true)
 	var yo=yo_ref; yo.root.position=Vector3(2.2,0,-2.0); yo.root.rotation_degrees.y=200; add_child(yo.root)
-	var ra:=make_girl(Color(1,0.88,0.8),Color(0.45,0.2,0.65),Color(0.17,0.3,0.6),Color(0.5,0.52,0.56),Color(0.85,0.1,0.15),true)
+	var ra:=make_girl(Color(1,0.88,0.8),Color(0.45,0.2,0.65),Color(0.17,0.3,0.6),Color(0.5,0.52,0.56),Color(0.85,0.1,0.15),true,true)
 	ra.root.position=Vector3(-2.2,0,-3.0); ra.root.rotation_degrees.y=160; add_child(ra.root)
-	for sx in [-1,1]:
-		var gl:=TorusMesh.new(); gl.inner_radius=0.06; gl.outer_radius=0.077
-		var gm:=mesh(ra.root,gl,Color(0.2,0.1,0.3),Vector3(sx*0.11,2.29,0.27),false); gm.rotation_degrees.x=90
 	for i in range(2):
 		var c=cols[i%3]; var n:=make_girl(c[0],c[1],c[2],c[3],c[4],i%2==0)
 		var side=-1 if i%2==0 else 1
@@ -349,16 +346,13 @@ func add_npc(node:Node3D,pos:Vector3,key:String,bg:String,lines:Array):
 	node.position=pos; add_child(node); npcs.append({"n":node,"key":key,"bg":bg,"lines":lines})
 func spawn_npcs():
 	no_outline=false
-	var ay:=make_girl(Color(1,0.88,0.8),Color(0.45,0.2,0.65),Color(0.17,0.3,0.6),Color(0.5,0.52,0.56),Color(0.85,0.1,0.15),true)
-	for sx in [-1,1]:
-		var gl:=TorusMesh.new(); gl.inner_radius=0.06; gl.outer_radius=0.077
-		var gm:=mesh(ay.root,gl,Color(0.2,0.1,0.3),Vector3(sx*0.11,2.29,0.27),false); gm.rotation_degrees.x=90
+	var ay:=make_girl(Color(1,0.88,0.8),Color(0.45,0.2,0.65),Color(0.17,0.3,0.6),Color(0.5,0.52,0.56),Color(0.85,0.1,0.15),true,true)
 	add_npc(ay.root,Vector3(-1.5,0,-26),"gate","",[["أياني","صباح الخير. انت الطالب الجديد؟ أنا أياني، رئيسة الفصل.","rana_calm"],["أياني","الفصل كله بيتقيّم بالنقاط. خلي بالك، أنا مش هسيبك تسبقني بسهولة.","rana_close"],["أياني","بس لو احتجت حاجة قولي. يلا بينا نشوف المدرسة.","rana_smile",[["أرد بثقة","العلاقات",5],["أسكت وأمشي","الدراسة",3]]]])
 	var ka:=make_boy(Color(0.9,0.68,0.52),Color(0.42,0.24,0.12),true)
 	add_npc(ka.root,Vector3(1.5,0,-58),"front","",[["كايتو","يا باشا! أنا كايتو، قاعد جنبك في الفصل.","youssef_laugh"],["كايتو","متقلقش، هعرّفك على كل حاجة. أول حاجة: الكافيه بعد المدرسة عليّ!","youssef_smile"],["كايتو","بس أياني دي شكلها هتبقى منافستك الأولى، خلي بالك 😄","youssef_joy"]])
 	var ka2:=make_boy(Color(0.9,0.68,0.52),Color(0.42,0.24,0.12),true)
 	add_npc(ka2.root,Vector3(-1.5,0,-73),"cafe","",[["كايتو","ده كافيه الهدوء. أحلى قهوة في ساكورا هيل. تحب نقعد؟","youssef_joy",[["نقعد ونتكلم","العلاقات",10],["نذاكر سوا","الدراسة",10]]]])
-	var ay2:=make_girl(Color(1,0.88,0.8),Color(0.45,0.2,0.65),Color(0.17,0.3,0.6),Color(0.5,0.52,0.56),Color(0.85,0.1,0.15),true)
+	var ay2:=make_girl(Color(1,0.88,0.8),Color(0.45,0.2,0.65),Color(0.17,0.3,0.6),Color(0.5,0.52,0.56),Color(0.85,0.1,0.15),true,true)
 	add_npc(ay2.root,Vector3(1.5,0,-88),"class","",[["أياني","ده فصلنا. أول امتحان بعد أسبوع، استعد.","rana_think",[["أذاكر معاها","الدراسة",10],["أنا هتصرف","الصحة",3]]]])
 	var cat:Node3D=load_char("cat",cmat(Color(1,0.95,0.9),Color(0.95,0.6,0.35),Color(1,1,1),Color(1,1,1),Color(1,1,1),Color(0.3,0.6,0.35))).root
 	add_npc(cat,Vector3(1.8,0,-12),"momo","",[["مومو","مياو! 🐱 (القطة مومو بتحك نفسها في رجلك)","youssef_joy",[["أحضنها","الصحة",5],["أديها أكل","العلاقات",4]]]])
@@ -906,7 +900,7 @@ func room_extras(kind:String):
 			spawn_room_npc(kind,cat,Vector3(0.5,0,1.0),"r_momo",[["مومو","مياو! (مومو جت تسلم عليك)","youssef_joy",[["أحضنها","الصحة",5,0],["أديها لبن","العلاقات",4,0]]]],0.5)
 			var bed:=Node3D.new(); spawn_room_npc(kind,bed,Vector3(-2.2,0,-1.2),"r_bed",[["أنا","كفاية النهاردة. أنام وأصحى بكرة بطاقة كاملة.",who_pick,[["أنام للصبح","الصحة",5,5]]]])
 		'class':
-			var ay:=make_girl(Color(1,0.88,0.8),Color(0.45,0.2,0.65),Color(0.17,0.3,0.6),Color(0.5,0.52,0.56),Color(0.85,0.1,0.15),true)
+			var ay:=make_girl(Color(1,0.88,0.8),Color(0.45,0.2,0.65),Color(0.17,0.3,0.6),Color(0.5,0.52,0.56),Color(0.85,0.1,0.15),true,true)
 			spawn_room_npc(kind,ay.root,Vector3(0.0,0,-2.0),"r_ayane",[["أياني","ده فصلنا. أول امتحان بعد أسبوع. هتذاكر معايا؟","rana_think",[["أذاكر معاها","الدراسة",10,-1],["أنا هتصرف","الصحة",3,0]]]],0.0)
 	no_outline=false
 func enter_room(kind:String):

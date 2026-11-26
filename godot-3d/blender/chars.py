@@ -38,11 +38,17 @@ def face(z=2.05,spiky=False,girl=True):
     ell(PINK,(0,-0.312,z-0.19),(0.028,0.01,0.007),(0,0,0),8,4)
 def build(kind):
     clear(); objs.clear()
+    glasses=kind.endswith('_g'); kind=kind.replace('_g','')
     girl=kind.startswith('girl'); H=2.05 if girl else 2.15
     # head
     h=ell(SK,(0,0,H),(0.33,0.31,0.35),seg=18,rings=11); taper_chin(h,H-0.05,0.28)
     ell(SK,(0,0.0,H-0.4),(0.075,0.075,0.12),seg=8,rings=5)
     face(H,girl=girl)
+    if glasses:
+        for sx in(-1,1):
+            bpy.ops.mesh.primitive_torus_add(major_radius=0.105,minor_radius=0.008,major_segments=20,minor_segments=6,location=(sx*0.135,-0.325,H-0.005),rotation=(math.radians(90),0,0))
+            o=bpy.context.object; bpy.ops.object.transform_apply(location=True,rotation=True,scale=True); bpy.ops.object.shade_smooth(); paint(o,DK); objs.append(o)
+        ell(DK,(0,-0.33,H+0.02),(0.04,0.012,0.012),seg=6,rings=4)
     # hair base
     ell(HA,(0,0.05,H+0.06),(0.385,0.37,0.37),seg=16,rings=10)
     ell(HA,(0,-0.07,H+0.2),(0.37,0.3,0.2),seg=14,rings=8)
@@ -78,9 +84,13 @@ def build(kind):
         ell(TOP,(0,-0.02,zt+0.25),(0.25,0.16,0.08),seg=12,rings=6)
         ell(ACC,(0,-0.16,zt+0.15),(0.06,0.03,0.04),(0,0,0),8,5)
         ell(ACC,(-0.07,-0.16,zt+0.15),(0.05,0.03,0.035),(0,0,25),6,4); ell(ACC,(0.07,-0.16,zt+0.15),(0.05,0.03,0.035),(0,0,-25),6,4)
+        ell(WH,(0,0,zt-0.27),(0.155,0.11,0.13),seg=12,rings=6)
+        ell(WH,(0,0,zt+0.2),(0.235,0.12,0.1),seg=12,rings=6)
         cone(BOT,(0,0,1.1),0.42,0.42,seg=20,r2=0.19)
     else:
         ell(TOP,(0,0,zt+0.02),(0.27,0.16,0.42),seg=14,rings=9)
+        ell(TOP,(0,0,zt+0.3),(0.31,0.15,0.12),seg=12,rings=6)
+        ell(TOP,(0,0,zt-0.2),(0.2,0.14,0.2),seg=12,rings=6)
         ell(WH,(0,-0.12,zt+0.3),(0.07,0.04,0.2),(0,0,0),8,6)
         ell(ACC,(0,-0.155,zt+0.22),(0.04,0.03,0.2),(0,0,0),8,6)
         ell(BOT,(0,0,1.08),(0.25,0.16,0.14),seg=12,rings=6)
@@ -91,8 +101,8 @@ def build(kind):
         jx,jy,jz=joint
         if isarm:
             sl=WH if girl else TOP
-            ell(sl,(jx,jy,jz-0.2),(0.085,0.085,0.25),seg=10,rings=6)
-            ell(sl,(jx,jy,jz-0.55),(0.07,0.07,0.22),seg=10,rings=6)
+            ell(sl,(jx,jy,jz-0.2),(0.072,0.072,0.25),seg=10,rings=6)
+            ell(sl,(jx,jy,jz-0.55),(0.06,0.06,0.22),seg=10,rings=6)
             ell(SK,(jx,jy,jz-0.8),(0.065,0.055,0.08),seg=8,rings=5)
         else:
             lc=SK if girl else BOT
