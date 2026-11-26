@@ -822,6 +822,7 @@ func _physics_process(_d):
 		if frames==40 and 'ward' in OS.get_cmdline_user_args(): mode='play'; apply_outfit(1); open_phone(); open_app(6)
 		if frames==40 and 'year' in OS.get_cmdline_user_args(): mode='play'; add_aff('أياني',7); stats['الدراسة']=80; hud_min=28*1440.0+600.0
 		if frames==40 and 'lib' in OS.get_cmdline_user_args(): mode='play'; scene_layer.visible=false; travel('library')
+		if frames==40 and 'bout' in OS.get_cmdline_user_args(): mode='play'; scene_layer.visible=false; travel('boutique')
 		if frames==40 and 'quest' in OS.get_cmdline_user_args(): mode='play'; qadd('talk','a'); qadd('park'); open_phone(); open_app(7)
 		if frames==40 and 'phone7' in OS.get_cmdline_user_args(): mode='play'; open_phone()
 		if frames==42 and 'city' in OS.get_cmdline_user_args(): city_map.visible=true; player.position=Vector3(0,0,-60)
@@ -904,7 +905,7 @@ func build_phone():
 	var mh:=vs.y-90.0; var mw:=mh*595.0/600.0; var mp:=Vector2(vs.x/2-mw/2,70)
 	var mt:=TextureRect.new(); mt.texture=img_tex("res://art/map.jpg"); mt.expand_mode=TextureRect.EXPAND_IGNORE_SIZE; mt.size=Vector2(mw,mh); mt.position=mp; map_layer.add_child(mt)
 	map_layer.add_child(lbl("خريطة تلة ساكورا",40,Vector2(vs.x/2-150,8),Color(0.9,0.3,0.4)))
-	var places=[["المدرسة","school",Vector2(160,70)],["البيت","home",Vector2(340,85)],["الكافيه","cafe",Vector2(180,315)],["السوبر ماركت","store",Vector2(500,380)],["الحديقة","park",Vector2(260,400)],["كونبيني","konbini",Vector2(330,290)],["المكتبة","library",Vector2(470,230)]]
+	var places=[["المدرسة","school",Vector2(160,70)],["البيت","home",Vector2(340,85)],["الكافيه","cafe",Vector2(180,315)],["السوبر ماركت","store",Vector2(500,380)],["الحديقة","park",Vector2(260,400)],["كونبيني","konbini",Vector2(330,290)],["المكتبة","library",Vector2(470,230)],["البوتيك","boutique",Vector2(105,235)]]
 	for p in places:
 		var b:=Button.new(); b.text=p[0]; b.size=Vector2(150,50); b.position=mp+p[2]*(mh/600.0)-Vector2(75,25)
 		b.add_theme_font_override("font",ar); b.add_theme_font_size_override("font_size",24)
@@ -995,7 +996,7 @@ func travel(key:String):
 		hud_min+=20.0; hud_clock.queue_redraw(); energy=mini(5,energy+1); hearts.queue_redraw()
 		if in_room!='': exit_room()
 		player.position=Vector3(14.0,0,-10.5); player.rotation.y=-PI/2; return
-	var rooms={"school":"class","home":"home","cafe":"cafe","store":"store","konbini":"konbini","library":"library"}
+	var rooms={"school":"class","home":"home","cafe":"cafe","store":"store","konbini":"konbini","library":"library","boutique":"boutique"}
 	if rooms.has(key):
 		hud_min+=30.0; hud_clock.queue_redraw(); enter_room(rooms[key]); return
 	var bgs={"school":"school_front","home":"in_room","cafe":"in_cafe","store":"in_store","park":"ex_hill","konbini":"ex_konbini"}
@@ -1023,6 +1024,7 @@ func build_room(kind:String):
 	batching=true
 	var floor_c:=Color(0.72,0.5,0.32); var wall_c:=Color(1,0.93,0.82)
 	if kind=='konbini' or kind=='store': floor_c=Color(0.92,0.94,0.98); wall_c=Color(0.85,0.95,1)
+	if kind=='boutique': floor_c=Color(0.95,0.85,0.88); wall_c=Color(1,0.9,0.95)
 	if kind=='library': floor_c=Color(0.6,0.42,0.3); wall_c=Color(0.95,0.88,0.75)
 	if kind=='class': floor_c=Color(0.8,0.65,0.45); wall_c=Color(0.95,0.95,0.88)
 	if kind=='home': floor_c=Color(0.85,0.7,0.55); wall_c=Color(1,0.88,0.92)
@@ -1048,6 +1050,7 @@ func build_room(kind:String):
 		'home': home_props(o)
 		'class': class_props(o)
 		'library': library_props(o)
+		'boutique': boutique_props(o)
 	prop_end()
 var pb:={}
 var pb_mat:={}
@@ -1125,6 +1128,16 @@ func class_props(o:Vector3):
 	prop(F,'trashcan',o+Vector3(4.6,0,3.2),0.0,S)
 	var lb:=Label3D.new(); lb.text="الفصل 2-أ"; lb.font=ar; lb.font_size=120; lb.pixel_size=0.006; lb.modulate=Color(1,1,0.9); lb.outline_modulate=Color(0.1,0.25,0.2); lb.outline_size=16
 	lb.position=o+Vector3(0,1.8,-4.0); add_child(lb)
+func boutique_props(o:Vector3):
+	var F:='furniture'; var S:=2.5
+	for k in range(5): prop(F,'coatRackStanding',o+Vector3(-3.6+k*1.8,0,-3.3),0.0,S)
+	for x in [-3.0,3.0]: prop(F,'loungeSofa',o+Vector3(x,0,2.4),3.14,S*0.8)
+	prop(F,'rugRound',o+Vector3(0,0.02,0.6),0.0,4.5)
+	for z in [-1.2,0.6]: prop(F,'coatRackStanding',o+Vector3(-4.7,0,z),1.57,S); prop(F,'coatRackStanding',o+Vector3(4.7,0,z),-1.57,S)
+	prop(F,'pottedPlant',o+Vector3(0,0,-1.2),0.0,S)
+	prop(F,'lampWall',o+Vector3(-5.1,2.5,0.5),1.57,S); prop(F,'lampWall',o+Vector3(5.1,2.5,0.5),-1.57,S)
+	var lb:=Label3D.new(); lb.text="بوتيك ساكورا"; lb.font=ar; lb.font_size=140; lb.pixel_size=0.006; lb.modulate=Color(1,0.7,0.85); lb.outline_modulate=Color(0.3,0.1,0.2); lb.outline_size=24
+	lb.position=o+Vector3(0.0,2.9,-4.0); add_child(lb)
 func library_props(o:Vector3):
 	var F:='furniture'; var S:=2.5
 	for k in range(4): prop(F,'bookcaseClosedWide',o+Vector3(-3.6+k*2.4,0,-3.7),0.0,S)
@@ -1169,6 +1182,9 @@ func room_extras(kind:String):
 		'konbini','store':
 			var cs:=make_girl(Color(1,0.88,0.8),Color(0.3,0.25,0.2),Color(0.2,0.6,0.35),Color(0.2,0.6,0.35),Color(1,1,1),false)
 			spawn_room_npc(kind,cs.root,Vector3(-3.5,0,-2.3),"r_shop",[["البائعة","أهلاً وسهلاً! اتفضل، عروض النهاردة على الأونيجيري والعصير.","rana_smile",[["أشتري أكل (-٥ فلوس)","الصحة",8,-1],["أتفرج بس","المجتمع",2,0]]]],0.0)
+		'boutique':
+			var bu:=make_girl(Color(1,0.86,0.78),Color(0.15,0.1,0.15),Color(0.9,0.3,0.5),Color(0.9,0.3,0.5),Color(1,1,1),true)
+			spawn_room_npc(kind,bu.root,Vector3(0.0,0,-1.9),"r_boutique",[["صاحبة البوتيك","أهلاً بيك! ستايلات جديدة كل أسبوع. افتح الدولاب في الهاتف وشوف الجديد.","rana_smile",[["أسألها عن الموضة","المجتمع",5],["أتفرج بس","العلاقات",2]]]])
 		'library':
 			var hu:=make_girl(Color(0.98,0.84,0.74),Color(0.55,0.3,0.15),Color(0.5,0.7,0.9),Color(0.9,0.9,0.95),Color(1,0.5,0.6),true)
 			spawn_room_npc(kind,hu.root,Vector3(0.0,0,-1.6),"r_huda",[["هدى","أهلاً في مكتبة النور! الهدوء هنا بيخلي المذاكرة أسهل بكتير.","rana_calm",[["أذاكر ساعة","الدراسة",10,-1],["أقرا رواية","الصحة",4,0]]]])
