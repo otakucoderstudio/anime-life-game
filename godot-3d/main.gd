@@ -498,6 +498,7 @@ func build_select():
 func pick(who:String):
 	if mode!='select': return
 	mode='play'; select_layer.visible=false; who_pick=who
+	if not ('shot' in OS.get_cmdline_user_args()): load_game()
 	hud_face.texture=img_tex("res://art/%s.png"%who)
 	if who=='boy':
 		player.get_child(0).queue_free()
@@ -678,7 +679,25 @@ func update_peds(dt:float):
 		var dd2:Dictionary=p.d
 		dd2.legl.rotation.x=sw; dd2.legr.rotation.x=-sw; dd2.arml.rotation.x=-sw*0.8; dd2.armr.rotation.x=sw*0.8
 
+var save_t:=0.0
+func save_game():
+	var d={'stats':stats,'inv':inv,'aff':aff,'aff_day':aff_day,'rel_seen':rel_seen,'min':hud_min,'energy':energy,'who':who_pick,'read':read_ids.keys()}
+	var f=FileAccess.open('user://save.json',FileAccess.WRITE)
+	if f: f.store_string(JSON.stringify(d))
+func load_game():
+	if not FileAccess.file_exists('user://save.json'): return
+	var d=JSON.parse_string(FileAccess.get_file_as_string('user://save.json'))
+	if typeof(d)!=TYPE_DICTIONARY: return
+	for k in d.get('stats',{}): stats[k]=int(d.stats[k])
+	for k in d.get('inv',{}): inv[k]=int(d.inv[k])
+	for k in d.get('aff',{}): aff[k]=int(d.aff[k])
+	aff_day=d.get('aff_day',{}); rel_seen=d.get('rel_seen',{})
+	hud_min=float(d.get('min',hud_min)); energy=int(d.get('energy',energy))
+	for k in d.get('read',[]): read_ids[k]=true
 func _process(dt):
+	if mode=='play' and not ('shot' in OS.get_cmdline_user_args()):
+		save_t+=dt
+		if save_t>15.0: save_t=0.0; save_game()
 	for n in npcs: n.n.visible=in_room=='' and player.position.distance_to(n.n.position)<14.0
 	if peds.size()>0: update_peds(dt)
 	if city_map and city_map.visible and map_layer.visible: city_dot.queue_redraw()
