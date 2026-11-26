@@ -71,6 +71,7 @@ func sph(r:float)->SphereMesh:
 
 func _ready():
 	RenderingServer.global_shader_parameter_add('snow',RenderingServer.GLOBAL_VAR_TYPE_FLOAT,0.0)
+	RenderingServer.global_shader_parameter_add('night',RenderingServer.GLOBAL_VAR_TYPE_FLOAT,0.0)
 	env=Environment.new()
 	var sky:=ProceduralSkyMaterial.new()
 	sky.sky_top_color=Color(0.2,0.5,0.95); sky.sky_horizon_color=Color(0.8,0.9,1.0); sky.ground_horizon_color=Color(0.85,0.9,0.95); sky.ground_bottom_color=Color(0.6,0.65,0.7)
@@ -112,19 +113,19 @@ func wire(a:Vector3,b:Vector3,sag:float):
 var pshader:Shader
 var pmats:={}
 var pmeshes:={}
-func pmat(tint:Color,acc:Color)->Material:
-	var key:=str([tint,acc])
+func pmat(tint:Color,acc:Color,glow:=0.0)->Material:
+	var key:=str([tint,acc,glow])
 	if pmats.has(key): return pmats[key]
 	if pshader==null: pshader=load("res://prop.gdshader")
 	var m:=ShaderMaterial.new(); m.shader=pshader
-	m.set_shader_parameter("tint",Vector3(tint.r,tint.g,tint.b)); m.set_shader_parameter("accent",Vector3(acc.r,acc.g,acc.b))
+	m.set_shader_parameter("glow",glow); m.set_shader_parameter("tint",Vector3(tint.r,tint.g,tint.b)); m.set_shader_parameter("accent",Vector3(acc.r,acc.g,acc.b))
 	var o:=ShaderMaterial.new(); o.shader=outl; o.set_shader_parameter("thickness",0.035); m.next_pass=o
 	pmats[key]=m; return m
 func pglb(name:String,pos:Vector3,ry:float,tint:=Color(1,1,1),acc:=Color(1,1,1)):
 	if not pmeshes.has(name):
 		var inst:Node=(load("res://props/"+name+".glb") as PackedScene).instantiate()
 		var f:={}; _collect(inst,f); pmeshes[name]=(f.values()[0] as MeshInstance3D).mesh; inst.free()
-	var xf:=Transform3D(Basis(Vector3.UP,deg_to_rad(ry)),pos); var mt:=pmat(tint,acc)
+	var xf:=Transform3D(Basis(Vector3.UP,deg_to_rad(ry)),pos); var mt:=pmat(tint,acc,1.0 if name.begins_with('bld') else 0.0)
 	if batching:
 		bt(mt,pos).append_from(pmeshes[name],0,Transform3D(Basis(),-chunk_o(pos))*xf)
 	else:
@@ -1484,6 +1485,7 @@ func apply_tod(dt:float):
 	tw.tween_property(sun,"light_color",sc*tint,1.0); tw.tween_property(sun,"light_energy",se,1.0)
 	var bgm:float=0.95 if (h>=6 and h<16) else (0.7 if (h>=16 and h<19.5) else 0.16)
 	tw.tween_property(env,"background_energy_multiplier",bgm,1.0)
+	RenderingServer.global_shader_parameter_set('night',1.0 if bgm<0.3 else (0.5 if bgm<0.8 else 0.0))
 	tw.tween_property(env,"ambient_light_color",am*tint,1.0); tw.tween_property(env,"ambient_light_energy",ae,1.0); tw.tween_property(env,"fog_light_color",fog,1.0)
 	if si!=season_i:
 		season_i=si; RenderingServer.global_shader_parameter_set('snow',1.0 if si==3 else 0.0)

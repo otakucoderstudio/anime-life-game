@@ -3,6 +3,8 @@ render_mode cull_back;
 uniform vec3 tint : source_color = vec3(1.0);
 uniform vec3 accent : source_color = vec3(1.0);
 global uniform float snow;
+global uniform float night;
+uniform float glow = 0.0;
 uniform float bands = 3.0;
 varying float up;
 varying vec3 wp;
@@ -16,7 +18,7 @@ void fragment(){
 		float cell = step(0.97,fract((wp.x+wp.z)/1.6));
 		float n = fract(sin(dot(floor(vec2((wp.x+wp.z)/0.55,wp.y/0.37)),vec2(12.9898,78.233)))*43758.5453);
 		c *= 1.0 - line*0.10 - cell*0.05 - n*0.045*(1.0-up*up); }
-	else if(COLOR.a < 0.75) c *= accent;
+	else if(COLOR.a < 0.75){ c *= accent; EMISSION = c*night*0.9*glow; }
 	c = mix(c, vec3(0.95,0.97,1.0), snow*smoothstep(0.6,0.85,up)*0.9);
 	ALBEDO = c;
 }
