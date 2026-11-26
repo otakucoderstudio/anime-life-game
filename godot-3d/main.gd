@@ -436,6 +436,14 @@ func spawn_npcs():
 	add_npc(ay2.root,Vector3(1.5,0,-88),"class","",[["أياني","ده فصلنا. أول امتحان بعد أسبوع، استعد.","rana_think",[["أذاكر معاها","الدراسة",10],["أنا هتصرف","الصحة",3]]]])
 	var cat:Node3D=load_char("cat",cmat(Color(1,0.95,0.9),Color(0.95,0.6,0.35),Color(1,1,1),Color(1,1,1),Color(1,1,1),Color(0.3,0.6,0.35))).root
 	add_npc(cat,Vector3(1.8,0,-12),"momo","",[["مومو","مياو! 🐱 (القطة مومو بتحك نفسها في رجلك)","youssef_joy",[["أحضنها","الصحة",5],["أديها أكل","العلاقات",4]]]])
+	var n1:=make_boy(Color(0.95,0.78,0.62),Color(0.25,0.2,0.18),false,Color(0.2,0.5,0.3))
+	add_npc(n1.root,Vector3(-68.5,0,-22),"w1","",[["سعيد","أهلاً يا بني! أنا بعمل أحلى طيّارات ورق في الحي.","youssef_smile",[["أسأله عن الحي","المجتمع",6],["أساعده","الفلوس",4]]]])
+	var n2:=make_girl(Color(1,0.86,0.78),Color(0.2,0.15,0.12),Color(0.9,0.6,0.2),Color(0.3,0.5,0.4),Color(1,0.9,0.3),false)
+	add_npc(n2.root,Vector3(68.5,0,-60),"w2","",[["ميرا","بجري كل صباح هنا. الهواء في الجادة الشرقية ينعش!","rana_smile",[["أجري معاها","الصحة",8],["أتكلم معاها","المجتمع",4]]]])
+	var n3:=make_boy(Color(0.85,0.62,0.45),Color(0.15,0.1,0.1),true,Color(0.9,0.5,0.1))
+	add_npc(n3.root,Vector3(-30,0,-36.5),"w3","",[["دودي","شفت القطة مومو؟ بتهرب مني كل يوم 😅","youssef_laugh",[["هساعدك تدور عليها","العلاقات",3],["أضحك وأمشي","المجتمع",3]]]])
+	var n4:=make_girl(Color(0.98,0.84,0.74),Color(0.55,0.3,0.15),Color(0.5,0.7,0.9),Color(0.9,0.9,0.95),Color(1,0.5,0.6),true)
+	add_npc(n4.root,Vector3(30,0,-98.5),"w4","",[["هدى","بشتغل في مكتبة صغيرة هناك. لو بتحب القراية تعالى.","rana_calm",[["أسألها عن كتب","الدراسة",8],["أشكرها","المجتمع",3]]]])
 	no_outline=false
 func _nox():
 	no_outline=false
@@ -784,6 +792,7 @@ func _physics_process(_d):
 			if frames==52 and rk in OS.get_cmdline_user_args(): for p in room_pts: scene_done[p.key]=true
 			if frames==52 and rk in OS.get_cmdline_user_args(): player.position+=Vector3(-2.0,0,-1.5) if rk!='home' else Vector3(-1.5,0,-3.0)
 		if frames==20 and 'outw' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20); apply_outfit(3)
+		if frames==20 and 'newst' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(-68.5,0,-14); player.rotation.y=PI
 		if frames==20 and 'street' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20)
 		if frames==20 and 'park' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(34.5,0,-4.5)
 		if frames==20 and 'world' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-30)
@@ -1159,7 +1168,7 @@ var aff_day:={}
 var rel_seen:={}
 var cur_key:=""
 var rel_queue:=[]
-var npc_of:={"gate":"أياني","class":"أياني","r_class_a":"أياني","front":"كايتو","cafe":"كايتو","r_cafe_k":"كايتو","momo":"مومو","m1":"كايتو"}
+var npc_of:={"gate":"أياني","class":"أياني","r_class_a":"أياني","front":"كايتو","cafe":"كايتو","r_cafe_k":"كايتو","momo":"مومو","m1":"كايتو","w1":"سعيد","w2":"ميرا","w3":"دودي","w4":"هدى"}
 func rel_title(v:int)->String:
 	if v>=10: return "قريبين جداً"
 	if v>=6: return "أعز أصحاب"
