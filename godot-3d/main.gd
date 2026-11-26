@@ -683,7 +683,7 @@ func update_peds(dt:float):
 
 var save_t:=0.0
 func save_game():
-	var d={'stats':stats,'inv':inv,'aff':aff,'aff_day':aff_day,'rel_seen':rel_seen,'min':hud_min,'energy':energy,'who':who_pick,'read':read_ids.keys()}
+	var d={'stats':stats,'inv':inv,'aff':aff,'aff_day':aff_day,'rel_seen':rel_seen,'min':hud_min,'outfit':outfit_i,'energy':energy,'who':who_pick,'read':read_ids.keys()}
 	var f=FileAccess.open('user://save.json',FileAccess.WRITE)
 	if f: f.store_string(JSON.stringify(d))
 func load_game():
@@ -696,6 +696,7 @@ func load_game():
 	aff_day=d.get('aff_day',{}); rel_seen=d.get('rel_seen',{})
 	hud_min=float(d.get('min',hud_min)); energy=int(d.get('energy',energy))
 	for k in d.get('read',[]): read_ids[k]=true
+	if int(d.get('outfit',0))>0: apply_outfit(int(d.outfit))
 func _process(dt):
 	if mode=='play' and not ('shot' in OS.get_cmdline_user_args()):
 		save_t+=dt
@@ -770,6 +771,8 @@ func _physics_process(_d):
 			cam.position=nn.position+Vector3(0.6,2.0,3.6); cam.fov=40; cam.look_at(nn.position+Vector3(0,1.45,0))
 		if frames==40 and 'map' in OS.get_cmdline_user_args(): mode='play'; open_map()
 		if frames==40 and 'rel' in OS.get_cmdline_user_args(): mode='play'; add_aff('كايتو',4); add_aff('أياني',7); add_aff('مومو',1); open_phone(); open_app(5)
+		if frames==40 and 'ward' in OS.get_cmdline_user_args(): mode='play'; apply_outfit(1); open_phone(); open_app(6)
+		if frames==40 and 'phone7' in OS.get_cmdline_user_args(): mode='play'; open_phone()
 		if frames==42 and 'city' in OS.get_cmdline_user_args(): city_map.visible=true; player.position=Vector3(0,0,-60)
 		if frames==40 and 'phone' in OS.get_cmdline_user_args(): mode='play'; open_phone()
 		if frames==40 and 'msgs' in OS.get_cmdline_user_args(): mode='play'; open_msgs()
@@ -778,6 +781,7 @@ func _physics_process(_d):
 			if frames==50 and rk in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'
 			if frames==52 and rk in OS.get_cmdline_user_args(): for p in room_pts: scene_done[p.key]=true
 			if frames==52 and rk in OS.get_cmdline_user_args(): player.position+=Vector3(-2.0,0,-1.5) if rk!='home' else Vector3(-1.5,0,-3.0)
+		if frames==20 and 'outw' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20); apply_outfit(3)
 		if frames==20 and 'street' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20)
 		if frames==20 and 'park' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(34.5,0,-4.5)
 		if frames==20 and 'world' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-30)
@@ -828,9 +832,9 @@ func build_phone():
 	var sb:=StyleBoxFlat.new(); sb.bg_color=Color(0.14,0.15,0.3); sb.set_corner_radius_all(36); sb.set_border_width_all(6); sb.border_color=Color(0.05,0.05,0.1); body.add_theme_stylebox_override("panel",sb); phone_layer.add_child(body)
 	var sc:=ColorRect.new(); sc.color=Color(0.75,0.88,1); sc.size=body.size-Vector2(30,60); sc.position=body.position+Vector2(15,30); phone_layer.add_child(sc)
 	phone_layer.add_child(lbl("الهاتف",34,body.position+Vector2(110,40),Color(0.1,0.1,0.3)))
-	var apps=[["الخريطة",Color(1,0.8,0.5),0],["المخزون",Color(0.7,0.85,1),1],["المتجر",Color(1,0.7,0.8),2],["الإحصائيات",Color(0.7,1,0.8),3],["الإعدادات",Color(0.85,0.8,1),4],["العلاقات",Color(1,0.75,0.85),5]]
+	var apps=[["الخريطة",Color(1,0.8,0.5),0],["المخزون",Color(0.7,0.85,1),1],["المتجر",Color(1,0.7,0.8),2],["الإحصائيات",Color(0.7,1,0.8),3],["الإعدادات",Color(0.85,0.8,1),4],["العلاقات",Color(1,0.75,0.85),5],["الدولاب",Color(0.95,0.85,0.6),6]]
 	for a in apps:
-		var b:=Button.new(); b.size=Vector2(130,110); b.position=body.position+Vector2(25+(a[2]%2)*155,100+int(a[2]/2)*135)
+		var b:=Button.new(); b.size=Vector2(130,92); b.position=body.position+Vector2(25+(a[2]%2)*155,95+int(a[2]/2)*105)
 		var sbb:=StyleBoxFlat.new(); sbb.bg_color=a[1]; sbb.set_corner_radius_all(26); sbb.set_border_width_all(4); sbb.border_color=Color(1,1,1)
 		for st in ["normal","hover","pressed"]: b.add_theme_stylebox_override(st,sbb)
 		b.text=a[0]; b.add_theme_font_override("font",ar); b.add_theme_font_size_override("font_size",24); b.add_theme_color_override("font_color",Color(0.1,0.1,0.25)); b.add_theme_color_override("font_hover_color",Color(0.1,0.1,0.25)); b.add_theme_color_override("font_pressed_color",Color(0.1,0.1,0.25))
@@ -1144,6 +1148,7 @@ func open_app(k:int):
 	if k==2: show_shop()
 	if k==4: show_settings()
 	if k==5: show_rel()
+	if k==6: show_wardrobe()
 
 var aff:={"كايتو":0,"أياني":0,"مومو":0}
 var aff_day:={}
@@ -1176,6 +1181,21 @@ func rel_scene(who:String,lv:int)->Array:
 		"مومو6": return [["مومو","مياو! (مومو بتجيلك كل ما تعدي الشارع دلوقتي)","youssef_joy"]]
 		"مومو10": return [["مومو","مرررر... (مومو قررت إنك صاحبها للأبد)","youssef_joy"],["أنا","[نهاية القطة: عندك رفيق مخلص]","youssef_smile"]]
 	return [["أنا","...",f]]
+var outfit_i:=0
+var outfits:=[["يونيفورم المدرسة",Color(0.17,0.3,0.6),Color(0.17,0.3,0.6),Color(1,0.35,0.5)],["فستان الصيف",Color(0.3,0.8,0.7),Color(1,0.8,0.3),Color(0.3,0.8,0.7)],["كاجوال وردي",Color(0.35,0.4,0.6),Color(1,0.65,0.78),Color(1,1,1)],["ستايل أحمر",Color(0.15,0.15,0.2),Color(0.85,0.15,0.2),Color(1,0.9,0.4)],["أخضر هادي",Color(0.95,0.95,0.9),Color(0.4,0.75,0.5),Color(0.9,0.5,0.3)],["شتوي بنفسجي",Color(0.25,0.2,0.35),Color(0.55,0.35,0.8),Color(1,0.8,0.9)]]
+func apply_outfit(i:int):
+	outfit_i=i; var o=outfits[i]
+	for mi in player.find_children("*","MeshInstance3D",true,false):
+		var m=mi.material_override
+		if m is ShaderMaterial and m.shader==cshader:
+			if not m.has_meta("own"): m=m.duplicate(); m.set_meta("own",true); mi.material_override=m
+			m.set_shader_parameter("p_top",Vector3(o[1].r,o[1].g,o[1].b)); m.set_shader_parameter("p_bot",Vector3(o[2].r,o[2].g,o[2].b)); m.set_shader_parameter("p_acc",Vector3(o[3].r,o[3].g,o[3].b))
+func show_wardrobe():
+	app_head("الدولاب",Color(0.75,0.6,0.3)); var vs:=get_viewport().get_visible_rect().size
+	for i in range(outfits.size()):
+		var ii:int=i
+		app_btn(("✓ " if i==outfit_i else "")+outfits[i][0],Vector2(vs.x/2-250+(i%2)*260,110+int(i/2)*90),Vector2(240,70),outfits[i][1].lightened(0.3),func(): apply_outfit(ii); show_wardrobe())
+	app_layer.add_child(lbl("اختار لبسك، يتغير فوراً",24,Vector2(vs.x/2-130,400),Color(1,1,0.85)))
 func show_rel():
 	app_head("العلاقات",Color(0.85,0.5,0.65)); var vs:=get_viewport().get_visible_rect().size; var y:=100.0
 	for nm in aff.keys():
