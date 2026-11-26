@@ -44,14 +44,20 @@ func mesh_xf(parent:Node,m:Mesh,c:Color,xf:Transform3D,outline:=true,th:=0.025)-
 	var mt:=mat(c,outline,th)
 	if batching and (parent==self or (parent is Node3D and parent.get_parent()==self and parent!=player)):
 		var pxf:Transform3D=Transform3D.IDENTITY if parent==self else (parent as Node3D).transform
-		if not batches.has(mt): batches[mt]=SurfaceTool.new()
-		batches[mt].append_from(m,0,pxf*xf)
+		var fx_:=pxf*xf; bt(mt,fx_.origin).append_from(m,0,Transform3D(Basis(),-chunk_o(fx_.origin))*fx_)
 		return MeshInstance3D.new()
 	var n:=MeshInstance3D.new(); n.mesh=m; n.material_override=mt; n.transform=xf; parent.add_child(n); return n
+func chunk_o(o:Vector3)->Vector3:
+	return Vector3(floor(o.x/45.0)*45.0+22.5,0,floor(o.z/45.0)*45.0+22.5)
+func bt(mt:Material,o:Vector3)->SurfaceTool:
+	var key:=str(mt.get_instance_id())+"_"+str(int(floor(o.x/45.0)))+"_"+str(int(floor(o.z/45.0)))
+	if not batches.has(key): batches[key]={"mt":mt,"st":SurfaceTool.new(),"o":chunk_o(o)}
+	return batches[key].st
 func flush_batches():
-	for mt in batches.keys():
-		var st:SurfaceTool=batches[mt]
-		var n:=MeshInstance3D.new(); n.mesh=st.commit(); n.material_override=mt; n.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF; add_child(n)
+	for k in batches.keys():
+		var e:Dictionary=batches[k]
+		var st:SurfaceTool=e.st
+		var n:=MeshInstance3D.new(); n.mesh=st.commit(); n.material_override=e.mt; n.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF; n.position=e.o; n.visibility_range_end=(85.0 if absf(e.o.x)<400 else 0.0); add_child(n)
 	batches.clear(); batching=false
 func mesh(parent:Node,m:Mesh,c:Color,pos:=Vector3.ZERO,outline:=true,th:=0.025)->MeshInstance3D:
 	if batching: return mesh_xf(parent,m,c,Transform3D(Basis(),pos),outline,th)
@@ -71,7 +77,7 @@ func _ready():
 	env.background_mode=Environment.BG_SKY; env.sky=s
 	env.ambient_light_source=Environment.AMBIENT_SOURCE_COLOR; env.ambient_light_color=Color(0.86,0.9,1.0); env.ambient_light_energy=0.55
 	env.glow_enabled=false; env.glow_intensity=0.35; env.glow_bloom=0.0; env.glow_hdr_threshold=1.4; env.tonemap_mode=Environment.TONE_MAPPER_FILMIC; env.tonemap_exposure=0.8; env.adjustment_enabled=true; env.adjustment_saturation=1.4; env.adjustment_contrast=1.1; env.adjustment_brightness=1.03
-	env.fog_enabled=true; env.fog_light_color=Color(0.86,0.92,1.0); env.fog_density=0.007
+	env.fog_enabled=true; env.fog_light_color=Color(0.86,0.92,1.0); env.fog_density=0.012
 	var we:=WorldEnvironment.new(); we.environment=env; add_child(we)
 	sun=DirectionalLight3D.new(); sun.rotation_degrees=Vector3(-42,-55,0); sun.light_color=Color(1,0.9,0.72); sun.light_energy=0.7; sun.shadow_enabled=false; sun.directional_shadow_max_distance=60; sun.shadow_blur=2.0; add_child(sun)
 	if OS.has_feature('mobile'):
@@ -79,7 +85,7 @@ func _ready():
 	build_street()
 	build_player()
 	no_outline=false
-	cam=Camera3D.new(); cam.fov=55; add_child(cam)
+	cam=Camera3D.new(); cam.fov=55; cam.far=140.0; add_child(cam)
 	build_ui()
 	var vg:=TextureRect.new(); vg.texture=load('res://art/vignette.png'); vg.expand_mode=TextureRect.EXPAND_IGNORE_SIZE; vg.size=get_viewport().get_visible_rect().size; vg.mouse_filter=Control.MOUSE_FILTER_IGNORE; ui.add_child(vg); ui.move_child(vg,0)
 	petal_fx()
@@ -119,10 +125,75 @@ func pglb(name:String,pos:Vector3,ry:float,tint:=Color(1,1,1),acc:=Color(1,1,1))
 		var f:={}; _collect(inst,f); pmeshes[name]=(f.values()[0] as MeshInstance3D).mesh; inst.free()
 	var xf:=Transform3D(Basis(Vector3.UP,deg_to_rad(ry)),pos); var mt:=pmat(tint,acc)
 	if batching:
-		if not batches.has(mt): batches[mt]=SurfaceTool.new()
-		batches[mt].append_from(pmeshes[name],0,xf)
+		bt(mt,pos).append_from(pmeshes[name],0,Transform3D(Basis(),-chunk_o(pos))*xf)
 	else:
 		var n:=MeshInstance3D.new(); n.mesh=pmeshes[name]; n.material_override=mt; n.transform=xf; add_child(n)
+
+func strip(ns:bool,c:float,t0:float,t1:float,gaps:Array):
+	var len:=absf(t1-t0); var mid:=(t0+t1)*0.5
+	var P=func(off:float,t:float,y:float)->Vector3: return Vector3(c+off,y,t) if ns else Vector3(t,y,c+off)
+	var S=func(w:float,l:float,h:float)->Vector3: return Vector3(w,h,l) if ns else Vector3(l,h,w)
+	box(self,S.call(9.0,len,0.2),Color(0.62,0.6,0.6),P.call(0.0,mid,-0.1),false)
+	# segments between gaps
+	var lo:=minf(t0,t1); var hi:=maxf(t0,t1)
+	var cuts:=[[lo,hi]]
+	for g in gaps:
+		var gl:=minf(g.x,g.y); var gh:=maxf(g.x,g.y); var nc:=[]
+		for sg in cuts:
+			if gh<=sg[0] or gl>=sg[1]: nc.append(sg)
+			else:
+				if gl>sg[0]: nc.append([sg[0],gl])
+				if gh<sg[1]: nc.append([gh,sg[1]])
+		cuts=nc
+	for sg in cuts:
+		var l2:float=sg[1]-sg[0]; var m2:float=(sg[0]+sg[1])*0.5
+		if l2<0.5: continue
+		for side in [-1,1]:
+			box(self,S.call(0.14,l2,0.01),Color(1,1,1),P.call(side*4.0,m2,0.02),false)
+			box(self,S.call(5.4,l2,0.35),Color(0.8,0.76,0.72),P.call(side*7.5,m2,0.0),false)
+			box(self,S.call(0.4,l2,0.5),Color(0.72,0.7,0.68),P.call(side*4.9,m2,0.05),false)
+		var n:=int(l2/4.0)
+		for k in range(n): box(self,S.call(0.12,2.2,0.01),Color(0.98,0.98,0.9),P.call(0.0,sg[0]+2.0+k*4.0,0.02),false)
+func overlaps(a0:float,a1:float,gaps:Array)->bool:
+	for g in gaps:
+		if a1>g.x and a0<g.y: return true
+	return false
+func world_row(ns:bool,c:float,t:float,idx:int,sak:bool):
+	var cols=[Color(0.9,0.84,0.72),Color(0.7,0.78,0.85),Color(0.86,0.7,0.62),Color(0.78,0.82,0.7),Color(0.92,0.9,0.86),Color(0.68,0.66,0.74)]
+	var accs=[Color(0.95,0.3,0.3),Color(0.25,0.55,0.95),Color(0.35,0.75,0.5),Color(0.95,0.7,0.2)]
+	for side in [-1,1]:
+		var h:=7.0+float((idx*7+side*3+20)%5)*2.2
+		var vi:int=clampi(int(round((h-7.0)/2.2)),0,4)
+		var pos:=Vector3(c+side*13.5,0,t) if ns else Vector3(t,0,c+side*13.5)
+		var ry:float=(0.0 if side<0 else 180.0) if ns else (-90.0 if side<0 else 90.0)
+		pglb("bld_"+str(vi),pos,ry,cols[(idx+(1 if side>0 else 0))%6],accs[((idx+(1 if side>0 else 0))%6)%4])
+	if sak:
+		var pp:=Vector3(c-5.9,0,t) if ns else Vector3(t,0,c-5.9)
+		sakura(pp,idx)
+	if idx%3==0:
+		var bp:=Vector3(c+6.3,0.2,t-3) if ns else Vector3(t-3,0.2,c+6.3)
+		bike(bp,90.0 if ns else 0.0,Color(0.3,0.5,0.8)); 
+		var vp:=Vector3(c-6.2,0.2,t+1) if ns else Vector3(t+1,0.2,c-6.2)
+		vending(vp,(90.0 if ns else 0.0) if true else 0.0,Color(0.9,0.2,0.25))
+	if idx%2==0:
+		pole(Vector3(c+5.1,0,t) if ns else Vector3(t,0,c+5.1))
+func build_world():
+	var gA:=Vector2(-28.8,-48.7); var gB:=Vector2(-90,-110)
+	# N-S side streets
+	for x0 in [-70.0,70.0]:
+		strip(true,x0,6.0,-112.0,[gA,gB])
+		for i in range(10):
+			if i==4 or i==5: continue
+			world_row(true,x0,-float(i)*9.5+4,i+int(x0)%7,i%2==0)
+	# E-W avenues
+	for z0 in [-38.75,-100.0]:
+		var gx:=[Vector2(-10.2,10.2),Vector2(59.8,80.2),Vector2(-80.2,-59.8)]
+		strip(false,z0,-112.0,112.0,gx)
+		var m:=-12
+		while m<=11:
+			var x:=9.5*float(m)+4.0
+			if not overlaps(x-4.4,x+4.4,gx): world_row(false,z0,x,m+int(-z0)%5+20,m%2==0)
+			m+=1
 func pole(p:Vector3):
 	pglb("pole",p,0.0)
 
@@ -143,22 +214,18 @@ func building(side:int,z:float,h:float,c:Color,i:int):
 	var cols=[Color(0.95,0.3,0.3),Color(0.25,0.55,0.95),Color(0.35,0.75,0.5),Color(0.95,0.7,0.2)]
 	var kind:=i+(1 if side>0 else 0)
 	var vi:int=clampi(int(round((h-7.0)/2.2)),0,4)
-	pglb("bld_"+str(vi),Vector3(side*13.5,0,z),0.0 if side<0 else 180.0,c,cols[kind%4])
+	pglb("bld_"+str(vi),Vector3(side*13.5,0,z),0.0 if side<0 else 180.0,c,cols[(kind%6)%4])
 
 func build_street():
 	batching=true
-	box(self,Vector3(9,0.2,160),Color(0.62,0.6,0.6),Vector3(0,-0.1,-60),false)
-	for i in range(40): box(self,Vector3(0.12,0.01,2.2),Color(0.98,0.98,0.9),Vector3(0,0.02,-i*4.0+6),false)
-	for side in [-1,1]:
-		box(self,Vector3(0.14,0.01,160),Color(1,1,1),Vector3(side*4.0,0.02,-60),false)
-		box(self,Vector3(5.4,0.35,160),Color(0.8,0.76,0.72),Vector3(side*7.5,0.0,-60),false)
-		box(self,Vector3(0.4,0.5,160),Color(0.72,0.7,0.68),Vector3(side*4.9,0.05,-60),false)
+	box(self,Vector3(320,0.2,320),Color(0.55,0.62,0.5),Vector3(0,-0.25,-50),false)
+	strip(true,0.0,6.0,-112.0,[Vector2(-28.8,-48.7),Vector2(-90,-110)])
 	for c in range(4):
 		var zc=-c*36.0-6
 		for k in range(8): box(self,Vector3(8.0,0.01,0.55),Color(1,1,1),Vector3(0,0.025,zc-k*1.0),false)
 	var cols=[Color(0.9,0.84,0.72),Color(0.7,0.78,0.85),Color(0.86,0.7,0.62),Color(0.78,0.82,0.7),Color(0.92,0.9,0.86),Color(0.68,0.66,0.74)]
 	for i in range(10):
-		for side in [-1,1]:
+		for side in ([] if i==4 or i==5 else [-1,1]):
 			var h=7.0+float((i*7+side*3+20)%5)*2.2
 			var z=-float(i)*9.5+4
 			building(side,z,h,cols[(i+(1 if side>0 else 0))%cols.size()],i)
@@ -172,6 +239,7 @@ func build_street():
 			vending(Vector3(-6.2,0.2,-float(i)*9.5-1),90,Color(0.2,0.5,0.9)); bike(Vector3(6.3,0.2,-float(i)*9.5-2),90,Color(0.3,0.7,0.5))
 		if i%2==0:
 			pole(Vector3(-5.1,0,-float(i)*9.5)); pole(Vector3(5.1,0,-float(i)*9.5))
+	build_world()
 	# wires: along street and across
 	for side in [-1,1]:
 		for i in range(0,9,2):
@@ -194,7 +262,7 @@ func sakura(p:Vector3,i:int):
 	if tree_mat==null: tree_mat=pmat(Color(1,1,1),Color(1,0.78,0.88)).duplicate()
 	if not pmeshes.has(nm): pglb_load(nm)
 	var n:=MeshInstance3D.new(); n.mesh=pmeshes[nm]; n.material_override=tree_mat
-	n.transform=Transform3D(Basis(Vector3.UP,deg_to_rad(float(i*47))),p); add_child(n)
+	n.transform=Transform3D(Basis(Vector3.UP,deg_to_rad(float(i*47))),p); n.visibility_range_end=90.0; add_child(n)
 func pglb_load(name:String):
 	var inst:Node=(load("res://props/"+name+".glb") as PackedScene).instantiate()
 	var f:={}; _collect(inst,f); pmeshes[name]=(f.values()[0] as MeshInstance3D).mesh; inst.free()
@@ -550,7 +618,7 @@ func _process(dt):
 	if moving:
 		var dir:=Vector3(v.x,0,v.y).normalized()
 		player.position+=dir*v.length()*4.2*dt
-		player.position.x=clamp(player.position.x,bnd.position.x,bnd.end.x); player.position.z=clamp(player.position.z,bnd.position.y,bnd.end.y)
+		player.position=clamp_walk(player.position)
 		var tgt=atan2(dir.x,dir.z)
 		player.rotation.y=lerp_angle(player.rotation.y,tgt,10*dt)
 		walk_t+=dt*9.0*v.length()
@@ -569,6 +637,18 @@ func _process(dt):
 	petals.position=player.position+Vector3(0,5,-4)
 
 var frames:=0
+
+var walk_rects:=[Rect2(-8.5,-120,17,126),Rect2(-78.5,-114,17,120),Rect2(61.5,-114,17,120),Rect2(-112,-47.25,224,17),Rect2(-112,-108.5,224,17)]
+func clamp_walk(p:Vector3)->Vector3:
+	if in_room!='':
+		return Vector3(clamp(p.x,bnd.position.x,bnd.end.x),p.y,clamp(p.z,bnd.position.y,bnd.end.y))
+	var best:=Vector3.ZERO; var bd:=1e9
+	for r in walk_rects:
+		var q:=Vector3(clamp(p.x,r.position.x,r.end.x),p.y,clamp(p.z,r.position.y,r.end.y))
+		var d:=q.distance_squared_to(p)
+		if d<bd: bd=d; best=q
+	return best
+
 func _physics_process(_d):
 	if "shot" in OS.get_cmdline_user_args():
 		frames+=1
@@ -594,6 +674,7 @@ func _physics_process(_d):
 			if frames==52 and rk in OS.get_cmdline_user_args(): for p in room_pts: scene_done[p.key]=true
 			if frames==52 and rk in OS.get_cmdline_user_args(): player.position+=Vector3(-2.0,0,-1.5) if rk!='home' else Vector3(-1.5,0,-3.0)
 		if frames==20 and 'street' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20)
+		if frames==20 and 'world' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-30)
 		if frames==5 and 'dusk' in OS.get_cmdline_user_args(): hud_min=17.5*60+(14*1440.0 if not "winter" in OS.get_cmdline_user_args() else 22*1440.0); env_t=0.0
 		if frames==59: print('STAT nodes=',get_tree().get_node_count(),' draws=',RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME),' prims=',RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME))
 		if frames==60:

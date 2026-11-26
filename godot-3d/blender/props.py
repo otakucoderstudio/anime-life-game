@@ -14,9 +14,10 @@ def bx(c,loc,dim,col=(1,1,1),a=FIX,bev=0.05,rot=(0,0,0)):
     bpy.ops.mesh.primitive_cube_add(location=loc); o=bpy.context.object
     o.scale=(dim[0]/2,dim[1]/2,dim[2]/2); o.rotation_euler=[math.radians(r) for r in rot]
     bpy.ops.object.transform_apply(location=True,rotation=True,scale=True)
-    m=o.modifiers.new('b','BEVEL'); m.width=min(bev,min(dim)/2.2); m.segments=1; m.limit_method='ANGLE'
-    bpy.ops.object.modifier_apply(modifier='b')
-    return fin(o,col,a)
+    if bev>0:
+        m=o.modifiers.new('b','BEVEL'); m.width=min(bev,min(dim)/2.2); m.segments=1; m.limit_method='ANGLE'
+        bpy.ops.object.modifier_apply(modifier='b')
+    return fin(o,col,a,smooth=bev>0)
 def cyl(loc,r,h,col,a=FIX,rot=(0,0,0),seg=14,r2=None):
     bpy.ops.mesh.primitive_cone_add(vertices=seg,radius1=r,radius2=r if r2 is None else r2,depth=h,location=loc,rotation=[math.radians(x) for x in rot])
     return fin(bpy.context.object,col,a)
@@ -59,12 +60,11 @@ def building(h,seed):
     nf=int((h-3.2)/2.6)
     for f in range(1,nf+1):
         y=3.6+(f-1)*2.6
-        bx(0,(3.55,0,y-1.15),(0.15,8.7,0.3),(0.8,0.8,0.8),WALL,bev=0.05)
+        bx(0,(3.55,0,y-1.15),(0.15,8.7,0.3),(0.8,0.8,0.8),WALL,bev=0.0)
         for k in range(3):
             z=(k-1)*2.6; lit=rnd.random()<0.28
-            bx(0,(3.55,z,y),(0.12,1.8,1.6),DARK,FIX,bev=0.04)
-            bx(0,(3.6,z,y),(0.1,1.5,1.3),LIT if lit else GL,FIX,bev=0.03)
-            bx(0,(3.8,z,y-0.78),(0.4,1.9,0.1),FR,FIX,bev=0.03)
+            bx(0,(3.58,z,y),(0.1,1.6,1.4),LIT if lit else GL,FIX,bev=0.0)
+            bx(0,(3.75,z,y-0.78),(0.35,1.9,0.1),FR,FIX,bev=0.0)
         if (f+seed)%2==0:
             bx(0,(4.1,0,y-0.8),(1.2,5.6,0.1),(0.82,0.82,0.85),FIX,bev=0.03)
             bx(0,(4.65,0,y-0.4),(0.05,5.6,0.9),(0.4,0.45,0.5),FIX,bev=0.02)
