@@ -544,7 +544,7 @@ func build_scene_ui():
 	stats_layer.add_child(lbl("اضغط للرجوع",24,Vector2(60,vs.y-50),Color(1,1,0.8)))
 func start_scene(key:String,bg:String,lines:Array):
 	if scene_done.has(key): return
-	scene_done[key]=true; mode='scene'; phone_btn.visible=false; badge.visible=false; joy_vec=Vector2.ZERO; joy_id=-1; knob.position=base.position
+	cur_key=key; scene_done[key]=true; mode='scene'; phone_btn.visible=false; badge.visible=false; joy_vec=Vector2.ZERO; joy_id=-1; knob.position=base.position
 	sc_bg.texture=(img_tex("res://art/%s.jpg"%bg) if bg!="" else null); scene_lines=lines; scene_i=0; scene_layer.visible=true; show_line()
 func show_line():
 	sfx('blip',randf_range(0.9,1.15))
@@ -557,13 +557,20 @@ func show_line():
 func choose(k:int):
 	var ch:Array=scene_lines[scene_i][3]
 	stats[ch[k][1]]=clampi(stats[ch[k][1]]+ch[k][2],0,100)
+	if ch[k][1]=='العلاقات': add_aff(npc_of.get(cur_key,scene_lines[scene_i][0]),1)
 	if ch[k].size()>3: energy=clampi(energy+ch[k][3],0,5); hearts.queue_redraw()
 	choices_on=false
 	for b in choice_btns: b.visible=false
 	advance()
 func advance():
 	scene_i+=1
-	if scene_i>=scene_lines.size(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; refresh_badge()
+	if scene_i>=scene_lines.size():
+		scene_layer.visible=false; mode='play'; phone_btn.visible=true; refresh_badge()
+		var who:String=npc_of.get(cur_key,"")
+		var day:=int(hud_min/1440.0)
+		if who!="" and aff_day.get(who,-1)!=day: aff_day[who]=day; add_aff(who,1)
+		if rel_queue.size()>0:
+			var sc:Array=rel_queue.pop_front(); scene_done.erase("rel_"+str(Time.get_ticks_msec())); start_scene("rel_"+str(Time.get_ticks_msec()),"",sc)
 	else: show_line()
 func check_triggers():
 	if in_room!='':
@@ -741,6 +748,7 @@ func _physics_process(_d):
 			var nn:Node3D=npcs[ni2].n; nn.rotation.y=0; player.visible=false; get_tree().root.set_meta("x",true)
 			cam.position=nn.position+Vector3(0.6,2.0,3.6); cam.fov=40; cam.look_at(nn.position+Vector3(0,1.45,0))
 		if frames==40 and 'map' in OS.get_cmdline_user_args(): mode='play'; open_map()
+		if frames==40 and 'rel' in OS.get_cmdline_user_args(): mode='play'; add_aff('كايتو',4); add_aff('أياني',7); add_aff('مومو',1); open_phone(); open_app(5)
 		if frames==42 and 'city' in OS.get_cmdline_user_args(): city_map.visible=true; player.position=Vector3(0,0,-60)
 		if frames==40 and 'phone' in OS.get_cmdline_user_args(): mode='play'; open_phone()
 		if frames==40 and 'msgs' in OS.get_cmdline_user_args(): mode='play'; open_msgs()
@@ -750,7 +758,7 @@ func _physics_process(_d):
 			if frames==52 and rk in OS.get_cmdline_user_args(): for p in room_pts: scene_done[p.key]=true
 			if frames==52 and rk in OS.get_cmdline_user_args(): player.position+=Vector3(-2.0,0,-1.5) if rk!='home' else Vector3(-1.5,0,-3.0)
 		if frames==20 and 'street' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20)
-		if frames==20 and 'park' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(24,0,-5.5); player.rotation.y=-1.2
+		if frames==20 and 'park' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(34.5,0,-4.5)
 		if frames==20 and 'world' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-30)
 		if frames==5 and 'dusk' in OS.get_cmdline_user_args(): hud_min=17.5*60+(14*1440.0 if not "winter" in OS.get_cmdline_user_args() else 22*1440.0); env_t=0.0
 		if frames==59: print('STAT nodes=',get_tree().get_node_count(),' draws=',RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME),' prims=',RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME))
@@ -799,7 +807,7 @@ func build_phone():
 	var sb:=StyleBoxFlat.new(); sb.bg_color=Color(0.14,0.15,0.3); sb.set_corner_radius_all(36); sb.set_border_width_all(6); sb.border_color=Color(0.05,0.05,0.1); body.add_theme_stylebox_override("panel",sb); phone_layer.add_child(body)
 	var sc:=ColorRect.new(); sc.color=Color(0.75,0.88,1); sc.size=body.size-Vector2(30,60); sc.position=body.position+Vector2(15,30); phone_layer.add_child(sc)
 	phone_layer.add_child(lbl("الهاتف",34,body.position+Vector2(110,40),Color(0.1,0.1,0.3)))
-	var apps=[["الخريطة",Color(1,0.8,0.5),0],["المخزون",Color(0.7,0.85,1),1],["المتجر",Color(1,0.7,0.8),2],["الإحصائيات",Color(0.7,1,0.8),3],["الإعدادات",Color(0.85,0.8,1),4]]
+	var apps=[["الخريطة",Color(1,0.8,0.5),0],["المخزون",Color(0.7,0.85,1),1],["المتجر",Color(1,0.7,0.8),2],["الإحصائيات",Color(0.7,1,0.8),3],["الإعدادات",Color(0.85,0.8,1),4],["العلاقات",Color(1,0.75,0.85),5]]
 	for a in apps:
 		var b:=Button.new(); b.size=Vector2(130,110); b.position=body.position+Vector2(25+(a[2]%2)*155,100+int(a[2]/2)*135)
 		var sbb:=StyleBoxFlat.new(); sbb.bg_color=a[1]; sbb.set_corner_radius_all(26); sbb.set_border_width_all(4); sbb.border_color=Color(1,1,1)
@@ -894,6 +902,10 @@ func travel(key:String):
 	if key!='home' and energy<1:
 		map_layer.visible=false; phone_layer.visible=true; mode='phone'; travel_note.text="تعبان! روح البيت وخد نوم."; return
 	map_layer.visible=false; mode='play'; phone_layer.visible=false; phone_layer.position.y=0
+	if key=="park":
+		hud_min+=20.0; hud_clock.queue_redraw(); energy=mini(5,energy+1); hearts.queue_redraw()
+		if in_room!='': exit_room()
+		player.position=Vector3(14.0,0,-10.5); player.rotation.y=-PI/2; return
 	var rooms={"school":"class","home":"home","cafe":"cafe","store":"store","konbini":"konbini"}
 	if rooms.has(key):
 		hud_min+=30.0; hud_clock.queue_redraw(); enter_room(rooms[key]); return
@@ -1110,13 +1122,63 @@ func open_app(k:int):
 	if k==1: show_inv()
 	if k==2: show_shop()
 	if k==4: show_settings()
+	if k==5: show_rel()
+
+var aff:={"كايتو":0,"أياني":0,"مومو":0}
+var aff_day:={}
+var rel_seen:={}
+var cur_key:=""
+var rel_queue:=[]
+var npc_of:={"gate":"أياني","class":"أياني","r_class_a":"أياني","front":"كايتو","cafe":"كايتو","r_cafe_k":"كايتو","momo":"مومو","m1":"كايتو"}
+func rel_title(v:int)->String:
+	if v>=10: return "قريبين جداً"
+	if v>=6: return "أعز أصحاب"
+	if v>=3: return "صحاب"
+	if v>=1: return "معارف"
+	return "غرباء"
+func add_aff(who:String,n:int):
+	if not aff.has(who): return
+	var old:int=aff[who]; aff[who]=clampi(old+n,0,10)
+	for lv in [3,6,10]:
+		if old<lv and aff[who]>=lv and not rel_seen.has(who+str(lv)):
+			rel_seen[who+str(lv)]=true; rel_queue.append(rel_scene(who,lv))
+func rel_scene(who:String,lv:int)->Array:
+	var f:="youssef_smile"; var f2:="rana_smile"
+	match who+str(lv):
+		"كايتو3": return [["كايتو","عارف يا باشا؟ بقالي زمان ماليش صاحب أرتاح معاه كده.",f],["كايتو","من النهاردة انت صاحبي الأصلي. لو احتجت أي حاجة أنا موجود.",f]]
+		"كايتو6": return [["كايتو","أنا مش بقول ده لحد: انت أعز صاحب ليّ هنا. هعملك مفاجأة في الكافيه قريب.","youssef_joy"],["كايتو","بس متقولش لأياني، هتسخر مني 😄","youssef_laugh"]]
+		"كايتو10": return [["كايتو","لو مكنتش جيت ساكورا هيل كنت لسه زي ما أنا. شكراً إنك بقيت جزء من يومي.","youssef_smile"],["كايتو","[نهاية الصداقة: ما بينكم رباط حقيقي]","youssef_joy"]]
+		"أياني3": return [["أياني","بصراحة... اتفاجئت إنك مش زي ما توقعت. مش وحش.",f2],["أياني","لسه المنافسة قايمة، بس هسيبك تذاكر معايا لو حبيت.","rana_smile"]]
+		"أياني6": return [["أياني","كنت فاكرة إني بحب أبقى الأولى لوحدي. بس معاك الدراسة بقت أحلى.","rana_calm"],["أياني","متفهمش غلط. ده مجرد اعتراف بالموهبة.","rana_think"]]
+		"أياني10": return [["أياني","أنا... مش بعرف أقول حاجات زي دي. بس وجودك بقى حاجة مهمة في أيامي.","rana_close"],["أياني","[نهاية المنافسة اللطيفة: بقيتوا أقرب من أي حد]","rana_smile"]]
+		"مومو3": return [["مومو","مياو~ (مومو بدأت تتبعك وتنام جنب رجلك)","youssef_joy"]]
+		"مومو6": return [["مومو","مياو! (مومو بتجيلك كل ما تعدي الشارع دلوقتي)","youssef_joy"]]
+		"مومو10": return [["مومو","مرررر... (مومو قررت إنك صاحبها للأبد)","youssef_joy"],["أنا","[نهاية القطة: عندك رفيق مخلص]","youssef_smile"]]
+	return [["أنا","...",f]]
+func show_rel():
+	app_head("العلاقات",Color(0.85,0.5,0.65)); var vs:=get_viewport().get_visible_rect().size; var y:=100.0
+	for nm in aff.keys():
+		var v:int=aff[nm]
+		var hs:=""
+		for i in range(10): hs+=("♥" if i<v else "♡")
+		app_layer.add_child(lbl("%s  —  %s"%[nm,rel_title(v)],34,Vector2(vs.x/2-250,y),Color(1,1,1)))
+		app_layer.add_child(lbl(hs,40,Vector2(vs.x/2-250,y+50),Color(1,0.85,0.9)))
+		y+=140
+	app_layer.add_child(lbl("اتكلم معاهم كل يوم أو اديهم هدية من المخزون",24,Vector2(vs.x/2-230,y+10),Color(1,1,0.85)))
+func gift_pick(nm:String):
+	app_head("اختار هتهدي مين",Color(0.85,0.5,0.65)); var vs:=get_viewport().get_visible_rect().size; var y:=130.0
+	for w in aff.keys():
+		var ww:String=w
+		app_btn(ww,Vector2(vs.x/2-200,y),Vector2(400,70),Color(1,0.9,0.95),func(): give_gift(nm,ww)); y+=90
+func give_gift(nm:String,who:String):
+	inv[nm]-=1; add_aff(who,3); sfx('bong'); show_inv()
 func show_inv():
 	app_head("المخزون",Color(0.45,0.55,0.8)); var vs:=get_viewport().get_visible_rect().size; var y:=90.0
 	if inv.is_empty(): app_layer.add_child(lbl("المخزون فاضي. روح المتجر!",32,Vector2(vs.x/2-200,200)))
 	for nm in inv.keys():
 		if inv[nm]<=0: continue
 		var it:Array=items[nm]; var n:String=nm
-		app_btn("%s ×%d  (استخدم)"%[nm,inv[nm]],Vector2(vs.x/2-300,y),Vector2(600,64),Color(1,0.95,0.7),func(): use_item(n)); y+=76
+		app_btn("%s ×%d  (استخدم)"%[nm,inv[nm]],Vector2(vs.x/2-300,y),Vector2(600,64),Color(1,0.95,0.7),func(): (gift_pick(n) if n=="دبدوب هدية" else use_item(n))); y+=76
 func use_item(nm:String):
 	var it:Array=items[nm]; inv[nm]-=1; energy=clampi(energy+it[1],0,5); stats[it[2]]=clampi(stats[it[2]]+it[3],0,100); hearts.queue_redraw(); sfx('open'); show_inv()
 func show_shop():
