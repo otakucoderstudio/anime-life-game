@@ -723,7 +723,11 @@ func update_peds(dt:float):
 			if p.bt<=0.0: bl.visible=false
 		elif in_room=='' and mode=='play' and player.position.distance_to(n.position)<2.6:
 			var gd:=int(hud_min/1440.0)
-			var greets=["صباح الخير!","أهلاً يا جميل","يوم حلو النهاردة","مساء الخير","منور الحي!","سلام!"]
+			var hr:=int(fmod(hud_min,1440.0)/60.0)
+			var greets=["أهلاً يا جميل","منور الحي!","سلام!"]
+			if hr<12: greets+=["صباح الخير!","صباح النور!"]
+			elif hr<18: greets+=["يوم حلو النهاردة","عاش، نهارك سعيد"]
+			else: greets+=["مساء الخير","ليلة حلوة!","خلي بالك من نفسك"]
 			bl.text=greets[randi()%greets.size()]; bl.visible=true; p.bt=2.5
 			if p.gday!=gd: p.gday=gd; stats['المجتمع']=clampi(stats['المجتمع']+1,0,100)
 		var sw:=sin(Time.get_ticks_msec()*0.006+p.ph)*0.6
