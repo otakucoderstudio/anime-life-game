@@ -112,14 +112,14 @@ def sakura(seed):
     cyl((0,0,0.1),0.34,0.25,trunk,FIX,seg=10,r2=0.26)
     for ang in (30,150,270):
         a=math.radians(ang); cyl((math.cos(a)*0.35,math.sin(a)*0.35,3.3),0.07,1.3,trunk,FIX,rot=(math.degrees(math.sin(a))*0+ (35*math.sin(a)*-1 if False else 0),0,0),seg=6)
-    pk=[(1,0.72,0.82),(1,0.8,0.88),(0.98,0.65,0.78),(1,0.86,0.92)]
+    pk=[(1,1,1),(0.95,0.94,0.97),(0.9,0.92,0.96),(1,0.97,0.96)]
     spots=[(0,0,4.4,1.4)]+[(math.cos(k*1.26+seed)*1.1,math.sin(k*1.26+seed)*1.1,3.7+(k%2)*0.6,0.95+rnd.random()*0.2) for k in range(5)]
     for i,(x,y,z,r) in enumerate(spots):
         bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2,radius=r,location=(x,y,z)); o=bpy.context.object
         for v in o.data.vertices:
             n=1+0.14*math.sin(v.co.x*5+seed)*math.cos(v.co.y*4+v.co.z*3)
             v.co*=n
-        fin(o,pk[(i+seed)%4],FIX)
+        fin(o,pk[(i+seed)%4],ACC)
     done('sakura','%s/props/sakura_%d.glb'%(os.path.expanduser('~/gp'),seed))
 which=sys.argv[-1]
 if which=='b':

@@ -188,8 +188,16 @@ func lamp(p:Vector3):
 	box(self,Vector3(0.15,3.4,0.15),Color(0.3,0.25,0.35),p+Vector3(0,1.7,0))
 	var m:=mesh(self,sph(0.28),Color(1,0.9,0.6),p+Vector3(0,3.5,0),false)
 
+var tree_mat:Material
 func sakura(p:Vector3,i:int):
-	pglb("sakura_"+str(i%3),p,float(i*47))
+	var nm:="sakura_"+str(i%3)
+	if tree_mat==null: tree_mat=pmat(Color(1,1,1),Color(1,0.78,0.88)).duplicate()
+	if not pmeshes.has(nm): pglb_load(nm)
+	var n:=MeshInstance3D.new(); n.mesh=pmeshes[nm]; n.material_override=tree_mat
+	n.transform=Transform3D(Basis(Vector3.UP,deg_to_rad(float(i*47))),p); add_child(n)
+func pglb_load(name:String):
+	var inst:Node=(load("res://props/"+name+".glb") as PackedScene).instantiate()
+	var f:={}; _collect(inst,f); pmeshes[name]=(f.values()[0] as MeshInstance3D).mesh; inst.free()
 
 func limb(parent:Node,pos:Vector3,len:float,r:float,c:Color)->Node3D:
 	var pivot:=Node3D.new(); pivot.position=pos; parent.add_child(pivot)
@@ -586,7 +594,7 @@ func _physics_process(_d):
 			if frames==52 and rk in OS.get_cmdline_user_args(): for p in room_pts: scene_done[p.key]=true
 			if frames==52 and rk in OS.get_cmdline_user_args(): player.position+=Vector3(-2.0,0,-1.5) if rk!='home' else Vector3(-1.5,0,-3.0)
 		if frames==20 and 'street' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20)
-		if frames==5 and 'dusk' in OS.get_cmdline_user_args(): hud_min=17.5*60+14*1440.0+0.0; env_t=0.0
+		if frames==5 and 'dusk' in OS.get_cmdline_user_args(): hud_min=17.5*60+(14*1440.0 if not "winter" in OS.get_cmdline_user_args() else 22*1440.0); env_t=0.0
 		if frames==59: print('STAT nodes=',get_tree().get_node_count(),' draws=',RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME),' prims=',RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME))
 		if frames==60:
 			get_viewport().get_texture().get_image().save_png("/tmp/shot1.png"); get_tree().quit()
@@ -996,3 +1004,5 @@ func apply_tod(dt:float):
 		season_i=si
 		var pc:Color=[Color(1,0.78,0.88),Color(0.8,1,0.7),Color(1,0.62,0.25),Color(1,1,1)][si]
 		(petals.mesh.material as StandardMaterial3D).albedo_color=pc
+		var tc:Color=[Color(1,0.78,0.88),Color(0.5,0.85,0.42),Color(1,0.55,0.2),Color(0.96,0.98,1.0)][si]
+		if tree_mat: (tree_mat as ShaderMaterial).set_shader_parameter("accent",Vector3(tc.r,tc.g,tc.b))
