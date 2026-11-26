@@ -90,7 +90,7 @@ func _ready():
 	build_ui()
 	var vg:=TextureRect.new(); vg.texture=load('res://art/vignette.png'); vg.expand_mode=TextureRect.EXPAND_IGNORE_SIZE; vg.size=get_viewport().get_visible_rect().size; vg.mouse_filter=Control.MOUSE_FILTER_IGNORE; ui.add_child(vg); ui.move_child(vg,0)
 	petal_fx()
-	build_select(); build_scene_ui(); build_phone(); spawn_npcs(); spawn_peds(); build_audio()
+	build_select(); build_scene_ui(); build_phone(); spawn_npcs(); spawn_peds(); spawn_cars(); build_audio()
 	if 'shot' in OS.get_cmdline_user_args() and not ('select' in OS.get_cmdline_user_args()): pick('girl')
 
 var jp:Font=load("res://fonts/jp_s.ttf")
@@ -644,6 +644,25 @@ func tod()->String:
 
 var peds:=[]
 var ped_streets:=[[true,0.0,-110.0,4.0],[true,-70.0,-108.0,4.0],[true,70.0,-108.0,4.0],[false,-38.75,-108.0,108.0],[false,-100.0,-108.0,108.0]]
+var cars:=[]
+func spawn_cars():
+	pglb_load("car")
+	var cc=[Color(0.95,0.35,0.4),Color(0.3,0.6,0.95),Color(0.98,0.8,0.3),Color(0.45,0.8,0.55),Color(0.9,0.9,0.95)]
+	var defs=[[0,-60.0,1.0],[0,-20.0,-1.0],[3,-30.0,1.0],[4,40.0,-1.0],[3,60.0,-1.0]]
+	for i in range(defs.size()):
+		var n:=MeshInstance3D.new(); n.mesh=pmeshes["car"]; n.material_override=pmat(Color(1,1,1),cc[i%5]); add_child(n)
+		cars.append({"n":n,"si":defs[i][0],"t":defs[i][1],"dir":defs[i][2]})
+func update_cars(dt:float):
+	for c in cars:
+		var st:Array=ped_streets[c.si]; var lo:float=minf(st[2],st[3]); var hi:float=maxf(st[2],st[3])
+		c.t+=c.dir*7.0*dt
+		if c.t>hi: c.t=lo
+		if c.t<lo: c.t=hi
+		var off:float=2.3*c.dir*(1.0 if st[0] else -1.0)
+		var n:Node3D=c.n
+		n.position=Vector3(st[1]+off,0.0,c.t) if st[0] else Vector3(c.t,0.0,st[1]+off)
+		n.rotation.y=atan2(0.0,c.dir) if st[0] else atan2(c.dir,0.0)
+		n.visible=in_room=='' and player.position.distance_to(n.position)<60.0
 func spawn_peds():
 	var rng:=RandomNumberGenerator.new(); rng.seed=7
 	var skins=[Color(1,0.88,0.8),Color(0.9,0.7,0.55),Color(0.8,0.58,0.42)]
@@ -713,6 +732,7 @@ func _process(dt):
 		if save_t>15.0: save_t=0.0; save_game()
 	for n in npcs: n.n.visible=in_room=='' and player.position.distance_to(n.n.position)<14.0
 	if peds.size()>0: update_peds(dt)
+	if cars.size()>0: update_cars(dt)
 	if city_map and city_map.visible and map_layer.visible: city_dot.queue_redraw()
 	if mode!='play':
 		if mode=='scene': return
@@ -798,6 +818,7 @@ func _physics_process(_d):
 		if frames==20 and 'outw' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20); apply_outfit(3)
 		if frames==20 and 'newst' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(-68.5,0,-14); player.rotation.y=PI
 		if frames==20 and 'snow' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20); hud_min=21*1440.0+600.0
+		if frames==20 and 'cars' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-22); cars[0].t=-30.0; cars[1].t=-34.0
 		if frames==20 and 'street' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20)
 		if frames==20 and 'park' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(34.5,0,-4.5)
 		if frames==20 and 'world' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-30)

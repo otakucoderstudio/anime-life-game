@@ -156,6 +156,17 @@ def flowers():
         ell((x,y,0.5),(0.09,0.09,0.09),(1,1,1),ACC,6,4)
     done('flowers','%s/props/flowers.glb'%os.path.expanduser('~/gp'))
 
+def car():
+    clear()
+    bx(0,(0,0,0.55),(1.7,3.9,0.7),(1,1,1),ACC,bev=0.28)
+    bx(0,(0,-0.1,1.05),(1.5,2.0,0.6),(0.62,0.82,0.95),FIX,bev=0.25)
+    bx(0,(0,-0.1,1.38),(1.45,1.7,0.12),(1,1,1),ACC,bev=0.05)
+    for sx in (-1,1):
+        for y in (-1.25,1.25):
+            tor((sx*0.82,y,0.34),0.26,0.1,(0.1,0.1,0.13),rot=(0,90,0)); cyl((sx*0.88,y,0.34),0.17,0.06,(0.75,0.75,0.8),FIX,rot=(0,90,0),seg=10)
+    for sx in (-1,1): ell((sx*0.55,-1.98,0.6),(0.17,0.05,0.1),(1,0.95,0.6),FIX,8,5); ell((sx*0.55,1.98,0.6),(0.17,0.05,0.1),(0.95,0.2,0.2),FIX,8,5)
+    done('car','%s/props/car.glb'%os.path.expanduser('~/gp'))
+
 which=sys.argv[-1]
 if which=='b':
     for i,h in enumerate((7.0,9.2,11.4,13.6,15.8)): building(h,i)
@@ -163,3 +174,6 @@ elif which=='park':
     bench(); fountain(); lamp(); flowers()
 elif which=='p':
     bike(); vending(); pole(); sakura(0); sakura(1); sakura(2)
+
+elif which=='car':
+    car()
