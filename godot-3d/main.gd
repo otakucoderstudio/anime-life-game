@@ -864,6 +864,8 @@ func _physics_process(_d):
 		if frames>=50 and frames<=59 and 'ptr' in OS.get_cmdline_user_args():
 			var pi:int=int(OS.get_cmdline_user_args()[-1]); var pn:Node3D=npcs[pi].n; pn.rotation.y=0; player.visible=false; get_tree().root.set_meta("x",true)
 			cam.position=pn.position+Vector3(0.1,2.0,2.3); cam.fov=34; cam.look_at(pn.position+Vector3(0,1.9,0))
+		if frames==40 and 'night' in OS.get_cmdline_user_args(): env_t=0.0
+		if frames==100 and 'night' in OS.get_cmdline_user_args(): pass
 		if frames==40 and 'map' in OS.get_cmdline_user_args(): mode='play'; open_map()
 		if frames==40 and 'rel' in OS.get_cmdline_user_args(): mode='play'; add_aff('كايتو',4); add_aff('أياني',7); add_aff('مومو',1); open_phone(); open_app(5)
 		if frames==40 and 'ward' in OS.get_cmdline_user_args(): mode='play'; apply_outfit(1); open_phone(); open_app(6)
@@ -889,6 +891,7 @@ func _physics_process(_d):
 		if frames==30 and 'talk' in OS.get_cmdline_user_args(): start_scene('w1','',npcs[5].lines)
 		if frames==20 and 'momo' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(0,0,-6)
 		if frames==20 and 'bench' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; energy=2; player.position=Vector3(20.0,0,-7.2)
+		if frames==20 and 'night' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; hud_min=22.0*60.0; env_t=0.0; player.position=Vector3(0,0,-6)
 		if frames==20 and 'street' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20)
 		if frames==20 and 'park' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(34.5,0,-4.5)
 		if frames==20 and 'world' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-30)
@@ -898,6 +901,7 @@ func _physics_process(_d):
 			get_viewport().get_texture().get_image().save_png("/tmp/shot1.png"); get_tree().quit()
 
 var energy:=5
+var stars:MeshInstance3D=null
 var bench_cd:=0.0
 var bench_t:=0.0
 var bench_lb:Label3D=null
@@ -1478,6 +1482,8 @@ func apply_tod(dt:float):
 	var tint:Color=[Color(1,0.97,1),Color(1,1,0.94),Color(1,0.93,0.86),Color(0.92,0.96,1.04)][si]
 	var tw:=create_tween().set_parallel(true)
 	tw.tween_property(sun,"light_color",sc*tint,1.0); tw.tween_property(sun,"light_energy",se,1.0)
+	var bgm:float=0.95 if (h>=6 and h<16) else (0.7 if (h>=16 and h<19.5) else 0.16)
+	tw.tween_property(env,"background_energy_multiplier",bgm,1.0)
 	tw.tween_property(env,"ambient_light_color",am*tint,1.0); tw.tween_property(env,"ambient_light_energy",ae,1.0); tw.tween_property(env,"fog_light_color",fog,1.0)
 	if si!=season_i:
 		season_i=si; RenderingServer.global_shader_parameter_set('snow',1.0 if si==3 else 0.0)
