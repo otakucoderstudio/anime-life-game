@@ -778,6 +778,23 @@ func _process(dt):
 	if day>=29 and not year_shown and mode=='play' and in_room=='': year_shown=true; show_year_end()
 	var ht="يوم %d، %s، %s"%[day,tod(),["ربيع","صيف","خريف","شتاء"][int((day-1)/7)%4]]
 	if ht!=hud_time.text: hud_time.text=ht
+	if mode=='play' and in_room=='' and player.position.x>18.0 and player.position.x<66.0:
+		bench_cd-=dt
+		var bz:float=player.position.z
+		var nearb:=false
+		for k in range(5):
+			var bx:float=20.0+k*9.0
+			if (absf(player.position.x-bx)<1.3 and absf(bz+7.2)<1.2) or (absf(player.position.x-bx-4.0)<1.3 and absf(bz+13.8)<1.2): nearb=true
+		if nearb and bench_cd<=0.0:
+			bench_cd=40.0; hud_min+=20.0; hud_clock.queue_redraw()
+			if energy<5: energy+=1; hearts.queue_redraw()
+			stats['الصحة']=clampi(stats['الصحة']+1,0,100)
+			if bench_lb==null:
+				bench_lb=Label3D.new(); bench_lb.font=ar; bench_lb.font_size=64; bench_lb.pixel_size=0.007; bench_lb.billboard=BaseMaterial3D.BILLBOARD_ENABLED; bench_lb.no_depth_test=true; bench_lb.outline_modulate=Color(0.25,0.1,0.2); bench_lb.outline_size=14; bench_lb.position=Vector3(0,2.9,0); player.add_child(bench_lb)
+			bench_lb.text="قعدت ارتاحت شوية على الكنبة"; bench_lb.visible=true; bench_t=3.0
+	if bench_t>0.0:
+		bench_t-=dt
+		if bench_t<=0.0 and bench_lb!=null: bench_lb.visible=false
 	if int(hud_min)%5==0 and int(hud_min)!=last_min: last_min=int(hud_min); hud_clock.queue_redraw()
 	var v:=joy_vec
 	var k:=Input.get_vector("ui_left","ui_right","ui_up","ui_down")
@@ -862,6 +879,7 @@ func _physics_process(_d):
 		if frames==20 and 'talk' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(-68.5,0,-17.5)
 		if frames==30 and 'talk' in OS.get_cmdline_user_args(): start_scene('w1','',npcs[5].lines)
 		if frames==20 and 'momo' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(0,0,-6)
+		if frames==20 and 'bench' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; energy=2; player.position=Vector3(20.0,0,-7.2)
 		if frames==20 and 'street' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20)
 		if frames==20 and 'park' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(34.5,0,-4.5)
 		if frames==20 and 'world' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-30)
@@ -871,6 +889,9 @@ func _physics_process(_d):
 			get_viewport().get_texture().get_image().save_png("/tmp/shot1.png"); get_tree().quit()
 
 var energy:=5
+var bench_cd:=0.0
+var bench_t:=0.0
+var bench_lb:Label3D=null
 var sun:DirectionalLight3D
 var env_t:=0.0
 var season_i:=-1
