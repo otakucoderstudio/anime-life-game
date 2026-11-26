@@ -728,7 +728,7 @@ func update_peds(dt:float):
 
 var save_t:=0.0
 func save_game():
-	var d={'stats':stats,'inv':inv,'aff':aff,'aff_day':aff_day,'rel_seen':rel_seen,'min':hud_min,'outfit':outfit_i,'energy':energy,'who':who_pick,'read':read_ids.keys()}
+	var d={'stats':stats,'inv':inv,'aff':aff,'aff_day':aff_day,'rel_seen':rel_seen,'min':hud_min,'outfit':outfit_i,'owned':owned.keys(),'energy':energy,'who':who_pick,'read':read_ids.keys()}
 	var f=FileAccess.open('user://save.json',FileAccess.WRITE)
 	if f: f.store_string(JSON.stringify(d))
 func load_game():
@@ -741,6 +741,7 @@ func load_game():
 	aff_day=d.get('aff_day',{}); rel_seen=d.get('rel_seen',{})
 	hud_min=float(d.get('min',hud_min)); energy=int(d.get('energy',energy))
 	for k in d.get('read',[]): read_ids[k]=true
+	for k in d.get('owned',[]): owned[int(k)]=true
 	if int(d.get('outfit',0))>0: apply_outfit(int(d.outfit))
 func _process(dt):
 	if mode=='play' and not ('shot' in OS.get_cmdline_user_args()):
@@ -1302,6 +1303,8 @@ func show_year_end():
 	for k in stats.keys(): if k!='الفلوس': app_layer.add_child(lbl("%s: %d"%[k,stats[k]],28,Vector2(vs.x/2-80,y),Color(1,1,1))); y+=44
 	app_layer.add_child(lbl("ارجع واكمل سنة تانية!",26,Vector2(vs.x/2-120,y+10),Color(1,1,0.85)))
 var outfit_i:=0
+var owned:={0:true,1:true,2:true}
+var ocost:={3:30,4:35,5:40}
 var outfits:=[["يونيفورم المدرسة",Color(0.17,0.3,0.6),Color(0.17,0.3,0.6),Color(1,0.35,0.5)],["فستان الصيف",Color(0.3,0.8,0.7),Color(1,0.8,0.3),Color(0.3,0.8,0.7)],["كاجوال وردي",Color(0.35,0.4,0.6),Color(1,0.65,0.78),Color(1,1,1)],["ستايل أحمر",Color(0.15,0.15,0.2),Color(0.85,0.15,0.2),Color(1,0.9,0.4)],["أخضر هادي",Color(0.95,0.95,0.9),Color(0.4,0.75,0.5),Color(0.9,0.5,0.3)],["شتوي بنفسجي",Color(0.25,0.2,0.35),Color(0.55,0.35,0.8),Color(1,0.8,0.9)]]
 func apply_outfit(i:int):
 	outfit_i=i; var o=outfits[i]
@@ -1314,8 +1317,15 @@ func show_wardrobe():
 	app_head("الدولاب",Color(0.75,0.6,0.3)); var vs:=get_viewport().get_visible_rect().size
 	for i in range(outfits.size()):
 		var ii:int=i
-		app_btn(("✓ " if i==outfit_i else "")+outfits[i][0],Vector2(vs.x/2-250+(i%2)*260,110+int(i/2)*90),Vector2(240,70),outfits[i][1].lightened(0.3),func(): apply_outfit(ii); show_wardrobe())
-	app_layer.add_child(lbl("اختار لبسك، يتغير فوراً",24,Vector2(vs.x/2-130,400),Color(1,1,0.85)))
+		var has:bool=owned.has(i)
+		var tx:String=("✓ " if i==outfit_i else "")+outfits[i][0]
+		if not has: tx+=" (%d فلوس)"%ocost[i]
+		app_btn(tx,Vector2(vs.x/2-250+(i%2)*260,110+int(i/2)*90),Vector2(240,70),outfits[i][1].lightened(0.3) if has else Color(0.75,0.75,0.75),func():
+			if owned.has(ii): apply_outfit(ii)
+			elif stats['الفلوس']>=ocost[ii]: stats['الفلوس']-=ocost[ii]; owned[ii]=true; sfx('bong'); apply_outfit(ii)
+			else: sfx('click')
+			show_wardrobe())
+	app_layer.add_child(lbl("اللبس الرمادي مقفول، اشتريه بالفلوس من المهام",24,Vector2(vs.x/2-130,400),Color(1,1,0.85)))
 func show_rel():
 	app_head("العلاقات",Color(0.85,0.5,0.65)); var vs:=get_viewport().get_visible_rect().size; var y:=100.0
 	for nm in aff.keys():
