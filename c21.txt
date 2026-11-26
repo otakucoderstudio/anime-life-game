@@ -1,0 +1,1188 @@
+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";
+
+  // ../../downloads/animegame/src/game.ts
+  var BG = { home: bg_home_default, school: bg_school_default, mall: bg_mall_default, cafe: bg_cafe_default, work: bg_work_default, park: bg_park_default };
+  var PORT = { sara: sara_default, hana: hana_default, layla: layla_default, yousef: yousef_default, adam: adam_default, karim: karim_default, reem: reem_default, hossam: hossam_default, nora: nora_default, kamal: kamal_default, m: pboy_default, f: pgirl_default };
+  var CSS = `
+.ag{position:relative;width:100%;max-width:960px;margin:0 auto;height:640px;background:#1b1530;border-radius:18px;overflow:hidden;font-family:'Noto Sans Arabic','Segoe UI',Tahoma,Arial,sans-serif;color:#fff;direction:rtl;user-select:none;-webkit-user-select:none;touch-action:none}
+.ag canvas.ag-world{position:absolute;inset:0;width:100%;height:100%;display:block}
+.ag-hud{position:absolute;top:6px;right:6px;left:6px;display:flex;flex-direction:column;gap:4px;pointer-events:none}
+.ag-top{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:13px}
+.ag-pill{background:rgba(20,12,40,.72);border:1px solid rgba(255,255,255,.2);border-radius:14px;padding:3px 10px;white-space:nowrap}
+.ag-bars{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.ag-bar{background:rgba(20,12,40,.72);border-radius:10px;padding:2px 6px;font-size:11px;border:1px solid rgba(255,255,255,.15)}
+.ag-bar i{display:block;height:6px;border-radius:4px;margin-top:2px;background:#fff3}
+.ag-bar i b{display:block;height:100%;border-radius:4px}
+.ag-goal{position:absolute;top:128px;right:6px;max-width:60%;background:rgba(255,110,170,.85);border-radius:12px;padding:3px 10px;font-size:12px;pointer-events:none}
+.ag-toast{position:absolute;top:160px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,.95);color:#2b1740;border-radius:14px;padding:6px 14px;font-size:14px;max-width:90%;text-align:center;opacity:0;transition:opacity .25s;pointer-events:none;z-index:6}
+.ag-joy{position:absolute;left:14px;bottom:18px;width:116px;height:116px;border-radius:50%;background:rgba(255,255,255,.14);border:2px solid rgba(255,255,255,.35)}
+.ag-joy div{position:absolute;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.55);left:34px;top:34px}
+.ag-act{position:absolute;right:14px;bottom:26px;min-width:96px;max-width:46%;min-height:64px;padding:8px 14px;border-radius:32px;border:2px solid #fff;background:linear-gradient(135deg,#ff6fa5,#ff9b6f);color:#fff;font:700 16px inherit;font-family:inherit;box-shadow:0 4px 14px #0006}
+.ag-act[disabled]{opacity:.35;filter:grayscale(.6)}
+.ag-menu-btn{position:absolute;right:6px;bottom:100px;display:flex;flex-direction:column;gap:6px}
+.ag-menu-btn button{width:46px;height:46px;border-radius:50%;border:2px solid #fff6;background:rgba(20,12,40,.75);color:#fff;font-size:20px}
+.ag-panel{position:absolute;inset:0;background:rgba(10,4,25,.6);display:none;align-items:flex-end;justify-content:center;z-index:5}
+.ag-sheet{width:100%;max-width:560px;max-height:88%;overflow:auto;background:linear-gradient(180deg,#fff7fb,#ffe9f3);color:#3a1d4d;border-radius:22px 22px 0 0;padding:14px 14px 18px;box-shadow:0 -6px 30px #0008}
+.ag-sheet h3{margin:0 0 4px;font-size:19px}
+.ag-sheet p{margin:4px 0 8px;font-size:14px;line-height:1.7}
+.ag-sheet button.ag-opt{display:block;width:100%;text-align:right;margin:6px 0;padding:10px 12px;min-height:46px;border-radius:14px;border:2px solid #f0b6d0;background:#fff;color:#3a1d4d;font:600 15px inherit;font-family:inherit}
+.ag-sheet button.ag-opt small{display:block;font-weight:400;color:#c9b8f0;font-size:12px}
+.ag-sheet button.ag-opt[disabled]{opacity:.45}
+.ag-sheet button.ag-opt.close{background:#f3e6fb;border-color:#d4b6ea;text-align:center}
+.ag-port{display:flex;gap:10px;align-items:center}
+.ag-port canvas{border-radius:16px;background:#ffdff0;border:2px solid #f0b6d0;flex:none}
+.ag-heart{display:inline-block;height:8px;border-radius:4px;background:#ffd0e3;width:100%;overflow:hidden}
+.ag-heart b{display:block;height:100%;background:linear-gradient(90deg,#ff6fa5,#ff3d7f)}
+.ag-title{position:absolute;inset:0;z-index:9;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:linear-gradient(160deg,#ff9fc4,#9a7bff 60%,#4fb4ff);text-align:center;padding:16px;overflow:auto}
+.ag-title h1{margin:0;font-size:34px;text-shadow:0 3px 0 #0003}
+.ag-title input{font:600 18px inherit;font-family:inherit;padding:10px 14px;border-radius:14px;border:0;text-align:center;width:220px;color:#3a1d4d}
+.ag-title .row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.ag-title button{font:700 17px inherit;font-family:inherit;padding:10px 18px;border-radius:24px;border:2px solid #fff;background:#fff3;color:#fff}
+.ag-title button.on{background:#fff;color:#7a2a8f}
+.ag-title button.go{background:linear-gradient(135deg,#ff4f93,#ff8d5a);font-size:20px;padding:12px 34px}
+.ag-sw{width:34px;height:34px;padding:0!important;border-radius:50%!important}
+.ag-meter{height:26px;border-radius:13px;background:#ddd;position:relative;overflow:hidden;margin:8px 0}
+.ag-meter .z{position:absolute;top:0;bottom:0;background:#4cd37b}
+.ag-meter .c{position:absolute;top:-2px;bottom:-2px;width:8px;background:#e8286b;border-radius:4px}
+
+.ag{box-sizing:border-box;background:#0d0a1f;border:2px solid #d9b25f;box-shadow:0 0 0 2px #3a2a63 inset,0 6px 24px #0008}
+.ag-pill{background:linear-gradient(180deg,#1d1a46,#0f0d2c);border:1.5px solid #d9b25f;color:#fff3cf;box-shadow:0 0 6px #d9b25f55}
+.ag-bar{background:linear-gradient(180deg,#1d1a46dd,#0f0d2cdd);border:1.5px solid #d9b25f;color:#fff3cf}
+.ag-bars{grid-template-columns:repeat(6,1fr)!important;gap:3px!important}.ag-bar{font-size:9.5px!important;padding:1px 4px!important;white-space:nowrap;overflow:hidden}.ag-bar i{background:#05041a;height:6px;border:1px solid #6b5420}
+.ag-bar i b{box-shadow:inset 0 2px 0 #fff6}
+.ag-goal{top:86px!important;background:linear-gradient(90deg,#8e2a6b,#c0457f);border:1.5px solid #ffd98a;color:#fff}
+.ag-toast{top:122px!important;background:linear-gradient(180deg,#fff7df,#ffe9a8);border:2px solid #d9b25f;color:#3a2a10}
+.ag-act{background:linear-gradient(180deg,#ff8fb8,#d93f86);border:2px solid #ffd98a;box-shadow:0 0 14px #ff6fa588,0 4px 10px #0008}
+.ag-menu-btn button{background:linear-gradient(180deg,#1d1a46,#0f0d2c);border:2px solid #d9b25f}
+.ag-joy{background:radial-gradient(#ffffff22,#ffffff0a);border:2px solid #d9b25f99}
+.ag-panel{background-size:cover;background-position:center;background-color:rgba(10,4,25,.7)}
+.ag-sheet{max-height:74%;background:linear-gradient(180deg,rgba(20,18,62,.94),rgba(10,8,36,.97));color:#fff3cf;border:2px solid #d9b25f;border-bottom:0;box-shadow:0 0 0 3px #0a0820,0 0 0 4px #7b5fc4,0 -8px 30px #000a;border-radius:20px 20px 0 0}
+.ag-sheet h3{color:#ffd98a;text-shadow:0 2px 0 #000a}
+.ag-sheet p{color:#f5ecd7}
+.ag-sheet button.ag-opt{background:linear-gradient(180deg,#2a2468,#171446);border:1.5px solid #d9b25f;color:#fff3cf;box-shadow:inset 0 1px 0 #ffffff33}
+.ag-sheet button.ag-opt::before{content:'\\2665 ';color:#ff6fa5}
+.ag-sheet button.ag-opt small{color:#c9b8f0}
+.ag-sheet button.ag-opt.close{background:#1a1740;border-color:#6b5420;color:#d9c8a0}
+.ag-sheet button.ag-opt.close::before{content:''}
+.ag-sheet hr{border-top-color:#6b5420!important}
+.ag-heart{background:#05041a;border:1px solid #6b5420}
+.ag-pimg{width:104px;height:104px;border-radius:12px;border:3px solid #d9b25f;object-fit:cover;flex:none;box-shadow:0 0 12px #d9b25f66}
+.ag-title{background-size:cover;background-position:center}
+.ag-title h1{color:#ffe9a8;text-shadow:0 0 18px #ff6fa5,0 3px 0 #000a;letter-spacing:1px}
+.ag-title .card{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px;border-radius:16px;border:2px solid #fff6;background:#0008;color:#fff;font:700 16px inherit;font-family:inherit}
+.ag-title .card img{width:120px;height:120px;object-fit:cover;border-radius:12px}
+.ag-title .card.on{border-color:#ffd98a;box-shadow:0 0 18px #ffd98a;background:#2a2468cc}
+.ag-title button.card.on{color:#fff!important;background:#2a2468cc!important}.ag-title button.go{border-color:#ffd98a;background:linear-gradient(180deg,#ff8fb8,#d93f86)}
+.ag-meter{background:#05041a;border:1px solid #d9b25f}
+`;
+  var DAYS = ["\u0627\u0644\u0633\u0628\u062A", "\u0627\u0644\u0623\u062D\u062F", "\u0627\u0644\u0627\u062B\u0646\u064A\u0646", "\u0627\u0644\u062B\u0644\u0627\u062B\u0627\u0621", "\u0627\u0644\u0623\u0631\u0628\u0639\u0627\u0621", "\u0627\u0644\u062E\u0645\u064A\u0633", "\u0627\u0644\u062C\u0645\u0639\u0629"];
+  var OUTFITS = {
+    uniform: { n: "\u0627\u0644\u0632\u064A \u0627\u0644\u0645\u062F\u0631\u0633\u064A", price: 0, charm: 2 },
+    casual: { n: "\u0645\u0644\u0627\u0628\u0633 \u0643\u0627\u062C\u0648\u0627\u0644", price: 0, charm: 4 },
+    sport: { n: "\u0645\u0644\u0627\u0628\u0633 \u0631\u064A\u0627\u0636\u064A\u0629", price: 60, charm: 3 },
+    formal: { n: "\u0628\u062F\u0644\u0629 / \u0641\u0633\u062A\u0627\u0646 \u0631\u0633\u0645\u064A", price: 150, charm: 10 },
+    kimono: { n: "\u0643\u064A\u0645\u0648\u0646\u0648 \u0623\u0646\u0645\u064A", price: 200, charm: 12 }
+  };
+  var HAIRS = ["#2b2438", "#7b4bd6", "#ff7eb6", "#f5c542", "#c0583a", "#3ab0ff"];
+  var RECIPES = [
+    { id: "egg", n: "\u0628\u064A\u0636 \u0628\u0627\u0644\u062C\u0628\u0646\u0629", cost: 10, h: 25, m: 3, sk: 0 },
+    { id: "kosh", n: "\u0643\u0634\u0631\u064A", cost: 15, h: 40, m: 6, sk: 10 },
+    { id: "burg", n: "\u0628\u0631\u062C\u0631 \u0645\u0646\u0632\u0644\u064A", cost: 25, h: 45, m: 10, sk: 25 },
+    { id: "cake", n: "\u0643\u064A\u0643\u0629 \u0627\u0644\u0634\u0648\u0643\u0648\u0644\u0627\u062A\u0629", cost: 30, h: 30, m: 20, sk: 35 },
+    { id: "sushi", n: "\u0633\u0648\u0634\u064A", cost: 40, h: 50, m: 18, sk: 50 }
+  ];
+  var GIFTS = { rose: { n: "\u0648\u0631\u062F\u0629 \u062D\u0645\u0631\u0627", price: 20, e: "\u{1F339}" }, choc: { n: "\u0634\u0648\u0643\u0648\u0644\u0627\u062A\u0629", price: 15, e: "\u{1F36B}" }, teddy: { n: "\u062F\u0628\u062F\u0648\u0628 \u0643\u0628\u064A\u0631", price: 40, e: "\u{1F9F8}" } };
+  var GIRLS = [
+    { id: "sara", n: "\u0633\u0627\u0631\u0629", hair: "#7b4bd6", eye: "#8e6bff", f: 1, style: "long", likes: "choc", bio: "\u0637\u0627\u0644\u0628\u0629 \u0647\u0627\u062F\u064A\u0629 \u0628\u062A\u062D\u0628 \u0627\u0644\u0642\u0631\u0627\u0621\u0629 \u0648\u0627\u0644\u0634\u0648\u0643\u0648\u0644\u0627\u062A\u0629" },
+    { id: "hana", n: "\u0647\u0646\u0627", hair: "#ff7eb6", eye: "#ff4f93", f: 1, style: "twin", likes: "teddy", bio: "\u0645\u0631\u062D\u0629 \u0648\u0628\u062A\u0639\u0634\u0642 \u0627\u0644\u062F\u0628\u0627\u062F\u064A\u0628 \u0648\u0627\u0644\u0643\u0627\u0641\u064A\u0647\u0627\u062A" },
+    { id: "layla", n: "\u0644\u064A\u0644\u0649", hair: "#25232f", eye: "#3aa0ff", f: 1, style: "long", likes: "rose", bio: "\u0631\u0632\u064A\u0646\u0629 \u0648\u063A\u0627\u0645\u0636\u0629 \u0648\u0628\u062A\u062D\u0628 \u0627\u0644\u0648\u0631\u062F" }
+  ];
+  var BOYS = [
+    { id: "yousef", n: "\u064A\u0648\u0633\u0641", hair: "#2c3e50", eye: "#4a7bff", f: 0, style: "short", likes: "choc", bio: "\u0634\u0627\u0628 \u0647\u0627\u062F\u064A \u0628\u064A\u062D\u0628 \u0627\u0644\u0643\u062A\u0628 \u0648\u0627\u0644\u0642\u0647\u0648\u0629" },
+    { id: "adam", n: "\u0622\u062F\u0645", hair: "#f5c542", eye: "#2fb36d", f: 0, style: "spiky", likes: "teddy", bio: "\u0631\u064A\u0627\u0636\u064A \u0648\u0631\u0648\u062D\u0647 \u062D\u0644\u0648\u0629 \u0648\u0628\u064A\u0636\u062D\u0643 \u0639\u0644\u0649 \u0637\u0648\u0644" },
+    { id: "karim", n: "\u0643\u0631\u064A\u0645", hair: "#c0583a", eye: "#c0392b", f: 0, style: "spiky", likes: "rose", bio: "\u0641\u0646\u0627\u0646 \u0648\u0628\u064A\u062D\u0628 \u0627\u0644\u0631\u0648\u0645\u0627\u0646\u0633\u064A\u0629" }
+  ];
+  var PLACES = {
+    home: { n: "\u0627\u0644\u0628\u064A\u062A", dx: 172, dy: 292 },
+    school: { n: "\u0627\u0644\u0645\u062F\u0631\u0633\u0629", dx: 605, dy: 238 },
+    mall: { n: "\u0627\u0644\u0645\u0648\u0644", dx: 1030, dy: 405 },
+    cafe: { n: "\u0627\u0644\u0643\u0627\u0641\u064A\u0647", dx: 178, dy: 700 },
+    work: { n: "\u0645\u062D\u0644 \u0627\u0644\u0623\u0644\u0639\u0627\u0628 (\u0634\u063A\u0644)", dx: 600, dy: 742 },
+    park: { n: "\u0627\u0644\u062D\u062F\u064A\u0642\u0629", dx: 930, dy: 548 }
+  };
+  var SEASONS = [
+    { n: "\u0627\u0644\u0631\u0628\u064A\u0639", e: "\u{1F338}", g1: "#8ad98f", g2: "#7fcf86", pk: "#6fc27a", tr: ["#ffb7d0", "#3f9d52"], pt: "#ffc4da" },
+    { n: "\u0627\u0644\u0635\u064A\u0641", e: "\u2600\uFE0F", g1: "#7ee08a", g2: "#6fd07a", pk: "#5fbf6d", tr: ["#2fa34b", "#3f9d52"], pt: "#fff6a0" },
+    { n: "\u0627\u0644\u062E\u0631\u064A\u0641", e: "\u{1F341}", g1: "#c9c97a", g2: "#bdbd6e", pk: "#b3b862", tr: ["#e8863a", "#c9552a"], pt: "#e8863a" },
+    { n: "\u0627\u0644\u0634\u062A\u0627\u0621", e: "\u2744\uFE0F", g1: "#e8f0ff", g2: "#dbe6fb", pk: "#d3e0f5", tr: ["#f4f8ff", "#cfdcf2"], pt: "#ffffff" }
+  ];
+  var FEST = ["\u0645\u0647\u0631\u062C\u0627\u0646 \u0647\u0627\u0646\u0627\u0645\u064A (\u0632\u0647\u0631 \u0627\u0644\u0643\u0631\u0632)", "\u0645\u0647\u0631\u062C\u0627\u0646 \u0647\u0627\u0646\u0627\u0628\u064A (\u0627\u0644\u0623\u0644\u0639\u0627\u0628 \u0627\u0644\u0646\u0627\u0631\u064A\u0629)", "\u0645\u0647\u0631\u062C\u0627\u0646 \u062A\u0633\u0648\u0643\u064A\u0645\u064A (\u0627\u0644\u0642\u0645\u0631)", "\u0627\u062D\u062A\u0641\u0627\u0644 \u0631\u0623\u0633 \u0627\u0644\u0633\u0646\u0629 (\u0647\u0627\u062A\u0633\u0648 \u0645\u0648\u062F\u064A)"];
+  var FURN = { bed: { n: "\u0633\u0631\u064A\u0631 \u0645\u0631\u064A\u062D", price: 80, e: "\u{1F6CF}\uFE0F", d: "\u0646\u0648\u0645 \u0623\u062D\u0633\u0646: \u0637\u0627\u0642\u0629 +12" }, desk: { n: "\u0645\u0643\u062A\u0628 \u0645\u0630\u0627\u0643\u0631\u0629", price: 70, e: "\u{1FA91}", d: "\u0645\u0630\u0627\u0643\u0631\u0629 \u0627\u0644\u0628\u064A\u062A \u0645\u0639\u0631\u0641\u0629 +1" }, shelf: { n: "\u0631\u0641 \u0645\u0627\u0646\u062C\u0627", price: 50, e: "\u{1F4DA}", d: "\u0645\u0632\u0627\u062C +3 \u0643\u0644 \u0635\u0628\u0627\u062D" }, poster: { n: "\u0628\u0648\u0633\u062A\u0631 \u0623\u0646\u0645\u064A", price: 25, e: "\u{1F5BC}\uFE0F", d: "\u0645\u0632\u0627\u062C +2 \u0643\u0644 \u0635\u0628\u0627\u062D" }, plant: { n: "\u0646\u0628\u062A\u0629 \u0632\u064A\u0646\u0629", price: 15, e: "\u{1FAB4}", d: "\u0645\u0632\u0627\u062C +2 \u0643\u0644 \u0635\u0628\u0627\u062D" }, lamp: { n: "\u0645\u0635\u0628\u0627\u062D \u0645\u0644\u0648\u0646", price: 30, e: "\u{1F4A1}", d: "\u0645\u0632\u0627\u062C +2 \u0643\u0644 \u0635\u0628\u0627\u062D" }, rug: { n: "\u0633\u062C\u0627\u062F\u0629 \u0648\u0631\u062F\u064A\u0629", price: 40, e: "\u{1F7E3}", d: "\u0645\u0632\u0627\u062C +2 \u0643\u0644 \u0635\u0628\u0627\u062D" } };
+  var PETS = { cat: { n: "\u0642\u0637\u0629", e: "\u{1F431}", c: "#f5b97a", price: 50 }, dog: { n: "\u0643\u0644\u0628", e: "\u{1F436}", c: "#c99763", price: 50 }, bunny: { n: "\u0623\u0631\u0646\u0628", e: "\u{1F430}", c: "#ffffff", price: 60 } };
+  var WW = 1238;
+  var WH = 928;
+  function startGame(root) {
+    const st = document.createElement("style");
+    st.textContent = CSS;
+    document.head.appendChild(st);
+    root.innerHTML = `<div class="ag">
+ <canvas class="ag-world"></canvas>
+ <div class="ag-hud" style="display:none"><div class="ag-top"><span class="ag-pill" id="t1"></span><span class="ag-pill" id="t2"></span><span class="ag-pill" id="t3"></span></div><div class="ag-bars" id="bars"></div></div>
+ <div class="ag-goal" id="goal" style="display:none"></div>
+ <div class="ag-toast" id="toast"></div>
+ <div class="ag-joy" id="joy" style="display:none"><div id="knob"></div></div>
+ <button class="ag-act" id="act" style="display:none" disabled>\u062A\u0641\u0627\u0639\u0644</button>
+ <div class="ag-menu-btn" id="mb" style="display:none"><button id="b1" title="\u0627\u0644\u062D\u0627\u0644\u0629">\u{1F4CB}</button><button id="b2" title="\u0627\u0644\u062E\u0632\u0627\u0646\u0629">\u{1F457}</button><button id="b3" title="\u0627\u0644\u062D\u064A\u0648\u0627\u0646 \u0627\u0644\u0623\u0644\u064A\u0641">\u{1F43E}</button></div>
+ <div class="ag-panel" id="panel"><div class="ag-sheet" id="sheet"></div></div>
+ <div class="ag-title" id="title"></div></div>`;
+    const $ = (s) => root.querySelector(s);
+    const box = $(".ag"), cv = $("canvas.ag-world"), cx = cv.getContext("2d");
+    let S = null, running = false, cleanup = [], panelOpen = false;
+    const keys = {};
+    let joy = { x: 0, y: 0 };
+    const rnd = (a, b) => a + Math.random() * (b - a), pick = (a) => a[Math.floor(Math.random() * a.length)], clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+    const g = (m, f) => S && S.gender === "f" ? f : m;
+    function person(c, x, y, u, o) {
+      const skin = o.skin || "#ffe0c8", hair = o.hair, eye = o.eye || "#4a5cff", f = o.f, sty = o.style || "short", bob = o.bob || 0;
+      y += bob;
+      c.save();
+      c.translate(x, y);
+      c.scale(u, u);
+      c.fillStyle = "rgba(0,0,0,.2)";
+      c.beginPath();
+      c.ellipse(0, 1, 9, 3.5, 0, 0, 7);
+      c.fill();
+      const out = o.outfit || "casual";
+      let top = "#ff8fb1", bot = "#3a3f5c", acc = null;
+      if (out === "uniform") {
+        top = "#ffffff";
+        bot = "#1f2d5c";
+        acc = "#d33";
+      } else if (out === "casual") {
+        top = f ? "#ff8fb1" : "#4aa3ff";
+        bot = f ? "#6c5ce7" : "#3a3f5c";
+      } else if (out === "sport") {
+        top = "#2ecc71";
+        bot = "#222";
+        acc = "#fff";
+      } else if (out === "formal") {
+        top = f ? "#8e1e5a" : "#202020";
+        bot = f ? "#8e1e5a" : "#202020";
+        acc = "#fff";
+      } else if (out === "kimono") {
+        top = "#c0392b";
+        bot = "#c0392b";
+        acc = "#f1c40f";
+      }
+      const skirt = f && (out === "uniform" || out === "casual" || out === "formal" || out === "kimono");
+      c.fillStyle = skin;
+      c.fillRect(-4.5, -9, 3.3, 9);
+      c.fillRect(1.2, -9, 3.3, 9);
+      c.fillStyle = "#fff";
+      c.fillRect(-5, -1.5, 4, 2);
+      c.fillRect(1, -1.5, 4, 2);
+      c.fillStyle = bot;
+      if (skirt) {
+        c.beginPath();
+        c.moveTo(-7, -8);
+        c.lineTo(7, -8);
+        c.lineTo(8.5, -15);
+        c.lineTo(-8.5, -15);
+        c.fill();
+      } else {
+        c.fillRect(-5, -15, 10, 8);
+      }
+      if (out === "sport") {
+        c.fillStyle = "#2a2a2a";
+        c.fillRect(-5, -15, 10, 6);
+      }
+      c.fillStyle = top;
+      c.beginPath();
+      c.roundRect ? c.roundRect(-6, -22, 12, 9, 2) : c.rect(-6, -22, 12, 9);
+      c.fill();
+      c.fillStyle = skin;
+      c.fillRect(-8.5, -21, 2.6, 8);
+      c.fillRect(5.9, -21, 2.6, 8);
+      if (out === "uniform") {
+        c.fillStyle = acc;
+        c.fillRect(-1, -22, 2, 6);
+      }
+      if (out === "kimono") {
+        c.fillStyle = acc;
+        c.fillRect(-6, -17, 12, 2.5);
+      }
+      if (out === "formal" && !f) {
+        c.fillStyle = "#fff";
+        c.fillRect(-1.5, -22, 3, 7);
+        c.fillStyle = "#c33";
+        c.fillRect(-0.7, -21, 1.4, 5);
+      }
+      if (out === "sport") {
+        c.fillStyle = acc;
+        c.fillRect(-6, -19, 12, 1.3);
+      }
+      c.fillStyle = hair;
+      if (sty === "long") {
+        c.beginPath();
+        c.ellipse(0, -23, 10.5, 11, 0, 0, 7);
+        c.fill();
+        c.fillRect(-10.5, -25, 21, 15);
+      }
+      if (sty === "twin") {
+        c.beginPath();
+        c.ellipse(-11, -22, 3.6, 9, 0.1, 0, 7);
+        c.fill();
+        c.beginPath();
+        c.ellipse(11, -22, 3.6, 9, -0.1, 0, 7);
+        c.fill();
+      }
+      c.fillStyle = skin;
+      c.beginPath();
+      c.ellipse(0, -27, 9.5, 9, 0, 0, 7);
+      c.fill();
+      c.strokeStyle = "#4a2c4f";
+      c.lineWidth = 0.8;
+      c.stroke();
+      const ey = -27;
+      for (const s of [-1, 1]) {
+        c.fillStyle = "#fff";
+        c.beginPath();
+        c.ellipse(s * 4.1, ey, 2.9, 3.6, 0, 0, 7);
+        c.fill();
+        c.fillStyle = eye;
+        c.beginPath();
+        c.ellipse(s * 4.1, ey + 0.3, 2.3, 3.2, 0, 0, 7);
+        c.fill();
+        c.fillStyle = "#14102a";
+        c.beginPath();
+        c.ellipse(s * 4.1, ey + 0.5, 1.2, 1.9, 0, 0, 7);
+        c.fill();
+        c.fillStyle = "#fff";
+        c.beginPath();
+        c.arc(s * 4.1 - 0.8, ey - 1, 0.9, 0, 7);
+        c.fill();
+        c.beginPath();
+        c.arc(s * 4.1 + 0.8, ey + 1.2, 0.45, 0, 7);
+        c.fill();
+        c.fillStyle = "rgba(255,90,130,.35)";
+        c.beginPath();
+        c.ellipse(s * 6, ey + 4.2, 1.8, 1, 0, 0, 7);
+        c.fill();
+      }
+      c.strokeStyle = "#a8505e";
+      c.lineWidth = 0.6;
+      c.beginPath();
+      c.arc(0, -22.7, 1.6, 0.2, Math.PI - 0.2);
+      c.stroke();
+      c.fillStyle = hair;
+      c.beginPath();
+      c.ellipse(0, -31.2, 10, 6.5, 0, Math.PI, 0);
+      c.fill();
+      c.beginPath();
+      c.moveTo(-9.8, -31);
+      c.lineTo(-5, -25.5);
+      c.lineTo(-1, -31);
+      c.lineTo(2, -26);
+      c.lineTo(5, -31);
+      c.lineTo(9, -26.5);
+      c.lineTo(9.8, -31);
+      c.fill();
+      c.strokeStyle = "rgba(60,30,70,.55)";
+      c.lineWidth = 0.6;
+      c.beginPath();
+      c.ellipse(0, -31.2, 10, 6.5, 0, Math.PI, 0);
+      c.stroke();
+      c.strokeStyle = "rgba(255,255,255,.55)";
+      c.lineWidth = 1.1;
+      c.beginPath();
+      c.arc(-3, -33.5, 5, 3.6, 5.2);
+      c.stroke();
+      if (sty === "spiky") {
+        c.beginPath();
+        c.moveTo(-8, -35);
+        c.lineTo(-5, -41);
+        c.lineTo(-2, -35);
+        c.lineTo(1, -42);
+        c.lineTo(4, -35);
+        c.lineTo(8, -40);
+        c.lineTo(9, -33);
+        c.fill();
+      }
+      if (sty === "twin") {
+        c.fillStyle = "#fff";
+        c.fillRect(-12, -28, 2.5, 2);
+        c.fillRect(9.7, -28, 2.5, 2);
+      }
+      c.restore();
+    }
+    function pOpts(o) {
+      return o;
+    }
+    const playerOpts = () => ({ hair: S.hair, eye: S.gender === "f" ? "#ff5d9e" : "#4a5cff", f: S.gender === "f", style: S.gender === "f" ? "long" : "spiky", outfit: S.outfit });
+    const trees = [];
+    const roads = [];
+    const solids = [[45, 55, 175, 222], [395, 18, 358, 190], [868, 28, 370, 362], [55, 520, 228, 150], [458, 498, 284, 205], [905, 610, 185, 190]];
+    const cars = [{ x: 100, y: 452, v: 90, c: "#e74c3c" }, { x: 700, y: 452, v: 70, c: "#f1c40f" }, { x: 1e3, y: 452, v: 110, c: "#2ecc71" }, { x: 400, y: 484, v: -80, c: "#3498db" }, { x: 900, y: 484, v: -100, c: "#ecf0f1" }];
+    const peds = [];
+    for (let i = 0; i < 9; i++) peds.push({ x: rnd(40, WW - 40), y: rnd(436, 492), tx: 0, ty: 0, w: rnd(0, 3), hair: pick(HAIRS), outfit: pick(["casual", "sport", "formal"]), f: Math.random() < 0.5, style: pick(["short", "long", "spiky", "twin"]) });
+    const petals = [];
+    for (let i = 0; i < 30; i++) petals.push({ x: rnd(0, WW), y: rnd(0, WH), s: rnd(0.5, 1.6), v: rnd(8, 22), p: rnd(0, 7) });
+    const sIdx = () => S ? Math.floor(S.day / 14) % 4 : 0, isFest = () => S && S.day % 14 === 6;
+    let P = { x: 172, y: 300, dir: 1, walk: 0 }, npcs = [], cam = { x: 0, y: 0, z: 1 };
+    function setupNpcs() {
+      const L = S.gender === "f" ? BOYS : GIRLS;
+      const F = S.gender === "f" ? [{ id: "reem", n: "\u0631\u064A\u0645", hair: "#ff9f43", eye: "#e67e22", f: 1, style: "twin", role: "friend", bio: "\u0635\u0627\u062D\u0628\u062A\u0643 \u0627\u0644\u0645\u0642\u0631\u0651\u0628\u0629 \u0641\u064A \u0627\u0644\u0645\u062F\u0631\u0633\u0629" }, { id: "nora", n: "\u0646\u0648\u0631\u0627", hair: "#00a8a8", eye: "#16a085", f: 1, style: "long", role: "rival", bio: "\u0645\u0646\u0627\u0641\u0633\u062A\u0643 \u0627\u0644\u062F\u0627\u064A\u0645\u0629 \u0639\u0644\u0649 \u0627\u0644\u0645\u0631\u0643\u0632 \u0627\u0644\u0623\u0648\u0644" }] : [{ id: "hossam", n: "\u062D\u0633\u0627\u0645", hair: "#3b3b4f", eye: "#2d98da", f: 0, style: "short", role: "friend", bio: "\u0635\u0627\u062D\u0628\u0643 \u0627\u0644\u0648\u0641\u064A \u0645\u0646 \u0623\u0648\u0644 \u064A\u0648\u0645" }, { id: "kamal", n: "\u0643\u0645\u0627\u0644", hair: "#b03a2e", eye: "#e74c3c", f: 0, style: "spiky", role: "rival", bio: "\u0645\u0646\u0627\u0641\u0633\u0643 \u0627\u0644\u062F\u0627\u064A\u0645 \u0639\u0644\u0649 \u0627\u0644\u0645\u0631\u0643\u0632 \u0627\u0644\u0623\u0648\u0644" }];
+      npcs = L.concat(F).map((d, i) => ({ ...d, x: 0, y: 0, tx: 0, ty: 0, w: 0, vis: false, sched: i }));
+    }
+    function npcAnchor(n) {
+      const h = S.min / 60, dow = S.day % 7;
+      const sch = dow === 6 ? "wk" : "sc";
+      const spots = { sara: ["school", "park"], hana: ["school", "cafe"], layla: ["park", "school"], yousef: ["school", "park"], adam: ["park", "school"], karim: ["school", "cafe"], reem: ["school", "cafe"], hossam: ["school", "park"], nora: ["school", "park"], kamal: ["school", "cafe"] };
+      const [a, b] = spots[n.id];
+      if (h < 7 || h >= 22) return null;
+      if (h < 15 && dow !== 6) return a;
+      if (h < 15) return b === "cafe" ? "cafe" : "park";
+      return b;
+    }
+    function spot(pl) {
+      if (pl === "school") return [600, 290];
+      if (pl === "park") return [880, 545];
+      if (pl === "cafe") return [180, 730];
+      if (pl === "work") return [600, 775];
+      return [172, 310];
+    }
+    function updateNpcs(dt) {
+      for (const n of npcs) {
+        const a = npcAnchor(n);
+        if (!a) {
+          n.vis = false;
+          continue;
+        }
+        const sp = spot(a);
+        const off = n.sched * 38 - 38;
+        if (!n.vis || n.at !== a) {
+          if (!n.vis || Math.hypot(n.x - sp[0], n.y - sp[1]) > 400 || true) {
+            n.x = sp[0] + off;
+            n.y = sp[1] + rnd(-10, 10);
+          }
+          n.at = a;
+          n.vis = true;
+          n.tx = n.x;
+          n.ty = n.y;
+        }
+        n.w -= dt;
+        if (n.w <= 0) {
+          n.w = rnd(1.5, 4);
+          n.tx = sp[0] + off + rnd(-45, 45);
+          n.ty = sp[1] + rnd(-30, 30);
+        }
+        const dx = n.tx - n.x, dy = n.ty - n.y, d = Math.hypot(dx, dy);
+        if (d > 2) {
+          n.x += dx / d * 28 * dt;
+          n.y += dy / d * 28 * dt;
+          n.bob = Math.sin(performance.now() / 90) * 0.8;
+        } else n.bob = 0;
+      }
+    }
+    function blocked(x, y) {
+      for (const r2 of solids) if (x > r2[0] && x < r2[0] + r2[2] && y > r2[1] && y < r2[1] + r2[3]) return true;
+      return false;
+    }
+    const mapImg = new Image();
+    let mapOK = false;
+    const tint = [];
+    mapImg.onload = () => {
+      mapOK = true;
+      for (let k = 0; k < 4; k++) {
+        const c = document.createElement("canvas");
+        c.width = WW;
+        c.height = WH;
+        const x = c.getContext("2d");
+        x.drawImage(mapImg, 0, 0, WW, WH);
+        if (k === 1) {
+          x.fillStyle = "rgba(255,236,140,.13)";
+          x.fillRect(0, 0, WW, WH);
+        }
+        if (k === 2) {
+          x.globalCompositeOperation = "multiply";
+          x.fillStyle = "rgba(255,170,90,.55)";
+          x.fillRect(0, 0, WW, WH);
+          x.globalCompositeOperation = "overlay";
+          x.fillStyle = "rgba(255,140,40,.35)";
+          x.fillRect(0, 0, WW, WH);
+        }
+        if (k === 3) {
+          x.globalCompositeOperation = "saturation";
+          x.fillStyle = "rgba(128,128,128,.6)";
+          x.fillRect(0, 0, WW, WH);
+          x.globalCompositeOperation = "source-over";
+          x.fillStyle = "rgba(225,238,255,.32)";
+          x.fillRect(0, 0, WW, WH);
+        }
+        tint.push(c);
+      }
+    };
+    mapImg.src = map_default;
+    function drawWorld() {
+      const w = cv.width, h = cv.height;
+      cx.setTransform(1, 0, 0, 1, 0, 0);
+      const SE = SEASONS[sIdx()];
+      cx.fillStyle = "#4d7f58";
+      cx.fillRect(0, 0, w, h);
+      cam.z = Math.min(w, h) / 420;
+      cam.x = clamp(P.x - w / 2 / cam.z, 0, Math.max(0, WW - w / cam.z));
+      cam.y = clamp(P.y - h / 2 / cam.z - 20, 0, Math.max(0, WH - h / cam.z));
+      cx.setTransform(cam.z, 0, 0, cam.z, -cam.x * cam.z, -cam.y * cam.z);
+      const hr = S ? S.min / 60 : 12;
+      if (tint[sIdx()]) cx.drawImage(tint[sIdx()], 0, 0);
+      else if (mapOK) cx.drawImage(mapImg, 0, 0, WW, WH);
+      const tm = performance.now();
+      for (const k in PLACES) {
+        const p = PLACES[k];
+        const r2 = 18 + Math.sin(tm / 280) * 2.5;
+        cx.strokeStyle = "#ffd98a";
+        cx.lineWidth = 2.5;
+        cx.shadowColor = "#ff6fa5";
+        cx.shadowBlur = 14;
+        cx.beginPath();
+        cx.arc(p.dx, p.dy, r2, 0, 7);
+        cx.stroke();
+        cx.shadowBlur = 0;
+        cx.fillStyle = "rgba(255,217,138,.25)";
+        cx.beginPath();
+        cx.arc(p.dx, p.dy, r2 - 4, 0, 7);
+        cx.fill();
+        cx.font = "bold 13px sans-serif";
+        cx.textAlign = "center";
+        cx.lineWidth = 4;
+        cx.strokeStyle = "rgba(20,10,50,.9)";
+        const nm = p.n.replace(" (\u0634\u063A\u0644)", "");
+        cx.strokeText(nm, p.dx, p.dy - 26);
+        cx.fillStyle = "#ffe9a8";
+        cx.fillText(nm, p.dx, p.dy - 26);
+      }
+      const dr = [];
+      for (const t of trees) dr.push({ y: t.y, f: () => {
+        cx.fillStyle = "#6b4a2e";
+        cx.fillRect(t.x - 3 * t.s, t.y - 18 * t.s, 6 * t.s, 18 * t.s);
+        cx.fillStyle = t.sak ? SE.tr[0] : SE.tr[1];
+        if (!t.sak && sIdx() === 2) cx.fillStyle = SE.tr[0];
+        cx.beginPath();
+        cx.arc(t.x, t.y - 26 * t.s, 16 * t.s, 0, 7);
+        cx.arc(t.x - 10 * t.s, t.y - 19 * t.s, 10 * t.s, 0, 7);
+        cx.arc(t.x + 10 * t.s, t.y - 19 * t.s, 10 * t.s, 0, 7);
+        cx.fill();
+      } });
+      for (const c of cars) dr.push({ y: c.y + 10, f: () => {
+        cx.fillStyle = "#0004";
+        cx.fillRect(c.x - 22, c.y + 8, 46, 5);
+        cx.fillStyle = c.c;
+        cx.beginPath();
+        cx.roundRect ? cx.roundRect(c.x - 22, c.y - 10, 46, 20, 5) : cx.rect(c.x - 22, c.y - 10, 46, 20);
+        cx.fill();
+        cx.fillStyle = "#bfe6ff";
+        cx.fillRect(c.x + (c.v > 0 ? 4 : -16), c.y - 8, 13, 9);
+        cx.fillStyle = "#111";
+        cx.fillRect(c.x - 16, c.y + 8, 9, 4);
+        cx.fillRect(c.x + 8, c.y + 8, 9, 4);
+      } });
+      for (const q of peds) dr.push({ y: q.y, f: () => person(cx, q.x, q.y, 0.8, { hair: q.hair, f: q.f, style: q.style, outfit: q.outfit, bob: Math.sin(performance.now() / 110 + q.w) * 0.7 }) });
+      for (const n of npcs) if (n.vis) dr.push({ y: n.y, f: () => {
+        person(cx, n.x, n.y, 0.9, { ...n, outfit: "casual", bob: n.bob });
+        const a = S.npcs[n.id].aff;
+        cx.fillStyle = S.partner === n.id ? "#ff3d7f" : "#fff";
+        cx.font = "bold 11px sans-serif";
+        cx.textAlign = "center";
+        cx.lineWidth = 3;
+        cx.strokeStyle = "rgba(40,20,60,.85)";
+        cx.strokeText((S.partner === n.id ? "\u2665 " : "") + n.n, n.x, n.y - 46);
+        cx.fillText((S.partner === n.id ? "\u2665 " : "") + n.n, n.x, n.y - 46);
+      } });
+      if (S.pet) dr.push({ y: S.pet.p.y, f: () => drawPet(cx, S.pet.p.x, S.pet.p.y, 1, S.pet.type) });
+      dr.push({ y: P.y, f: () => {
+        person(cx, P.x, P.y, 0.9, { ...playerOpts(), bob: P.walk > 0 ? Math.sin(performance.now() / 80) * 1 : 0 });
+        cx.fillStyle = "#fff";
+        cx.font = "bold 11px sans-serif";
+        cx.textAlign = "center";
+        cx.lineWidth = 3;
+        cx.strokeStyle = "rgba(40,20,60,.85)";
+        cx.strokeText(S.name, P.x, P.y - 46);
+        cx.fillText(S.name, P.x, P.y - 46);
+      } });
+      dr.sort((a, b) => a.y - b.y).forEach((d) => d.f());
+      cx.fillStyle = SE.pt;
+      for (const p of petals) {
+        cx.beginPath();
+        if (sIdx() === 3) cx.arc(p.x, p.y, 2 * p.s, 0, 7);
+        else if (sIdx() === 1) {
+          if (hr < 6 || hr >= 19) cx.arc(p.x, p.y + Math.sin(p.p * 2) * 6, 1.6, 0, 7);
+          else continue;
+        } else cx.ellipse(p.x, p.y, 3 * p.s, 1.8 * p.s, p.p, 0, 7);
+        cx.fill();
+      }
+      if (S && isFest() && hr >= 16 && hr < 23) {
+        for (let i = 0; i < 9; i++) {
+          const lx = 830 + i * 45, ly = 508 + Math.sin(i) * 6;
+          cx.fillStyle = ["#ff4f6d", "#ffd23f", "#ff9f43"][i % 3];
+          cx.beginPath();
+          cx.ellipse(lx, ly, 7, 9, 0, 0, 7);
+          cx.fill();
+          cx.fillStyle = "#fff8";
+          cx.fillRect(lx - 1, ly - 12, 2, 4);
+        }
+        cx.fillStyle = "#fff";
+        cx.font = "bold 12px sans-serif";
+        cx.textAlign = "center";
+        cx.fillText("\u{1F3EE} " + FEST[sIdx()], 1e3, 488);
+      }
+      if (S && sIdx() === 1 && isFest() && hr >= 19 && hr < 23) {
+        const t = performance.now() / 700;
+        for (let k = 0; k < 3; k++) {
+          const ph = (t + k * 1.3) % 4, fx = 940 + k * 120 + Math.sin(k * 5) * 20, fy = 400 - k * 18;
+          if (ph < 2) {
+            cx.fillStyle = ["#ff4f6d", "#ffd23f", "#6fe0ff"][k];
+            for (let a = 0; a < 14; a++) {
+              const an = a / 14 * 6.28, r2 = ph * 20;
+              cx.fillRect(fx + Math.cos(an) * r2, fy + Math.sin(an) * r2 + ph * 3, 3, 3);
+            }
+          }
+        }
+      }
+      if (S) {
+        let a = 0;
+        if (hr >= 19) a = Math.min(0.55, (hr - 19) / 3 * 0.55);
+        else if (hr < 6) a = 0.55;
+        else if (hr < 8) a = 0.55 * (8 - hr) / 2;
+        if (S.weather !== "clear") {
+          cx.setTransform(1, 0, 0, 1, 0, 0);
+          cx.fillStyle = "rgba(60,70,100,.18)";
+          cx.fillRect(0, 0, w, h);
+          if (S.weather === "rain") {
+            cx.strokeStyle = "rgba(200,225,255,.6)";
+            cx.lineWidth = 1.2;
+            const tt = performance.now() / 40;
+            for (let i = 0; i < 90; i++) {
+              const rx = (i * 97 + tt * 9) % w, ry = (i * 53 + tt * 22) % h;
+              cx.beginPath();
+              cx.moveTo(rx, ry);
+              cx.lineTo(rx - 4, ry + 12);
+              cx.stroke();
+            }
+          }
+        }
+        if (a > 0) {
+          cx.setTransform(1, 0, 0, 1, 0, 0);
+          cx.fillStyle = `rgba(15,10,60,${a})`;
+          cx.fillRect(0, 0, w, h);
+        } else if (hr >= 17 && hr < 19) {
+          cx.setTransform(1, 0, 0, 1, 0, 0);
+          cx.fillStyle = "rgba(255,140,60,.12)";
+          cx.fillRect(0, 0, w, h);
+        }
+      }
+    }
+    let toastT = null;
+    function toast(m, ms = 2600) {
+      const t = $("#toast");
+      t.textContent = m;
+      t.style.opacity = 1;
+      clearTimeout(toastT);
+      toastT = setTimeout(() => t.style.opacity = 0, ms);
+    }
+    const fmtT = () => {
+      const m = Math.floor(S.min), hh = Math.floor(m / 60), mm = m % 60, ap = hh >= 12 ? "\u0645" : "\u0635";
+      const h12 = hh % 12 === 0 ? 12 : hh % 12;
+      return `${h12}:${String(mm).padStart(2, "0")} ${ap}`;
+    };
+    function hud() {
+      $("#t1").textContent = `${SEASONS[sIdx()].e} ${DAYS[S.day % 7]} \u2022 \u064A\u0648\u0645 ${S.day + 1}`;
+      $("#t2").textContent = `\u{1F552} ${fmtT()} ${S.weather === "rain" ? "\u{1F327}\uFE0F" : S.weather === "snow" ? "\u{1F328}\uFE0F" : "\u2600\uFE0F"}`;
+      $("#t3").textContent = `\u{1F4B0} ${Math.floor(S.money)} \u062C`;
+      const B = [["\u26A1 \u0627\u0644\u0637\u0627\u0642\u0629", S.energy, "#ffd23f"], ["\u{1F37D}\uFE0F \u0627\u0644\u062C\u0648\u0639", S.hunger, "#ff8a4c"], ["\u{1F60A} \u0627\u0644\u0645\u0632\u0627\u062C", S.mood, "#ff6fa5"], ["\u{1F4DA} \u0627\u0644\u0645\u0639\u0631\u0641\u0629", S.know, "#4fb4ff"], ["\u2728 \u0627\u0644\u062C\u0627\u0630\u0628\u064A\u0629", S.charm, "#b583ff"], ["\u{1F469}\u200D\u{1F373} \u0627\u0644\u0637\u0628\u062E", S.cook, "#4cd37b"]];
+      $("#bars").innerHTML = B.map((b) => `<div class="ag-bar">${b[0]}<i><b style="width:${clamp(b[1], 0, 100)}%;background:${b[2]}"></b></i></div>`).join("");
+      const goal = isFest() ? `\u{1F3EE} \u0627\u0644\u0646\u0647\u0627\u0631\u062F\u0629 ${FEST[sIdx()]} \u0641\u064A \u0627\u0644\u062D\u062F\u064A\u0642\u0629 \u0645\u0646 4 \u0627\u0644\u0639\u0635\u0631!` : S.know >= 100 && S.partner ? "\u{1F389} \u0643\u0645\u0644\u062A \u0643\u0644 \u0627\u0644\u0623\u0647\u062F\u0627\u0641! \u0643\u0645\u0651\u0644 \u062D\u064A\u0627\u062A\u0643 \u0628\u0631\u0627\u062D\u062A\u0643" : !S.partner && S.know < 100 ? `\u{1F3AF} \u0647\u062F\u0641\u0643: \u062E\u0644\u0651\u0635 \u062F\u0631\u0627\u0633\u062A\u0643 (${Math.floor(S.know)}/100) \u0648\u0627\u0628\u062D\u062B \u0639\u0646 \u0627\u0644\u062D\u0628` : S.know < 100 ? `\u{1F3AF} \u0647\u062F\u0641\u0643: \u0643\u0645\u0651\u0644 \u062F\u0631\u0627\u0633\u062A\u0643 (${Math.floor(S.know)}/100)` : "\u{1F3AF} \u0647\u062F\u0641\u0643: \u0644\u0627\u0642\u064A \u0627\u0644\u062D\u0628 \u2764\uFE0F";
+      $("#goal").textContent = goal;
+    }
+    function stat(k, d) {
+      S[k] = clamp(S[k] + d, 0, 100);
+    }
+    function spend(n) {
+      if (S.money < n) {
+        toast("\u0641\u0644\u0648\u0633\u0643 \u0645\u0634 \u0643\u0641\u0627\u064A\u0629 \u{1F4B8}");
+        return false;
+      }
+      S.money -= n;
+      return true;
+    }
+    function pass(mins) {
+      if (S.pet) {
+        S.pet.hun = clamp(S.pet.hun - mins * 0.02, 0, 100);
+        S.pet.joy = clamp(S.pet.joy - mins * (S.pet.hun < 20 ? 0.04 : 0.012), 0, 100);
+      }
+      S.min += mins;
+      stat("hunger", -mins * 0.035);
+      stat("energy", -mins * 0.015);
+      while (S.min >= 1440) {
+        S.min -= 1440;
+        S.day++;
+        newDay();
+      }
+      if (S.hunger <= 0) stat("mood", -mins * 0.03);
+    }
+    function newDay() {
+      for (const n of Object.keys(S.npcs)) {
+        if (S.partner === n) S.npcs[n].aff = Math.max(40, S.npcs[n].aff - (S.talkedToday[n] ? 0 : 4));
+        else S.npcs[n].aff = Math.max(0, S.npcs[n].aff - (S.talkedToday[n] ? 0 : 1));
+      }
+      S.talkedToday = {};
+      S.workToday = 0;
+      S.weather = Math.random() < 0.28 ? sIdx() === 3 ? "snow" : "rain" : "clear";
+      if (sIdx() === 3 && S.weather === "clear" && Math.random() < 0.4) S.weather = "snow";
+      let fm = 0;
+      S.furn.forEach((k) => {
+        if (k === "shelf") fm += 3;
+        else if (k !== "bed" && k !== "desk") fm += 2;
+      });
+      if (fm) stat("mood", fm);
+      if (S.pet) {
+        stat("mood", S.pet.joy > 50 ? 4 : -3);
+      }
+      if (S.day % 7 === 0) S.examDone = false;
+    }
+    function sleepNow() {
+      const h = S.min / 60;
+      let wake = 7 * 60;
+      const hours = h < 7 ? 7 - h : 24 - h + 7;
+      if (h >= 7) S.day++, newDay();
+      else newDay();
+      S.min = wake;
+      S.energy = clamp(40 + hours * 9 + (S.furn.includes("bed") ? 12 : 0), 50, 100);
+      S.hunger = Math.max(20, S.hunger - 25);
+      stat("mood", 8);
+      toast(`\u0635\u062D\u064A\u062A \u064A\u0648\u0645 \u062C\u062F\u064A\u062F: ${DAYS[S.day % 7]} \u2600\uFE0F`);
+    }
+    function faint() {
+      S.energy = 0;
+      toast(g("\u0623\u063A\u0645\u064A \u0639\u0644\u064A\u0643", "\u0623\u063A\u0645\u064A \u0639\u0644\u064A\u0643\u064A") + " \u0645\u0646 \u0627\u0644\u062A\u0639\u0628! \u0627\u062A\u0646\u0642\u0644\u062A \u0644\u0644\u0628\u064A\u062A \u{1F635}");
+      P.x = PLACES.home.dx;
+      P.y = PLACES.home.dy + 20;
+      sleepNow();
+      stat("mood", -10);
+      S.money = Math.max(0, S.money - 20);
+    }
+    let curBg = null;
+    function closePanel() {
+      curBg = null;
+      $("#panel").style.display = "none";
+      panelOpen = false;
+    }
+    function openPanel(html) {
+      $("#panel").style.backgroundImage = curBg ? `linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.35)),url(${BG[curBg]})` : "none";
+      $("#sheet").innerHTML = html;
+      $("#panel").style.display = "flex";
+      panelOpen = true;
+      $("#sheet").scrollTop = 0;
+    }
+    function esc(s) {
+      return String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+    }
+    let actMap = {};
+    function menu(title, body, items, opt = {}) {
+      actMap = {};
+      let h = `<h3>${esc(title)}</h3>`;
+      if (opt.npc) {
+        h = `<div class="ag-port"><img class="ag-pimg" src="${PORT[opt.npc.id]}" alt=""><div style="flex:1"><h3>${esc(title)}</h3>${opt.sub || ""}</div></div>`;
+      }
+      if (body) h += `<p>${body}</p>`;
+      items.forEach((it, i) => {
+        actMap["o" + i] = it.fn;
+        h += `<button class="ag-opt${it.cls ? " " + it.cls : ""}" data-k="o${i}"${it.dis ? " disabled" : ""}>${esc(it.t)}${it.s ? `<small>${esc(it.s)}</small>` : ""}</button>`;
+      });
+      if (!opt.noClose) {
+        actMap.cl = closePanel;
+        h += `<button class="ag-opt close" data-k="cl">\u0625\u063A\u0644\u0627\u0642</button>`;
+      }
+      openPanel(h);
+    }
+    $("#sheet").addEventListener("click", (e) => {
+      const b = e.target.closest("button[data-k]");
+      if (!b || b.disabled) return;
+      const f = actMap[b.dataset.k];
+      if (f) f();
+    });
+    function afterAct() {
+      hud();
+      if (S.energy <= 0) faint();
+    }
+    function menuHome() {
+      curBg = "home";
+      menu("\u{1F3E0} \u0627\u0644\u0628\u064A\u062A", `\u0627\u0644\u0633\u0627\u0639\u0629 ${fmtT()}. \u0625\u064A\u0647 \u0627\u0644\u0644\u064A \u0647\u062A\u0639\u0645\u0644\u0647\u061F`, [
+        { t: "\u{1F634} \u0646\u0648\u0645", s: S.min / 60 < 20 && S.min / 60 >= 7 ? "\u062A\u0642\u062F\u0631 \u062A\u0646\u0627\u0645 \u0628\u062F\u0631\u064A \u0628\u0633 \u0627\u0644\u0637\u0627\u0642\u0629 \u0647\u062A\u062A\u0639\u0648\u0636 \u0623\u0642\u0644" : "\u062A\u0631\u062C\u0639 \u064A\u0648\u0645 \u062C\u062F\u064A\u062F \u0627\u0644\u0633\u0627\u0639\u0629 7 \u0627\u0644\u0635\u0628\u062D", fn: () => {
+          closePanel();
+          sleepNow();
+          hud();
+        } },
+        { t: "\u{1F373} \u0627\u0644\u0645\u0637\u0628\u062E (\u0637\u0628\u062E)", s: `\u0645\u0633\u062A\u0648\u0649 \u0627\u0644\u0637\u0628\u062E ${Math.floor(S.cook)}`, fn: menuCook },
+        { t: "\u{1F457} \u0627\u0644\u062E\u0632\u0627\u0646\u0629 (\u062A\u063A\u064A\u064A\u0631 \u0627\u0644\u0645\u0644\u0627\u0628\u0633)", fn: menuWardrobe },
+        { t: "\u{1F6CB}\uFE0F \u062A\u062C\u0647\u064A\u0632 \u0627\u0644\u063A\u0631\u0641\u0629", s: `\u0645\u0639\u0627\u0643 ${S.furn.length} \u0645\u0646 ${Object.keys(FURN).length} \u0642\u0637\u0639`, fn: menuRoom },
+        { t: "\u{1F4D6} \u0645\u0630\u0627\u0643\u0631\u0629 \u0641\u064A \u0627\u0644\u0628\u064A\u062A", s: "\u0633\u0627\u0639\u062A\u064A\u0646 \u2022 \u0645\u0639\u0631\u0641\u0629 +3 \u2022 \u0637\u0627\u0642\u0629 -12", fn: () => {
+          if (S.energy < 14) return toast("\u0623\u0646\u062A \u062A\u0639\u0628\u0627\u0646\u060C \u0646\u0627\u0645 \u0627\u0644\u0623\u0648\u0644");
+          const kb = 3 + (S.furn.includes("desk") ? 1 : 0);
+          stat("know", kb);
+          stat("energy", -12);
+          stat("mood", -3);
+          pass(120);
+          afterAct();
+          toast("\u0630\u0627\u0643\u0631\u062A \u0633\u0627\u0639\u062A\u064A\u0646 \u{1F4DA} \u0645\u0639\u0631\u0641\u0629 +" + kb);
+          if (S.know >= 100) checkGrad();
+        } }
+      ]);
+    }
+    function drawRoom(c) {
+      const W = 300, H = 150;
+      const g1 = c.createLinearGradient(0, 0, 0, H * 0.7);
+      g1.addColorStop(0, "#ffd6e8");
+      g1.addColorStop(1, "#ffeaf3");
+      c.fillStyle = g1;
+      c.fillRect(0, 0, W, H);
+      c.fillStyle = "#c98f5b";
+      c.fillRect(0, H * 0.68, W, H * 0.32);
+      c.fillStyle = "#b97d49";
+      for (let i = 0; i < W; i += 30) c.fillRect(i, H * 0.68, 2, H * 0.32);
+      c.fillStyle = "#bfe6ff";
+      c.fillRect(120, 18, 60, 48);
+      c.strokeStyle = "#fff";
+      c.lineWidth = 3;
+      c.strokeRect(120, 18, 60, 48);
+      c.beginPath();
+      c.moveTo(150, 18);
+      c.lineTo(150, 66);
+      c.moveTo(120, 42);
+      c.lineTo(180, 42);
+      c.stroke();
+      c.fillStyle = "#ffc4da";
+      c.beginPath();
+      c.arc(135, 34, 3, 0, 7);
+      c.fill();
+      const has = (k) => S.furn.includes(k);
+      if (has("rug")) {
+        c.fillStyle = "#c78bd9";
+        c.beginPath();
+        c.ellipse(150, 128, 70, 12, 0, 0, 7);
+        c.fill();
+      }
+      if (has("bed")) {
+        c.fillStyle = "#fff";
+        c.fillRect(205, 70, 80, 36);
+        c.fillStyle = "#ff8fb1";
+        c.fillRect(205, 86, 80, 24);
+        c.fillStyle = "#fff";
+        c.fillRect(208, 74, 22, 12);
+      } else {
+        c.fillStyle = "#d8c7e0";
+        c.fillRect(215, 88, 60, 20);
+      }
+      if (has("desk")) {
+        c.fillStyle = "#8a5a3a";
+        c.fillRect(20, 86, 60, 6);
+        c.fillRect(24, 92, 5, 26);
+        c.fillRect(71, 92, 5, 26);
+        c.fillStyle = "#4aa3ff";
+        c.fillRect(34, 70, 26, 16);
+      }
+      if (has("shelf")) {
+        c.fillStyle = "#8a5a3a";
+        c.fillRect(20, 30, 70, 5);
+        for (let i = 0; i < 7; i++) {
+          c.fillStyle = ["#ff6fa5", "#4fb4ff", "#ffd23f", "#8e6bff"][i % 4];
+          c.fillRect(24 + i * 9, 18, 7, 12);
+        }
+      }
+      if (has("poster")) {
+        c.fillStyle = "#fff";
+        c.fillRect(205, 20, 36, 46);
+        c.fillStyle = "#ff6fa5";
+        c.fillRect(209, 24, 28, 38);
+        c.fillStyle = "#ffe0c8";
+        c.beginPath();
+        c.arc(223, 38, 7, 0, 7);
+        c.fill();
+        c.fillStyle = "#7b4bd6";
+        c.fillRect(214, 36, 18, 5);
+      }
+      if (has("plant")) {
+        c.fillStyle = "#b9692f";
+        c.fillRect(5, 100, 16, 14);
+        c.fillStyle = "#3fb55e";
+        c.beginPath();
+        c.ellipse(13, 92, 12, 12, 0, 0, 7);
+        c.fill();
+      }
+      if (has("lamp")) {
+        c.fillStyle = "#ffe27a";
+        c.beginPath();
+        c.arc(100, 100, 10, 0, 7);
+        c.fill();
+        c.fillStyle = "#ffe27a66";
+        c.beginPath();
+        c.arc(100, 100, 22, 0, 7);
+        c.fill();
+        c.fillStyle = "#666";
+        c.fillRect(99, 108, 3, 10);
+      }
+      if (S.pet) {
+        drawPet(c, 255, 128, 1.3, S.pet.type);
+      }
+      person(c, 150, 128, 1.35, { ...playerOpts(), outfit: S.outfit });
+    }
+    function menuRoom() {
+      menu("\u{1F6CB}\uFE0F \u063A\u0631\u0641\u062A\u0643", '<canvas id="rc" width="300" height="150" style="width:100%;border-radius:14px;border:2px solid #f0b6d0"></canvas>', Object.keys(FURN).map((k) => {
+        const f = FURN[k], has = S.furn.includes(k);
+        return { t: `${f.e} ${f.n} ${has ? "\u2714 \u0645\u0639\u0627\u0643" : "\u2022 " + f.price + " \u062C"}`, s: f.d, dis: has, fn: () => {
+          if (!spend(f.price)) return;
+          S.furn.push(k);
+          pass(20);
+          hud();
+          toast("\u0627\u062A\u062D\u0637\u062A \u0641\u064A \u063A\u0631\u0641\u062A\u0643 \u2728");
+          menuRoom();
+        } };
+      }));
+      drawRoom($("#rc").getContext("2d"));
+    }
+    function drawPet(c, x, y, u, type) {
+      const col = PETS[type].c;
+      c.save();
+      c.translate(x, y);
+      c.scale(u, u);
+      c.fillStyle = "rgba(0,0,0,.2)";
+      c.beginPath();
+      c.ellipse(0, 1, 8, 2.5, 0, 0, 7);
+      c.fill();
+      c.fillStyle = col;
+      c.strokeStyle = "#4a2c4f";
+      c.lineWidth = 0.7;
+      c.beginPath();
+      c.ellipse(0, -6, 8, 6, 0, 0, 7);
+      c.fill();
+      c.stroke();
+      if (type === "cat") {
+        c.beginPath();
+        c.moveTo(7, -8);
+        c.quadraticCurveTo(15, -12, 12, -18);
+        c.stroke();
+      }
+      c.beginPath();
+      c.ellipse(-4, -12, 6.5, 5.8, 0, 0, 7);
+      c.fill();
+      c.stroke();
+      c.beginPath();
+      if (type === "bunny") {
+        c.ellipse(-6, -22, 1.8, 5, -0.2, 0, 7);
+        c.ellipse(-2, -22, 1.8, 5, 0.2, 0, 7);
+      } else if (type === "dog") {
+        c.ellipse(-9, -12, 2.6, 5, 0.3, 0, 7);
+        c.ellipse(1, -12, 2.6, 5, -0.3, 0, 7);
+      } else {
+        c.moveTo(-9, -15);
+        c.lineTo(-8, -21);
+        c.lineTo(-5, -16);
+        c.moveTo(-3, -16);
+        c.lineTo(0, -21);
+        c.lineTo(1, -15);
+      }
+      c.fill();
+      c.stroke();
+      c.fillStyle = "#14102a";
+      c.beginPath();
+      c.ellipse(-6.2, -12, 1.2, 1.7, 0, 0, 7);
+      c.ellipse(-1.8, -12, 1.2, 1.7, 0, 0, 7);
+      c.fill();
+      c.fillStyle = "#fff";
+      c.beginPath();
+      c.arc(-6.5, -12.8, 0.5, 0, 7);
+      c.arc(-2.1, -12.8, 0.5, 0, 7);
+      c.fill();
+      c.fillStyle = "#ff8fb1";
+      c.beginPath();
+      c.arc(-4, -9.8, 0.8, 0, 7);
+      c.fill();
+      c.restore();
+    }
+    function menuPet() {
+      if (!S.pet) {
+        return menu("\u{1F43E} \u0645\u0644\u062C\u0623 \u0627\u0644\u062D\u064A\u0648\u0627\u0646\u0627\u062A", "\u062A\u0642\u062F\u0631 \u062A\u062A\u0628\u0646\u0649 \u062D\u064A\u0648\u0627\u0646 \u0623\u0644\u064A\u0641 \u064A\u0645\u0634\u064A \u0645\u0639\u0627\u0643 \u0648\u064A\u062D\u0633\u0651\u0646 \u0645\u0632\u0627\u062C\u0643 \u0643\u0644 \u064A\u0648\u0645.", Object.keys(PETS).map((k) => ({ t: `${PETS[k].e} ${PETS[k].n} \u2022 ${PETS[k].price} \u062C`, fn: () => {
+          if (!spend(PETS[k].price)) return;
+          S.pet = { type: k, hun: 80, joy: 80, name: pick(["\u0645\u064A\u0645\u064A", "\u0644\u0648\u0644\u0648", "\u0643\u0648\u0643\u064A", "\u0634\u064A\u0631\u0648", "\u0645\u0648\u0643\u0627"]), p: { x: P.x - 20, y: P.y } };
+          hud();
+          toast(`\u0627\u062A\u0628\u0646\u064A\u062A ${PETS[k].n} \u0627\u0633\u0645\u0647\u0627 ${S.pet.name} \u{1F970}`);
+          menuPet();
+        } })));
+      }
+      const pt = S.pet;
+      menu(`${PETS[pt.type].e} ${pt.name}`, `<canvas id="pp" width="90" height="70" style="float:left"></canvas>\u062C\u0648\u0639: ${Math.floor(pt.hun)}% \u2022 \u0633\u0639\u0627\u062F\u0629: ${Math.floor(pt.joy)}%<br>${pt.joy > 50 ? "\u0645\u0628\u0633\u0648\u0637\u0629 \u0648\u0628\u062A\u062D\u0628\u0643 \u{1F495}" : "\u0645\u062D\u062A\u0627\u062C\u0629 \u0627\u0647\u062A\u0645\u0627\u0645 \u{1F97A}"}`, [
+        { t: "\u{1F356} \u0623\u0643\u0651\u0644\u0647\u0627", s: "10 \u062C\u0646\u064A\u0647 \u2022 \u062C\u0648\u0639 +40", fn: () => {
+          if (!spend(10)) return;
+          pt.hun = clamp(pt.hun + 40, 0, 100);
+          pt.joy = clamp(pt.joy + 5, 0, 100);
+          pass(10);
+          hud();
+          toast("\u0623\u0643\u0644\u062A \u0648\u0641\u0631\u062D\u062A \u{1F60B}");
+          menuPet();
+        } },
+        { t: "\u{1F3BE} \u0627\u0644\u0639\u0628 \u0645\u0639\u0627\u0647\u0627", s: "\u0646\u0635 \u0633\u0627\u0639\u0629 \u2022 \u0633\u0639\u0627\u062F\u0629 +30 \u2022 \u0645\u0632\u0627\u062C +4", fn: () => {
+          if (S.energy < 8) return toast("\u0623\u0646\u062A \u062A\u0639\u0628\u0627\u0646");
+          pt.joy = clamp(pt.joy + 30, 0, 100);
+          stat("mood", 4);
+          stat("energy", -6);
+          pass(30);
+          afterAct();
+          toast("\u0644\u0639\u0628\u062A\u0648\u0627 \u0645\u0639 \u0628\u0639\u0636 \u{1F3BE}");
+          menuPet();
+        } },
+        { t: "\u{1F932} \u062F\u0644\u0651\u0639\u0647\u0627", s: "\u0633\u0639\u0627\u062F\u0629 +10 \u2022 \u0645\u0632\u0627\u062C +2", fn: () => {
+          pt.joy = clamp(pt.joy + 10, 0, 100);
+          stat("mood", 2);
+          pass(10);
+          hud();
+          menuPet();
+        } }
+      ]);
+      drawPet($("#pp").getContext("2d"), 48, 60, 4, pt.type);
+    }
+    function menuWardrobe() {
+      menu(
+        "\u{1F457} \u0627\u0644\u062E\u0632\u0627\u0646\u0629",
+        `\u0644\u0627\u0628\u0633 \u062F\u0644\u0648\u0642\u062A\u064A: <b>${OUTFITS[S.outfit].n}</b><br>\u0627\u0644\u0645\u0644\u0627\u0628\u0633 \u0628\u062A\u0623\u062B\u0631 \u0639\u0644\u0649 \u062C\u0627\u0630\u0628\u064A\u062A\u0643 (\u2728 ${Math.floor(S.charm)}).`,
+        Object.keys(OUTFITS).filter((k) => S.owned.includes(k)).map((k) => ({ t: (S.outfit === k ? "\u2714 " : "") + OUTFITS[k].n, s: `\u062C\u0627\u0630\u0628\u064A\u0629 +${OUTFITS[k].charm}`, fn: () => {
+          S.outfit = k;
+          toast("\u0644\u0628\u0633\u062A " + OUTFITS[k].n + " \u{1F45A}");
+          menuWardrobe();
+          hud();
+        } })),
+        {}
+      );
+    }
+    function menuCook() {
+      menu("\u{1F373} \u0627\u0644\u0645\u0637\u0628\u062E", "\u0627\u062E\u062A\u0627\u0631 \u0627\u0644\u0623\u0643\u0644\u0629. \u0627\u0644\u0645\u0643\u0648\u0646\u0627\u062A \u0628\u062A\u062A\u0634\u0631\u0649 \u0645\u0646 \u0641\u0644\u0648\u0633\u0643.", RECIPES.map((r2) => ({ t: `${r2.n} \u2022 ${r2.cost} \u062C`, s: r2.sk > S.cook ? `\u{1F512} \u0645\u062D\u062A\u0627\u062C \u0645\u0647\u0627\u0631\u0629 \u0637\u0628\u062E ${r2.sk}` : `\u0634\u0628\u0639 +${r2.h} \u2022 \u0645\u0632\u0627\u062C +${r2.m}`, dis: r2.sk > S.cook, fn: () => cookGame(r2) })));
+    }
+    function cookGame(r2) {
+      if (S.money < r2.cost) return toast("\u0641\u0644\u0648\u0633\u0643 \u0645\u0634 \u0643\u0641\u0627\u064A\u0629 \u0644\u0644\u0645\u0643\u0648\u0646\u0627\u062A \u{1F4B8}");
+      if (S.energy < 8) return toast("\u0623\u0646\u062A \u062A\u0639\u0628\u0627\u0646 \u062C\u062F\u0627\u064B");
+      actMap = {};
+      const zw = 34 - Math.min(14, S.cook / 6), zs = rnd(15, 80 - zw);
+      let pos = 0, dir = 1, run = true, t0 = performance.now();
+      openPanel(`<h3>\u{1F373} \u0628\u062A\u0637\u0628\u062E ${r2.n}</h3><p>\u0627\u0636\u063A\u0637 \xAB\u0627\u0642\u0644\u0628!\xBB \u0644\u0645\u0627 \u0627\u0644\u0645\u0624\u0634\u0631 \u064A\u0628\u0642\u0649 \u0641\u064A \u0627\u0644\u0645\u0646\u0637\u0642\u0629 \u0627\u0644\u062E\u0636\u0631\u0627.</p><div class="ag-meter"><div class="z" style="right:${zs}%;width:${zw}%"></div><div class="c" id="cur"></div></div><button class="ag-opt" id="flip" style="text-align:center;font-size:19px">\u{1F525} \u0627\u0642\u0644\u0628!</button>`);
+      const cur2 = $("#cur");
+      const tick = () => {
+        if (!run) return;
+        const dt = (performance.now() - t0) / 1e3;
+        t0 = performance.now();
+        pos += dir * dt * (70 + S.cook * 0.3);
+        if (pos >= 96) {
+          pos = 96;
+          dir = -1;
+        }
+        if (pos <= 0) {
+          pos = 0;
+          dir = 1;
+        }
+        cur2.style.right = pos + "%";
+        requestAnimationFrame(tick);
+      };
+      tick();
+      $("#flip").onclick = () => {
+        run = false;
+        const c = pos + 2;
+        let q, mult, sk, txt;
+        if (c >= zs && c <= zs + zw) {
+          q = "perfect";
+          mult = 1.3;
+          sk = 4;
+          txt = "\u0637\u0644\u0639\u062A \u062A\u062D\u0641\u0629! \u{1F60D}";
+        } else if (Math.abs(c - (zs + zw / 2)) < zw) {
+          q = "ok";
+          mult = 1;
+          sk = 2;
+          txt = "\u0637\u0644\u0639\u062A \u0643\u0648\u064A\u0633\u0629 \u{1F642}";
+        } else {
+          q = "burn";
+          mult = 0.4;
+          sk = 1;
+          txt = "\u0627\u062A\u062D\u0631\u0642\u062A \u0634\u0648\u064A\u0629 \u{1F605}";
+        }
+        S.money -= r2.cost;
+        stat("hunger", r2.h * mult);
+        stat("mood", r2.m * mult * (q === "burn" ? 0.3 : 1));
+        stat("energy", -8);
+        S.cook = clamp(S.cook + sk, 0, 100);
+        pass(45);
+        hud();
+        menu("\u{1F37D}\uFE0F \u0627\u0644\u0646\u062A\u064A\u062C\u0629", `${r2.n}: ${txt}<br>\u0634\u0628\u0639 +${Math.round(r2.h * mult)} \u2022 \u0645\u0647\u0627\u0631\u0629 \u0627\u0644\u0637\u0628\u062E +${sk}`, [{ t: "\u0627\u0637\u0628\u062E \u062A\u0627\u0646\u064A", fn: menuCook }, { t: "\u0631\u062C\u0648\u0639 \u0644\u0644\u0628\u064A\u062A", fn: menuHome }], { noClose: true });
+      };
+    }
+    function checkGrad() {
+      if (S.know >= 100 && !S.grad) {
+        S.grad = true;
+        menu("\u{1F393} \u0645\u0628\u0631\u0648\u0643!", `\u062E\u0644\u0651\u0635\u062A \u0645\u0646\u0647\u062C \u0627\u0644\u0645\u062F\u0631\u0633\u0629 \u0643\u0644\u0647 \u0648\u0628\u0642\u064A\u062A \u0645\u0646 \u0627\u0644\u0623\u0648\u0627\u0626\u0644! \u0627\u0644\u0641\u0631\u062D\u0629 \u0643\u0628\u064A\u0631\u0629 \u{1F389}<br>\u062A\u0642\u062F\u0631 \u062A\u0643\u0645\u0644 \u062D\u064A\u0627\u062A\u0643\u060C \u062A\u0634\u062A\u063A\u0644\u060C \u062A\u062D\u0628\u060C \u0648\u062A\u062C\u0631\u0628 \u0643\u0644 \u062D\u0627\u062C\u0629.`, [{ t: "\u064A\u0644\u0627 \u0646\u0643\u0645\u0644", fn: closePanel }], { noClose: true });
+      }
+    }
+    function menuSchool() {
+      curBg = "school";
+      const h = S.min / 60, dow = S.day % 7, open = dow !== 6 && h >= 8 && h < 15;
+      const uni = S.outfit === "uniform";
+      menu("\u{1F3EB} \u0627\u0644\u0645\u062F\u0631\u0633\u0629", open ? `\u0627\u0644\u0645\u062F\u0631\u0633\u0629 \u0645\u0641\u062A\u0648\u062D\u0629. ${uni ? "\u0644\u0627\u0628\u0633 \u0627\u0644\u0632\u064A \u0627\u0644\u0645\u062F\u0631\u0633\u064A\u060C \u062A\u0645\u0627\u0645 \u2705" : "\u0645\u0634 \u0644\u0627\u0628\u0633 \u0627\u0644\u0632\u064A \u0627\u0644\u0645\u062F\u0631\u0633\u064A\u060C \u0647\u062A\u062A\u0646\u0628\u0647 \u0645\u0646 \u0627\u0644\u0645\u062F\u0631\u0633 \u26A0\uFE0F"}` : dow === 6 ? "\u0627\u0644\u0646\u0647\u0627\u0631\u062F\u0629 \u0627\u0644\u062C\u0645\u0639\u0629\u060C \u0627\u0644\u0645\u062F\u0631\u0633\u0629 \u0645\u0642\u0641\u0648\u0644\u0629 \u{1F512}" : "\u0627\u0644\u0645\u062F\u0631\u0633\u0629 \u0645\u0641\u062A\u0648\u062D\u0629 \u0645\u0646 8 \u0627\u0644\u0635\u0628\u062D \u0644\u0640 3 \u0627\u0644\u0639\u0635\u0631 \u{1F512}", [
+        { t: "\u{1F4DA} \u062D\u0636\u0648\u0631 \u062D\u0635\u0629", s: "3 \u0633\u0627\u0639\u0627\u062A \u2022 \u0645\u0639\u0631\u0641\u0629 +6 \u2022 \u0637\u0627\u0642\u0629 -18", dis: !open, fn: () => {
+          if (S.energy < 20) return toast("\u0623\u0646\u062A \u062A\u0639\u0628\u0627\u0646");
+          stat("know", uni ? 6 : 3.5);
+          stat("energy", -18);
+          stat("mood", uni ? -2 : -8);
+          pass(180);
+          afterAct();
+          toast(uni ? "\u062D\u0635\u0629 \u0645\u0645\u062A\u0627\u0632\u0629! \u0645\u0639\u0631\u0641\u0629 +6 \u{1F4DA}" : "\u0627\u0644\u0645\u062F\u0631\u0633 \u0632\u0639\u0644 \u0645\u0646 \u0644\u0628\u0633\u0643\u060C \u0645\u0639\u0631\u0641\u0629 +3.5");
+          checkGrad();
+          menuSchool();
+        } },
+        { t: "\u{1F3DB}\uFE0F \u0627\u0644\u0645\u0643\u062A\u0628\u0629 (\u0645\u0630\u0627\u0643\u0631\u0629)", s: "\u0633\u0627\u0639\u062A\u064A\u0646 \u2022 \u0645\u0639\u0631\u0641\u0629 +4 \u2022 \u0637\u0627\u0642\u0629 -12", dis: !open, fn: () => {
+          if (S.energy < 14) return toast("\u0623\u0646\u062A \u062A\u0639\u0628\u0627\u0646");
+          stat("know", 4);
+          stat("energy", -12);
+          pass(120);
+          afterAct();
+          toast("\u0630\u0627\u0643\u0631\u062A \u0641\u064A \u0627\u0644\u0645\u0643\u062A\u0628\u0629\u060C \u0645\u0639\u0631\u0641\u0629 +4");
+          checkGrad();
+          menuSchool();
+        } },
+        { t: "\u{1F4DD} \u0627\u0645\u062A\u062D\u0627\u0646 \u0627\u0644\u0623\u0633\u0628\u0648\u0639", s: S.examDone ? "\u0627\u062A\u0639\u0645\u0644 \u0627\u0644\u0623\u0633\u0628\u0648\u0639 \u062F\u0647" : "\u0628\u064A\u0639\u062A\u0645\u062F \u0639\u0644\u0649 \u0645\u0639\u0631\u0641\u062A\u0643 \u2022 \u0628\u064A\u062F\u064A \u0641\u0644\u0648\u0633 \u0645\u0643\u0627\u0641\u0623\u0629", dis: !open || S.examDone, fn: () => {
+          const sc = Math.round(clamp(S.know * 0.9 + rnd(0, 15), 0, 100));
+          S.examDone = true;
+          const rw = Math.round(sc * 0.8);
+          S.money += rw;
+          stat("energy", -10);
+          pass(90);
+          afterAct();
+          const rv = Math.round(clamp(45 + S.day * 2 + rnd(-8, 10), 40, 96)), rn = npcs.find((x) => x.role === "rival"), beat = sc > rv;
+          if (beat) {
+            S.money += 30;
+            stat("mood", 10);
+          } else stat("mood", -6);
+          menu("\u{1F4DD} \u0646\u062A\u064A\u062C\u0629 \u0627\u0644\u0627\u0645\u062A\u062D\u0627\u0646", `\u062C\u0628\u062A <b>${sc} \u0645\u0646 100</b> ${sc >= 85 ? "\u{1F3C6} \u0645\u0645\u062A\u0627\u0632" : sc >= 60 ? "\u{1F44D} \u062C\u064A\u062F" : "\u{1F615} \u0645\u062D\u062A\u0627\u062C \u0645\u0630\u0627\u0643\u0631\u0629 \u0623\u0643\u062A\u0631"}<br>\u0645\u0643\u0627\u0641\u0623\u0629: ${rw} \u062C\u0646\u064A\u0647<br>${rn ? rn.n : "\u0627\u0644\u0645\u0646\u0627\u0641\u0633"} \u062C\u0627\u0628 <b>${rv}</b> ${beat ? "\u2014 \u0625\u0646\u062A \u0627\u062A\u0641\u0648\u0642\u062A \u0639\u0644\u064A\u0647! \u{1F3C6} (+30 \u062C\u0646\u064A\u0647)" : "\u2014 \u0647\u0648 \u0627\u062A\u0641\u0648\u0642 \u0639\u0644\u064A\u0643 \u0647\u0630\u0647 \u0627\u0644\u0645\u0631\u0629 \u{1F624}"}`, [{ t: "\u062A\u0645\u0627\u0645", fn: menuSchool }], { noClose: true });
+        } }
+      ]);
+    }
+    function menuCafe() {
+      curBg = "cafe";
+      const items = [["\u2615 \u0642\u0647\u0648\u0629", 8, 10, 6], ["\u{1F96A} \u0633\u0627\u0646\u062F\u0648\u062A\u0634", 15, 30, 3], ["\u{1F35D} \u0648\u062C\u0628\u0629 \u0643\u0627\u0645\u0644\u0629", 30, 55, 8], ["\u{1F370} \u0643\u064A\u0643 \u0648\u0639\u0635\u064A\u0631", 20, 20, 14]];
+      menu("\u2615 \u0627\u0644\u0643\u0627\u0641\u064A\u0647", "\u0623\u0647\u0644\u0627\u064B \u0628\u064A\u0643! \u0627\u062E\u062A\u0627\u0631 \u0637\u0644\u0628\u0643.", items.map((i) => ({ t: `${i[0]} \u2022 ${i[1]} \u062C`, s: `\u0634\u0628\u0639 +${i[2]} \u2022 \u0645\u0632\u0627\u062C +${i[3]}`, fn: () => {
+        if (!spend(i[1])) return;
+        stat("hunger", i[2]);
+        stat("mood", i[3]);
+        pass(30);
+        hud();
+        toast("\u0628\u0627\u0644\u0647\u0646\u0627 \u0648\u0627\u0644\u0634\u0641\u0627 \u{1F60B}");
+        menuCafe();
+      } })));
+    }
+    function menuMall() {
+      curBg = "mall";
+      menu("\u{1F6CD}\uFE0F \u0627\u0644\u0645\u0648\u0644", "\u0645\u062D\u0644\u0627\u062A \u0627\u0644\u0645\u0644\u0627\u0628\u0633 \u0648\u0627\u0644\u0647\u062F\u0627\u064A\u0627 \u0648\u0627\u0644\u0635\u0627\u0644\u0648\u0646.", [
+        { t: "\u{1F455} \u0645\u062D\u0644 \u0627\u0644\u0645\u0644\u0627\u0628\u0633", fn: menuShop },
+        { t: "\u{1F381} \u0645\u062D\u0644 \u0627\u0644\u0647\u062F\u0627\u064A\u0627", fn: menuGifts },
+        { t: "\u{1F487} \u0627\u0644\u0635\u0627\u0644\u0648\u0646 (\u0644\u0648\u0646 \u0627\u0644\u0634\u0639\u0631)", s: "30 \u062C\u0646\u064A\u0647", fn: menuSalon }
+      ]);
+    }
+    function menuShop() {
+      curBg = "mall";
+      menu("\u{1F455} \u0645\u062D\u0644 \u0627\u0644\u0645\u0644\u0627\u0628\u0633", "\u0627\u0634\u062A\u0631\u064A \u0645\u0644\u0627\u0628\u0633 \u062C\u062F\u064A\u062F\u0629. \u0627\u0644\u0644\u0628\u0633 \u0627\u0644\u062D\u0644\u0648 \u0628\u064A\u0632\u0648\u062F \u062C\u0627\u0630\u0628\u064A\u062A\u0643 \u2728", Object.keys(OUTFITS).map((k) => {
+        const o = OUTFITS[k], has = S.owned.includes(k);
+        return { t: `${o.n} ${has ? "\u2714 \u0645\u0639\u0627\u0643" : "\u2022 " + o.price + " \u062C"}`, s: `\u062C\u0627\u0630\u0628\u064A\u0629 +${o.charm}`, dis: has, fn: () => {
+          if (!spend(o.price)) return;
+          S.owned.push(k);
+          S.outfit = k;
+          pass(30);
+          hud();
+          toast("\u0627\u0634\u062A\u0631\u064A\u062A \u0648\u062C\u0631\u0628\u062A " + o.n + " \u{1F60D}");
+          menuShop();
+        } };
+      }));
+    }
+    function menuGifts() {
+      menu("\u{1F381} \u0645\u062D\u0644 \u0627\u0644\u0647\u062F\u0627\u064A\u0627", `\u0645\u0639\u0627\u0643: ${Object.keys(GIFTS).map((k) => GIFTS[k].e + "\xD7" + (S.gifts[k] || 0)).join(" ")}`, Object.keys(GIFTS).map((k) => ({ t: `${GIFTS[k].e} ${GIFTS[k].n} \u2022 ${GIFTS[k].price} \u062C`, fn: () => {
+        if (!spend(GIFTS[k].price)) return;
+        S.gifts[k] = (S.gifts[k] || 0) + 1;
+        pass(10);
+        hud();
+        toast("\u0627\u0634\u062A\u0631\u064A\u062A " + GIFTS[k].n);
+        menuGifts();
+      } })));
+    }
+    function menuSalon() {
+      menu("\u{1F487} \u0627\u0644\u0635\u0627\u0644\u0648\u0646", "\u0627\u062E\u062A\u0627\u0631 \u0644\u0648\u0646 \u0634\u0639\u0631\u0643 \u0627\u0644\u062C\u062F\u064A\u062F", HAIRS.map((c, i) => ({ t: `\u0644\u0648\u0646 ${i + 1}  \u25CF`, s: "30 \u062C\u0646\u064A\u0647", fn: () => {
+        if (c === S.hair) return toast("\u062F\u0647 \u0644\u0648\u0646 \u0634\u0639\u0631\u0643 \u062F\u0644\u0648\u0642\u062A\u064A");
+        if (!spend(30)) return;
+        S.hair = c;
+        stat("charm", 2);
+        pass(45);
+        hud();
+        toast("\u0634\u0643\u0644\u0643 \u0627\u062A\u063A\u064A\u0631! \u2728");
+        menuSalon();
+      } })));
+      const bs = $("#sheet").querySelectorAll("button.ag-opt");
+      HAIRS.forEach((c, i) => {
+        bs[i].style.borderRight = `14px solid ${c}`;
+      });
+    }
+    function menuWork() {
+      curBg = "work";
+      const h = S.min / 60;
+      const J = [
+        { t: "\u{1F3AE} \u0628\u0627\u0626\u0639 \u0641\u064A \u0645\u062D\u0644 \u0627\u0644\u0623\u0644\u0639\u0627\u0628", s: "4 \u0633\u0627\u0639\u0627\u062A \u2022 +45 \u062C \u2022 \u0637\u0627\u0642\u0629 -25 \u2022 9\u0635-9\u0645", open: h >= 9 && h < 21, need: 28, pay: 45, en: 25, mins: 240, mood: -6 },
+        { t: "\u{1F6F5} \u062A\u0648\u0635\u064A\u0644 \u0637\u0644\u0628\u0627\u062A", s: "3 \u0633\u0627\u0639\u0627\u062A \u2022 +65 \u062C \u2022 \u0637\u0627\u0642\u0629 -30 \u2022 10\u0635-10\u0645", open: h >= 10 && h < 22, need: 33, pay: 65, en: 30, mins: 180, mood: -6 },
+        { t: "\u{1F393} \u0645\u062F\u0631\u0651\u0633 \u062E\u0635\u0648\u0635\u064A", s: "3 \u0633\u0627\u0639\u0627\u062A \u2022 +90 \u062C \u2022 \u0637\u0627\u0642\u0629 -18 \u2022 \u0645\u062D\u062A\u0627\u062C \u0645\u0639\u0631\u0641\u0629 40+", open: h >= 9 && h < 20 && S.know >= 40, need: 22, pay: 90, en: 18, mins: 180, mood: -3 }
+      ];
+      menu("\u{1F4BC} \u0627\u0644\u0634\u063A\u0644 \u0627\u0644\u062C\u0632\u0626\u064A", "\u0627\u0634\u062A\u063A\u0644 \u0648\u0643\u0648\u0651\u0646 \u0641\u0644\u0648\u0633 \u0644\u062A\u0635\u0631\u0641\u0647\u0627 \u0639\u0644\u0649 \u0627\u0644\u0623\u0643\u0644 \u0648\u0627\u0644\u0647\u062F\u0648\u0645 \u0648\u0627\u0644\u0628\u064A\u062A \u0648\u0627\u0644\u0647\u062F\u0627\u064A\u0627.", J.map((j) => ({ t: j.t, s: j.open ? j.s : j.s + " \u{1F512}", dis: !j.open, fn: () => {
+        if (S.energy < j.need) return toast("\u0623\u0646\u062A \u062A\u0639\u0628\u0627\u0646");
+        const bonus = Math.random() < 0.2 ? 10 : 0;
+        S.money += j.pay + bonus;
+        stat("energy", -j.en);
+        stat("hunger", -10);
+        stat("mood", j.mood);
+        pass(j.mins);
+        afterAct();
+        toast(`\u062E\u0644\u0635\u062A \u0627\u0644\u0634\u063A\u0644: +${j.pay + bonus} \u062C\u0646\u064A\u0647 \u{1F4B0}${bonus ? " (\u0628\u0642\u0634\u064A\u0634!)" : ""}`);
+        menuWork();
+      } })));
+    }
+    function menuPark() {
+      curBg = "park";
+      menu("\u{1F338} \u0627\u0644\u062D\u062F\u064A\u0642\u0629", "\u0647\u0648\u0627 \u062D\u0644\u0648 \u0648\u0632\u0647\u0631 \u0643\u0631\u0632 \u{1F338}", [
+        { t: "\u{1F3C3} \u062C\u0631\u064A", s: "\u0633\u0627\u0639\u0629 \u2022 \u0645\u0632\u0627\u062C +10 \u2022 \u0637\u0627\u0642\u0629 -15 \u2022 \u062C\u0627\u0630\u0628\u064A\u0629 +1", fn: () => {
+          if (S.energy < 18) return toast("\u0623\u0646\u062A \u062A\u0639\u0628\u0627\u0646");
+          stat("mood", 10);
+          stat("energy", -15);
+          stat("charm", 1);
+          pass(60);
+          afterAct();
+          toast("\u062C\u0631\u064A \u0645\u0645\u062A\u0639! \u{1F3C3}");
+          menuPark();
+        } },
+        { t: "\u{1FA91} \u0631\u0627\u062D\u0629 \u0639\u0644\u0649 \u0627\u0644\u0643\u0631\u0633\u064A", s: "\u0633\u0627\u0639\u0629 \u2022 \u0637\u0627\u0642\u0629 +8 \u2022 \u0645\u0632\u0627\u062C +8", fn: () => {
+          stat("energy", 8);
+          stat("mood", 8);
+          pass(60);
+          afterAct();
+          toast("\u0627\u0633\u062A\u0631\u062E\u0627\u0621 \u062C\u0645\u064A\u0644 \u{1F338}");
+          menuPark();
+        } },
+        { t: S.pet ? "\u{1F43E} \u062D\u064A\u0648\u0627\u0646\u0643 \u0627\u0644\u0623\u0644\u064A\u0641" : "\u{1F43E} \u0645\u0644\u062C\u0623 \u0627\u0644\u062D\u064A\u0648\u0627\u0646\u0627\u062A", fn: menuPet },
+        ...isFest() && S.min / 60 >= 16 && S.min / 60 < 23 ? [{ t: "\u{1F3EE} \u062D\u0636\u0648\u0631 " + FEST[sIdx()], s: "20 \u062C \u2022 \u0633\u0627\u0639\u062A\u064A\u0646 \u2022 \u0645\u0632\u0627\u062C +25", fn: () => {
+          if (!spend(20)) return;
+          stat("mood", 25);
+          stat("hunger", 10);
+          pass(120);
+          if (S.partner) {
+            S.npcs[S.partner].aff = clamp(S.npcs[S.partner].aff + 12, 0, 100);
+            toast("\u0627\u062A\u0641\u0631\u062C\u062A\u0648\u0627 \u0639\u0644\u0649 \u0627\u0644\u0645\u0647\u0631\u062C\u0627\u0646 \u0645\u0639 \u0628\u0639\u0636 \u{1F49E} (\u0639\u0644\u0627\u0642\u0629 +12)", 3500);
+          } else {
+            const v = npcs.filter((x) => x.vis && x.at === "park");
+            if (v.length) {
+              S.npcs[v[0].id].aff = clamp(S.npcs[v[0].id].aff + 5, 0, 100)
