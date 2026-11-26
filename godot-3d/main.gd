@@ -67,13 +67,13 @@ func _ready():
 	env=Environment.new()
 	var sky:=ProceduralSkyMaterial.new()
 	sky.sky_top_color=Color(0.2,0.5,0.95); sky.sky_horizon_color=Color(0.8,0.9,1.0); sky.ground_horizon_color=Color(0.85,0.9,0.95); sky.ground_bottom_color=Color(0.6,0.65,0.7)
-	var s:=Sky.new(); s.sky_material=sky
+	var s:=Sky.new(); var psm:=PanoramaSkyMaterial.new(); psm.panorama=load('res://art/sky.jpg'); s.sky_material=psm
 	env.background_mode=Environment.BG_SKY; env.sky=s
-	env.ambient_light_source=Environment.AMBIENT_SOURCE_COLOR; env.ambient_light_color=Color(0.8,0.88,1.0); env.ambient_light_energy=0.5
-	env.glow_enabled=false; env.glow_intensity=0.35; env.glow_bloom=0.0; env.glow_hdr_threshold=1.4; env.tonemap_mode=Environment.TONE_MAPPER_FILMIC; env.tonemap_exposure=0.8; env.adjustment_enabled=true; env.adjustment_saturation=1.2; env.adjustment_contrast=1.08
-	env.fog_enabled=true; env.fog_light_color=Color(0.82,0.9,1.0); env.fog_density=0.014
+	env.ambient_light_source=Environment.AMBIENT_SOURCE_COLOR; env.ambient_light_color=Color(0.86,0.9,1.0); env.ambient_light_energy=0.55
+	env.glow_enabled=false; env.glow_intensity=0.35; env.glow_bloom=0.0; env.glow_hdr_threshold=1.4; env.tonemap_mode=Environment.TONE_MAPPER_FILMIC; env.tonemap_exposure=0.8; env.adjustment_enabled=true; env.adjustment_saturation=1.4; env.adjustment_contrast=1.1; env.adjustment_brightness=1.03
+	env.fog_enabled=true; env.fog_light_color=Color(0.86,0.92,1.0); env.fog_density=0.007
 	var we:=WorldEnvironment.new(); we.environment=env; add_child(we)
-	var sun:=DirectionalLight3D.new(); sun.rotation_degrees=Vector3(-42,-55,0); sun.light_color=Color(1,0.93,0.8); sun.light_energy=0.62; sun.shadow_enabled=false; sun.directional_shadow_max_distance=60; sun.shadow_blur=2.0; add_child(sun)
+	sun=DirectionalLight3D.new(); sun.rotation_degrees=Vector3(-42,-55,0); sun.light_color=Color(1,0.9,0.72); sun.light_energy=0.7; sun.shadow_enabled=false; sun.directional_shadow_max_distance=60; sun.shadow_blur=2.0; add_child(sun)
 	if OS.has_feature('mobile'):
 		get_viewport().scaling_3d_scale=0.6; Engine.max_fps=30
 	build_street()
@@ -81,6 +81,7 @@ func _ready():
 	no_outline=false
 	cam=Camera3D.new(); cam.fov=55; add_child(cam)
 	build_ui()
+	var vg:=TextureRect.new(); vg.texture=load('res://art/vignette.png'); vg.expand_mode=TextureRect.EXPAND_IGNORE_SIZE; vg.size=get_viewport().get_visible_rect().size; vg.mouse_filter=Control.MOUSE_FILTER_IGNORE; ui.add_child(vg); ui.move_child(vg,0)
 	petal_fx()
 	build_select(); build_scene_ui(); build_phone(); spawn_npcs(); build_audio()
 	if 'shot' in OS.get_cmdline_user_args() and not ('select' in OS.get_cmdline_user_args()): pick('girl')
@@ -333,7 +334,7 @@ func build_ui():
 	var lb:=Label.new(); lb.text="شارع الحياة"; lb.add_theme_font_override("font",f); lb.add_theme_font_size_override("font_size",34)
 	lb.add_theme_color_override("font_outline_color",Color(0.3,0.1,0.4)); lb.add_theme_constant_override("outline_size",10)
 	lb.position=Vector2(24,20); lb.text_direction=Control.TEXT_DIRECTION_RTL; cl.add_child(lb)
-	hud_time=Label.new(); hud_time.add_theme_font_override("font",f); hud_time.add_theme_font_size_override("font_size",26); hud_time.add_theme_color_override("font_color",Color(1,1,1))
+	hud_time=Label.new(); hud_time.add_theme_font_override("font",f); hud_time.add_theme_font_size_override("font_size",20); hud_time.add_theme_color_override("font_color",Color(1,1,1))
 	var ys0:=get_viewport().get_visible_rect().size
 	var panel:=Panel.new(); panel.position=Vector2(ys0.x-330,16); panel.size=Vector2(300,64)
 	var sb:=StyleBoxFlat.new(); sb.bg_color=Color(0.15,0.12,0.25,0.88); sb.set_corner_radius_all(18); panel.add_theme_stylebox_override("panel",sb); cl.add_child(panel)
@@ -518,9 +519,10 @@ func _process(dt):
 		return
 	check_triggers()
 	hud_min+=dt*2.0
+	apply_tod(dt)
 	var hh=int(hud_min/60.0)%12; if hh==0: hh=12
 	var day=1+int(hud_min/1440.0)
-	var ht="يوم %d، %s"%[day,tod()]
+	var ht="يوم %d، %s، %s"%[day,tod(),["ربيع","صيف","خريف","شتاء"][int((day-1)/7)%4]]
 	if ht!=hud_time.text: hud_time.text=ht
 	if int(hud_min)%5==0 and int(hud_min)!=last_min: last_min=int(hud_min); hud_clock.queue_redraw()
 	var v:=joy_vec
@@ -566,11 +568,16 @@ func _physics_process(_d):
 			if frames==50 and rk in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'
 			if frames==52 and rk in OS.get_cmdline_user_args(): for p in room_pts: scene_done[p.key]=true
 			if frames==52 and rk in OS.get_cmdline_user_args(): player.position+=Vector3(-2.0,0,-1.5) if rk!='home' else Vector3(-1.5,0,-3.0)
+		if frames==20 and 'street' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20)
+		if frames==5 and 'dusk' in OS.get_cmdline_user_args(): hud_min=17.5*60+14*1440.0+0.0; env_t=0.0
 		if frames==59: print('STAT nodes=',get_tree().get_node_count(),' draws=',RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME),' prims=',RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME))
 		if frames==60:
 			get_viewport().get_texture().get_image().save_png("/tmp/shot1.png"); get_tree().quit()
 
 var energy:=5
+var sun:DirectionalLight3D
+var env_t:=0.0
+var season_i:=-1
 var env:Environment
 var bnd:=Rect2(-8.5,-120,17,126)
 var in_room:=''
@@ -874,7 +881,7 @@ func enter_room(kind:String):
 	exit_btn.visible=true
 	sfx('bong'); play_bg('cafe' if kind=='cafe' else 'street')
 func exit_room():
-	in_room=''; bnd=Rect2(-8.5,-120,17,126); player.position=street_ret; exit_btn.visible=false; petals.visible=true; env.ambient_light_color=Color(0.8,0.88,1.0); env.ambient_light_energy=0.5; env.adjustment_saturation=1.2
+	in_room=''; bnd=Rect2(-8.5,-120,17,126); player.position=street_ret; exit_btn.visible=false; petals.visible=true; env_t=0.0; env.ambient_light_color=Color(0.86,0.9,1.0); env.ambient_light_energy=0.55; env.adjustment_saturation=1.2
 	cam.position=player.position+Vector3(0,3.6,6.0); sfx('bong'); play_bg('street')
 
 var app_layer:Control
@@ -951,3 +958,24 @@ func sfx(n:String,pitch:=1.0):
 	if snd.is_empty(): return
 	var key={"click":"click1","blip":"click2","foot":"foot","bong":"bong","open":"open"}.get(n,n)
 	var p:AudioStreamPlayer=sfxp[sfx_i]; sfx_i=(sfx_i+1)%sfxp.size(); p.stream=snd.get(key); p.pitch_scale=pitch; p.play()
+
+func apply_tod(dt:float):
+	if in_room!='': return
+	env_t-=dt
+	if env_t>0: return
+	env_t=1.0
+	var h:=fmod(hud_min/60.0,24.0)
+	var sc:Color; var se:float; var am:Color; var ae:float; var fog:Color
+	if h>=6 and h<11: sc=Color(1,0.9,0.72); se=0.7; am=Color(0.86,0.9,1); ae=0.55; fog=Color(0.88,0.93,1)
+	elif h>=11 and h<16: sc=Color(1,0.98,0.92); se=0.8; am=Color(0.9,0.94,1); ae=0.6; fog=Color(0.86,0.93,1)
+	elif h>=16 and h<19.5: sc=Color(1,0.62,0.38); se=0.75; am=Color(1,0.78,0.72); ae=0.5; fog=Color(1,0.82,0.7)
+	else: sc=Color(0.5,0.55,0.95); se=0.35; am=Color(0.5,0.55,0.85); ae=0.42; fog=Color(0.35,0.4,0.6)
+	var day:=int(hud_min/1440.0); var si:=int(day/7)%4
+	var tint:Color=[Color(1,0.97,1),Color(1,1,0.94),Color(1,0.93,0.86),Color(0.92,0.96,1.04)][si]
+	var tw:=create_tween().set_parallel(true)
+	tw.tween_property(sun,"light_color",sc*tint,1.0); tw.tween_property(sun,"light_energy",se,1.0)
+	tw.tween_property(env,"ambient_light_color",am*tint,1.0); tw.tween_property(env,"ambient_light_energy",ae,1.0); tw.tween_property(env,"fog_light_color",fog,1.0)
+	if si!=season_i:
+		season_i=si
+		var pc:Color=[Color(1,0.78,0.88),Color(0.8,1,0.7),Color(1,0.62,0.25),Color(1,1,1)][si]
+		(petals.mesh.material as StandardMaterial3D).albedo_color=pc

@@ -3,7 +3,7 @@ render_mode cull_back;
 uniform sampler2D tex : source_color, filter_nearest;
 uniform vec4 tint : source_color = vec4(1.0);
 uniform float bands = 3.0;
-uniform vec4 shade_color : source_color = vec4(0.5,0.4,0.62,1.0);
+uniform vec4 shade_color : source_color = vec4(0.52,0.42,0.74,1.0);
 void fragment(){ ALBEDO = texture(tex, UV).rgb * tint.rgb * 1.08; }
 void light(){
 	float d = clamp(dot(NORMAL, LIGHT) * 0.5 + 0.5, 0.0, 1.0);

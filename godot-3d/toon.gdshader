@@ -2,7 +2,7 @@ shader_type spatial;
 render_mode cull_back;
 uniform vec4 albedo : source_color = vec4(1.0);
 uniform float bands = 3.0;
-uniform vec4 shade_color : source_color = vec4(0.45,0.35,0.6,1.0);
+uniform vec4 shade_color : source_color = vec4(0.52,0.42,0.74,1.0);
 void fragment(){ ALBEDO = albedo.rgb; }
 void light(){
 	float d = clamp(dot(NORMAL, LIGHT) * 0.5 + 0.5, 0.0, 1.0);
