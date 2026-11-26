@@ -70,6 +70,7 @@ func sph(r:float)->SphereMesh:
 	var m:=SphereMesh.new(); m.radius=r; m.height=r*2; m.radial_segments=12; m.rings=6; return m
 
 func _ready():
+	RenderingServer.global_shader_parameter_add('snow',RenderingServer.GLOBAL_VAR_TYPE_FLOAT,0.0)
 	env=Environment.new()
 	var sky:=ProceduralSkyMaterial.new()
 	sky.sky_top_color=Color(0.2,0.5,0.95); sky.sky_horizon_color=Color(0.8,0.9,1.0); sky.ground_horizon_color=Color(0.85,0.9,0.95); sky.ground_bottom_color=Color(0.6,0.65,0.7)
@@ -793,6 +794,7 @@ func _physics_process(_d):
 			if frames==52 and rk in OS.get_cmdline_user_args(): player.position+=Vector3(-2.0,0,-1.5) if rk!='home' else Vector3(-1.5,0,-3.0)
 		if frames==20 and 'outw' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20); apply_outfit(3)
 		if frames==20 and 'newst' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(-68.5,0,-14); player.rotation.y=PI
+		if frames==20 and 'snow' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20); hud_min=21*1440.0+600.0
 		if frames==20 and 'street' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20)
 		if frames==20 and 'park' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(34.5,0,-4.5)
 		if frames==20 and 'world' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-30)
@@ -1315,7 +1317,7 @@ func apply_tod(dt:float):
 	tw.tween_property(sun,"light_color",sc*tint,1.0); tw.tween_property(sun,"light_energy",se,1.0)
 	tw.tween_property(env,"ambient_light_color",am*tint,1.0); tw.tween_property(env,"ambient_light_energy",ae,1.0); tw.tween_property(env,"fog_light_color",fog,1.0)
 	if si!=season_i:
-		season_i=si
+		season_i=si; RenderingServer.global_shader_parameter_set('snow',1.0 if si==3 else 0.0)
 		var pc:Color=[Color(1,0.78,0.88),Color(0.8,1,0.7),Color(1,0.62,0.25),Color(1,1,1)][si]
 		(petals.mesh.material as StandardMaterial3D).albedo_color=pc
 		var tc:Color=[Color(1,0.78,0.88),Color(0.5,0.85,0.42),Color(1,0.55,0.2),Color(0.96,0.98,1.0)][si]
