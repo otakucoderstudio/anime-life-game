@@ -438,13 +438,13 @@ func spawn_npcs():
 	var cat:Node3D=load_char("cat",cmat(Color(1,0.95,0.9),Color(0.95,0.6,0.35),Color(1,1,1),Color(1,1,1),Color(1,1,1),Color(0.3,0.6,0.35))).root
 	add_npc(cat,Vector3(1.8,0,-12),"momo","",[["مومو","مياو! 🐱 (القطة مومو بتحك نفسها في رجلك)","youssef_joy",[["أحضنها","الصحة",5],["أديها أكل","العلاقات",4]]]])
 	var n1:=make_boy(Color(0.95,0.78,0.62),Color(0.25,0.2,0.18),false,Color(0.2,0.5,0.3))
-	add_npc(n1.root,Vector3(-68.5,0,-22),"w1","",[["سعيد","أهلاً يا بني! أنا بعمل أحلى طيّارات ورق في الحي.","youssef_smile",[["أسأله عن الحي","المجتمع",6],["أساعده","الفلوس",4]]]])
+	add_npc(n1.root,Vector3(-68.5,0,-22),"w1","",[["سعيد","أهلاً يا بني! أنا بعمل أحلى طيّارات ورق في الحي.","pt_w1",[["أسأله عن الحي","المجتمع",6],["أساعده","الفلوس",4]]]])
 	var n2:=make_girl(Color(1,0.86,0.78),Color(0.2,0.15,0.12),Color(0.9,0.6,0.2),Color(0.3,0.5,0.4),Color(1,0.9,0.3),false)
-	add_npc(n2.root,Vector3(68.5,0,-60),"w2","",[["ميرا","بجري كل صباح هنا. الهواء في الجادة الشرقية ينعش!","rana_smile",[["أجري معاها","الصحة",8],["أتكلم معاها","المجتمع",4]]]])
+	add_npc(n2.root,Vector3(68.5,0,-60),"w2","",[["ميرا","بجري كل صباح هنا. الهواء في الجادة الشرقية ينعش!","pt_w2",[["أجري معاها","الصحة",8],["أتكلم معاها","المجتمع",4]]]])
 	var n3:=make_boy(Color(0.85,0.62,0.45),Color(0.15,0.1,0.1),true,Color(0.9,0.5,0.1))
-	add_npc(n3.root,Vector3(-30,0,-36.5),"w3","",[["دودي","شفت القطة مومو؟ بتهرب مني كل يوم 😅","youssef_laugh",[["هساعدك تدور عليها","العلاقات",3],["أضحك وأمشي","المجتمع",3]]]])
+	add_npc(n3.root,Vector3(-30,0,-36.5),"w3","",[["دودي","شفت القطة مومو؟ بتهرب مني كل يوم 😅","pt_w3",[["هساعدك تدور عليها","العلاقات",3],["أضحك وأمشي","المجتمع",3]]]])
 	var n4:=make_girl(Color(0.98,0.84,0.74),Color(0.55,0.3,0.15),Color(0.5,0.7,0.9),Color(0.9,0.9,0.95),Color(1,0.5,0.6),true)
-	add_npc(n4.root,Vector3(30,0,-98.5),"w4","",[["هدى","بشتغل في مكتبة صغيرة هناك. لو بتحب القراية تعالى.","rana_calm",[["أسألها عن كتب","الدراسة",8],["أشكرها","المجتمع",3]]]])
+	add_npc(n4.root,Vector3(30,0,-98.5),"w4","",[["هدى","بشتغل في مكتبة صغيرة هناك. لو بتحب القراية تعالى.","pt_w4",[["أسألها عن كتب","الدراسة",8],["أشكرها","المجتمع",3]]]])
 	no_outline=false
 func _nox():
 	no_outline=false
@@ -821,6 +821,11 @@ func _physics_process(_d):
 			var ni2:=1 if 'k1' in OS.get_cmdline_user_args() else (4 if 'k4' in OS.get_cmdline_user_args() else 0)
 			var nn:Node3D=npcs[ni2].n; nn.rotation.y=0; player.visible=false; get_tree().root.set_meta("x",true)
 			cam.position=nn.position+Vector3(0.6,2.0,3.6); cam.fov=40; cam.look_at(nn.position+Vector3(0,1.45,0))
+		if frames==30 and 'ptr' in OS.get_cmdline_user_args():
+			var pi0:int=int(OS.get_cmdline_user_args()[-1]); player.position=npcs[pi0].n.position+Vector3(0,0,9); scene_layer.visible=false; mode='play'; ui.visible=false
+		if frames>=50 and frames<=59 and 'ptr' in OS.get_cmdline_user_args():
+			var pi:int=int(OS.get_cmdline_user_args()[-1]); var pn:Node3D=npcs[pi].n; pn.rotation.y=0; player.visible=false; get_tree().root.set_meta("x",true)
+			cam.position=pn.position+Vector3(0.1,2.0,2.3); cam.fov=34; cam.look_at(pn.position+Vector3(0,1.9,0))
 		if frames==40 and 'map' in OS.get_cmdline_user_args(): mode='play'; open_map()
 		if frames==40 and 'rel' in OS.get_cmdline_user_args(): mode='play'; add_aff('كايتو',4); add_aff('أياني',7); add_aff('مومو',1); open_phone(); open_app(5)
 		if frames==40 and 'ward' in OS.get_cmdline_user_args(): mode='play'; apply_outfit(1); open_phone(); open_app(6)
@@ -842,6 +847,8 @@ func _physics_process(_d):
 		if frames==20 and 'snow' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20); hud_min=21*1440.0+600.0
 		if frames==20 and 'cars' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-22); cars[0].t=-30.0; cars[1].t=-34.0
 		if frames==20 and 'greet' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; peds[0].si=0; peds[0].off=7.5; peds[0].t=-20.0; player.position=Vector3(7.5,0,-16.5)
+		if frames==20 and 'talk' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(-68.5,0,-17.5)
+		if frames==30 and 'talk' in OS.get_cmdline_user_args(): start_scene('w1','',npcs[5].lines)
 		if frames==20 and 'street' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20)
 		if frames==20 and 'park' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(34.5,0,-4.5)
 		if frames==20 and 'world' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-30)
