@@ -728,7 +728,7 @@ func update_peds(dt:float):
 
 var save_t:=0.0
 func save_game():
-	var d={'stats':stats,'inv':inv,'aff':aff,'aff_day':aff_day,'rel_seen':rel_seen,'min':hud_min,'outfit':outfit_i,'owned':owned.keys(),'energy':energy,'who':who_pick,'read':read_ids.keys()}
+	var d={'stats':stats,'inv':inv,'aff':aff,'aff_day':aff_day,'rel_seen':rel_seen,'min':hud_min,'outfit':outfit_i,'qday':qday,'qp':qp,'qdone':qdone,'year':year_shown,'owned':owned.keys(),'energy':energy,'who':who_pick,'read':read_ids.keys()}
 	var f=FileAccess.open('user://save.json',FileAccess.WRITE)
 	if f: f.store_string(JSON.stringify(d))
 func load_game():
@@ -741,8 +741,12 @@ func load_game():
 	aff_day=d.get('aff_day',{}); rel_seen=d.get('rel_seen',{})
 	hud_min=float(d.get('min',hud_min)); energy=int(d.get('energy',energy))
 	for k in d.get('read',[]): read_ids[k]=true
+	qday=int(d.get('qday',-1)); qp=d.get('qp',{}); qdone=d.get('qdone',{}); year_shown=bool(d.get('year',false))
 	for k in d.get('owned',[]): owned[int(k)]=true
 	if int(d.get('outfit',0))>0: apply_outfit(int(d.outfit))
+func _notification(what):
+	if what==NOTIFICATION_APPLICATION_PAUSED or what==NOTIFICATION_WM_GO_BACK_REQUEST or what==NOTIFICATION_APPLICATION_FOCUS_OUT:
+		if mode!='select' and not ('shot' in OS.get_cmdline_user_args()): save_game()
 func _process(dt):
 	if mode=='play' and not ('shot' in OS.get_cmdline_user_args()):
 		save_t+=dt
