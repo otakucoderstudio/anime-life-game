@@ -89,7 +89,7 @@ func _ready():
 	build_ui()
 	var vg:=TextureRect.new(); vg.texture=load('res://art/vignette.png'); vg.expand_mode=TextureRect.EXPAND_IGNORE_SIZE; vg.size=get_viewport().get_visible_rect().size; vg.mouse_filter=Control.MOUSE_FILTER_IGNORE; ui.add_child(vg); ui.move_child(vg,0)
 	petal_fx()
-	build_select(); build_scene_ui(); build_phone(); spawn_npcs(); build_audio()
+	build_select(); build_scene_ui(); build_phone(); spawn_npcs(); spawn_peds(); build_audio()
 	if 'shot' in OS.get_cmdline_user_args() and not ('select' in OS.get_cmdline_user_args()): pick('girl')
 
 var jp:Font=load("res://fonts/jp_s.ttf")
@@ -598,8 +598,59 @@ func tod()->String:
 	if h<12: return "صباحاً"
 	if h<17: return "ظهراً"
 	return "مساءً"
+
+var peds:=[]
+var ped_streets:=[[true,0.0,-110.0,4.0],[true,-70.0,-108.0,4.0],[true,70.0,-108.0,4.0],[false,-38.75,-108.0,108.0],[false,-100.0,-108.0,108.0]]
+func spawn_peds():
+	var rng:=RandomNumberGenerator.new(); rng.seed=7
+	var skins=[Color(1,0.88,0.8),Color(0.9,0.7,0.55),Color(0.8,0.58,0.42)]
+	var hairs=[Color(0.15,0.1,0.1),Color(0.4,0.22,0.12),Color(0.75,0.55,0.25),Color(0.55,0.25,0.55),Color(0.2,0.3,0.6)]
+	var outf=[Color(0.9,0.4,0.5),Color(0.3,0.6,0.8),Color(0.95,0.8,0.3),Color(0.45,0.75,0.5),Color(0.8,0.5,0.8)]
+	for i in range(6):
+		var g:Dictionary
+		if i%2==0: g=make_girl(skins[i%3],hairs[(i*2)%5],outf[i%5],outf[(i+2)%5],outf[(i+3)%5],i%4==0)
+		else: g=make_boy(skins[(i+1)%3],hairs[(i*3)%5],i%3==0,outf[(i+1)%5])
+		add_child(g.root)
+		peds.append({"d":g,"si":i%5,"t":rng.randf_range(-100,-5),"off":(7.5 if i%2==0 else -7.5),"dir":(1.0 if i%3==0 else -1.0),"ph":rng.randf()*6.0})
+		place_ped(peds[-1])
+func ped_pos(p:Dictionary)->Vector3:
+	var st:Array=ped_streets[p.si]
+	return Vector3(st[1]+p.off,0,p.t) if st[0] else Vector3(p.t,0,st[1]+p.off)
+func place_ped(p:Dictionary):
+	var n:Node3D=p.d.root; n.position=ped_pos(p)
+	var st:Array=ped_streets[p.si]
+	var dirv:=Vector3(0,0,p.dir) if st[0] else Vector3(p.dir,0,0)
+	n.rotation.y=atan2(dirv.x,dirv.z)
+func update_peds(dt:float):
+	for p in peds:
+		var n:Node3D=p.d.root
+		var st:Array=ped_streets[p.si]
+		var lo:float=minf(st[2],st[3]); var hi:float=maxf(st[2],st[3])
+		p.t+=p.dir*1.3*dt
+		if p.t<lo or p.t>hi: p.dir=-p.dir; p.t=clampf(p.t,lo,hi)
+		var d:=player.position.distance_to(n.position)
+		if d>70.0:
+			# jump to a street near the player, out of sight
+			var best:=-1; var bd:=1e9
+			for k in range(ped_streets.size()):
+				var s2:Array=ped_streets[k]
+				var ap:=Vector3(s2[1],0,clampf(player.position.z,-108,4)) if s2[0] else Vector3(clampf(player.position.x,-108,108),0,s2[1])
+				var dd:=ap.distance_to(player.position)
+				if dd<bd and randf()<0.7: bd=dd; best=k
+			if best>=0:
+				p.si=best; var s3:Array=ped_streets[best]
+				var pt:float=(player.position.z if s3[0] else player.position.x)+randf_range(25,45)*(1.0 if randf()<0.5 else -1.0)
+				p.t=clampf(pt,minf(s3[2],s3[3]),maxf(s3[2],s3[3])); p.off=7.5*(1.0 if randf()<0.5 else -1.0)
+				if d>1e8: pass
+		place_ped(p)
+		n.visible=in_room=='' and player.position.distance_to(n.position)<32.0
+		var sw:=sin(Time.get_ticks_msec()*0.006+p.ph)*0.6
+		var dd2:Dictionary=p.d
+		dd2.legl.rotation.x=sw; dd2.legr.rotation.x=-sw; dd2.arml.rotation.x=-sw*0.8; dd2.armr.rotation.x=sw*0.8
+
 func _process(dt):
 	for n in npcs: n.n.visible=in_room=='' and player.position.distance_to(n.n.position)<14.0
+	if peds.size()>0: update_peds(dt)
 	if mode!='play':
 		if mode=='scene': return
 		return
