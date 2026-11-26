@@ -1323,6 +1323,9 @@ func build_audio():
 	mus=AudioStreamPlayer.new(); mus.volume_db=-13; add_child(mus); amb=AudioStreamPlayer.new(); amb.volume_db=-17; add_child(amb)
 	for i in range(4):
 		var p:=AudioStreamPlayer.new(); p.volume_db=-6; add_child(p); sfxp.append(p)
+	var fst=load("res://audio/fountain.ogg")
+	if fst:
+		fst.loop=true; var fp:=AudioStreamPlayer3D.new(); fp.stream=fst; fp.position=Vector3(34.5,1.0,-10.5); fp.unit_size=5.0; fp.max_distance=32.0; fp.volume_db=-4; fp.autoplay=true; add_child(fp)
 	play_bg('street')
 func play_bg(kind:String):
 	if snd.is_empty(): return
