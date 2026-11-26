@@ -185,6 +185,8 @@ func build_park():
 	box(self,Vector3(8,0.14,17),Color(0.9,0.84,0.7),Vector3(13.0,0.0,-10.5),false)
 	box(self,Vector3(3,0.14,17),Color(0.9,0.84,0.7),Vector3(34.5,0.0,-10.5),false)
 	pglb("fountain",Vector3(34.5,0.1,-10.5),0.0)
+	var fw:=CPUParticles3D.new(); fw.position=Vector3(34.5,1.6,-10.5); fw.amount=40; fw.lifetime=1.3; fw.direction=Vector3(0,1,0); fw.spread=22; fw.initial_velocity_min=2.2; fw.initial_velocity_max=3.2; fw.gravity=Vector3(0,-7,0)
+	var fm:=SphereMesh.new(); fm.radius=0.06; fm.height=0.12; fm.radial_segments=6; fm.rings=3; var fmt:=StandardMaterial3D.new(); fmt.albedo_color=Color(0.75,0.92,1,0.8); fmt.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED; fmt.transparency=BaseMaterial3D.TRANSPARENCY_ALPHA; fm.material=fmt; fw.mesh=fm; fw.visibility_range_end=60.0; add_child(fw)
 	for k in range(5):
 		var x:=20.0+k*9.0
 		pglb("bench",Vector3(x,0.1,-7.2),0.0,Color(1,1,1),Color(1,1,1))
@@ -1213,7 +1215,8 @@ func show_settings():
 	app_head("الإعدادات",Color(0.55,0.5,0.75)); var vs:=get_viewport().get_visible_rect().size
 	app_btn("الصوت: "+("شغال" if snd_on else "مقفول"),Vector2(vs.x/2-250,140),Vector2(500,70),Color(1,0.95,0.7),func(): snd_on=not snd_on; AudioServer.set_bus_mute(0,not snd_on); show_settings())
 	app_btn("الجرافيك: "+("عالي" if hq else "عادي (أخف)"),Vector2(vs.x/2-250,240),Vector2(500,70),Color(1,0.95,0.7),func(): hq=not hq; get_viewport().scaling_3d_scale=0.85 if hq else 0.6; show_settings())
-	app_layer.add_child(lbl("الصوت والخرائط: مكتبات Kenney (CC0)",22,Vector2(vs.x/2-200,350)))
+	app_btn("لعبة جديدة (يمسح التقدم)",Vector2(vs.x/2-250,340),Vector2(500,70),Color(1,0.75,0.75),func(): DirAccess.remove_absolute(ProjectSettings.globalize_path('user://save.json')); get_tree().reload_current_scene())
+	app_layer.add_child(lbl("الصوت والخرائط: مكتبات Kenney (CC0)",22,Vector2(vs.x/2-200,440)))
 # audio
 var mus:AudioStreamPlayer; var amb:AudioStreamPlayer; var sfxp:Array=[]; var sfx_i:=0; var snd:={}
 var foot_t:=0.0
