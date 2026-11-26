@@ -50,8 +50,6 @@ def build(kind):
         ell(HA,(x,-0.275,H+0.19-abs(x)*0.18),(0.085,0.05,0.16),(0,0,x*-60),8,6)
     for sx in(-1,1):
         ell(HA,(sx*0.325,-0.12,H-0.1),(0.05,0.07,0.24),(0,0,sx*-6),8,6)
-        ell(HL,(sx*0.1,-0.34,H+0.27),(0.07,0.012,0.045),(0,0,sx*-25),6,4)
-    ell(HL,(0.0,-0.02,H+0.52),(0.2,0.12,0.02),(0,0,0),8,4)
     if kind=='girl_long':
         ell(HA,(0,0.2,H-0.55),(0.3,0.14,0.62),seg=12,rings=8)
         ell(HA,(0,0.22,H-1.0),(0.2,0.1,0.35),seg=10,rings=6)
@@ -70,19 +68,22 @@ def build(kind):
             x=-0.26+k*0.13
             cone(HA,(x,-0.22,H+0.3),0.075,0.24,(-70,0,-x*60),8)
         ell(HA,(0,0.1,H-0.05),(0.4,0.36,0.34),seg=14,rings=8)
-    # torso
-    zt=1.38
+    S=0.82; Hn=2.3 if girl else 2.3
+    for o in objs:
+        for v in o.data.vertices:
+            v.co.x*=S; v.co.y*=S; v.co.z=(v.co.z-H)*S+Hn
+    zt=1.5 if girl else 1.52
     if girl:
-        ell(WH,(0,0,zt),(0.22,0.14,0.3),seg=12,rings=8)
-        ell(TOP,(0,-0.02,zt+0.24),(0.26,0.17,0.09),seg=12,rings=6)
-        ell(ACC,(0,-0.17,zt+0.15),(0.08,0.03,0.05),(0,0,0),8,5)
-        ell(ACC,(-0.07,-0.17,zt+0.15),(0.06,0.03,0.04),(0,0,25),6,4); ell(ACC,(0.07,-0.17,zt+0.15),(0.06,0.03,0.04),(0,0,-25),6,4)
-        cone(BOT,(0,0,0.98),0.44,0.4,seg=20,r2=0.2)
+        ell(WH,(0,0,zt),(0.2,0.13,0.31),seg=12,rings=8)
+        ell(TOP,(0,-0.02,zt+0.25),(0.25,0.16,0.08),seg=12,rings=6)
+        ell(ACC,(0,-0.16,zt+0.15),(0.06,0.03,0.04),(0,0,0),8,5)
+        ell(ACC,(-0.07,-0.16,zt+0.15),(0.05,0.03,0.035),(0,0,25),6,4); ell(ACC,(0.07,-0.16,zt+0.15),(0.05,0.03,0.035),(0,0,-25),6,4)
+        cone(BOT,(0,0,1.1),0.42,0.42,seg=20,r2=0.19)
     else:
-        ell(TOP,(0,0,zt+0.05),(0.3,0.19,0.4),seg=14,rings=9)
-        ell(WH,(0,-0.14,zt+0.28),(0.075,0.05,0.2),(0,0,0),8,6)
-        ell(ACC,(0,-0.18,zt+0.2),(0.04,0.03,0.2),(0,0,0),8,6)
-        ell(BOT,(0,0,0.95),(0.27,0.17,0.15),seg=12,rings=6)
+        ell(TOP,(0,0,zt+0.02),(0.27,0.16,0.42),seg=14,rings=9)
+        ell(WH,(0,-0.12,zt+0.3),(0.07,0.04,0.2),(0,0,0),8,6)
+        ell(ACC,(0,-0.155,zt+0.22),(0.04,0.03,0.2),(0,0,0),8,6)
+        ell(BOT,(0,0,1.08),(0.25,0.16,0.14),seg=12,rings=6)
     pieces={'body':[o for o in objs]}
     # limbs
     def limb(name,joint,sx,isarm):
@@ -90,20 +91,20 @@ def build(kind):
         jx,jy,jz=joint
         if isarm:
             sl=WH if girl else TOP
-            ell(sl,(jx,jy,jz-0.17),(0.065,0.065,0.22),seg=10,rings=6)
-            ell(sl,(jx,jy,jz-0.5),(0.055,0.055,0.2),seg=10,rings=6)
-            ell(SK,(jx,jy,jz-0.72),(0.058,0.05,0.07),seg=8,rings=5)
+            ell(sl,(jx,jy,jz-0.2),(0.085,0.085,0.25),seg=10,rings=6)
+            ell(sl,(jx,jy,jz-0.55),(0.07,0.07,0.22),seg=10,rings=6)
+            ell(SK,(jx,jy,jz-0.8),(0.065,0.055,0.08),seg=8,rings=5)
         else:
             lc=SK if girl else BOT
-            ell(lc,(jx,jy,jz-0.25),(0.09,0.09,0.3),seg=10,rings=6)
-            ell(lc,(jx,jy,jz-0.66),(0.073,0.073,0.3),seg=10,rings=6)
-            if girl: ell(WH,(jx,jy,jz-0.72),(0.082,0.082,0.22),seg=10,rings=6)
+            ell(lc,(jx,jy,jz-0.27),(0.1,0.1,0.34),seg=10,rings=6)
+            ell(lc,(jx,jy,jz-0.76),(0.075,0.075,0.31),seg=10,rings=6)
+            if girl: ell(WH,(jx,jy,jz-0.83),(0.085,0.085,0.22),seg=10,rings=6)
             ell(SHOE,(jx,jy-0.045,0.07),(0.095,0.16,0.075),seg=10,rings=6)
         new=objs[start:]
         pieces[name]=new
-    limb('legl',(-0.13,0,0.9),-1,False); limb('legr',(0.13,0,0.9),1,False)
-    limb('arml',(-0.31 if girl else -0.4,0,1.56 if girl else 1.7),-1,True)
-    limb('armr',(0.31 if girl else 0.4,0,1.56 if girl else 1.7),1,True)
+    limb('legl',(-0.12,0,1.05),-1,False); limb('legr',(0.12,0,1.05),1,False)
+    limb('arml',(-0.27 if girl else -0.36,0,1.76 if girl else 1.85),-1,True)
+    limb('armr',(0.27 if girl else 0.36,0,1.76 if girl else 1.85),1,True)
     # body pieces = everything before limbs
     nb=len(pieces['body'])
     allp={}
@@ -113,8 +114,8 @@ def build(kind):
     for n in('legl','legr','arml','armr'):
         for o in pieces[n]: limbset.add(o)
     pieces['body']=[o for o in objs if o not in limbset]
-    joints={'legl':(-0.13,0,0.9),'legr':(0.13,0,0.9),'body':(0,0,0),
-            'arml':(-0.31 if girl else -0.4,0,1.56 if girl else 1.7),'armr':(0.31 if girl else 0.4,0,1.56 if girl else 1.7)}
+    joints={'legl':(-0.12,0,1.05),'legr':(0.12,0,1.05),'body':(0,0,0),
+            'arml':(-0.27 if girl else -0.36,0,1.76 if girl else 1.85),'armr':(0.27 if girl else 0.36,0,1.76 if girl else 1.85)}
     final=[]
     for n,lst in pieces.items():
         bpy.ops.object.select_all(action='DESELECT')

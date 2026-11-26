@@ -335,8 +335,8 @@ func build_player():
 	var ra:=make_girl(Color(1,0.88,0.8),Color(0.45,0.2,0.65),Color(0.17,0.3,0.6),Color(0.5,0.52,0.56),Color(0.85,0.1,0.15),true)
 	ra.root.position=Vector3(-2.2,0,-3.0); ra.root.rotation_degrees.y=160; add_child(ra.root)
 	for sx in [-1,1]:
-		var gl:=TorusMesh.new(); gl.inner_radius=0.075; gl.outer_radius=0.095
-		var gm:=mesh(ra.root,gl,Color(0.2,0.1,0.3),Vector3(sx*0.15,1.98,0.35),false); gm.rotation_degrees.x=90
+		var gl:=TorusMesh.new(); gl.inner_radius=0.06; gl.outer_radius=0.077
+		var gm:=mesh(ra.root,gl,Color(0.2,0.1,0.3),Vector3(sx*0.11,2.29,0.27),false); gm.rotation_degrees.x=90
 	for i in range(2):
 		var c=cols[i%3]; var n:=make_girl(c[0],c[1],c[2],c[3],c[4],i%2==0)
 		var side=-1 if i%2==0 else 1
@@ -351,8 +351,8 @@ func spawn_npcs():
 	no_outline=false
 	var ay:=make_girl(Color(1,0.88,0.8),Color(0.45,0.2,0.65),Color(0.17,0.3,0.6),Color(0.5,0.52,0.56),Color(0.85,0.1,0.15),true)
 	for sx in [-1,1]:
-		var gl:=TorusMesh.new(); gl.inner_radius=0.075; gl.outer_radius=0.095
-		var gm:=mesh(ay.root,gl,Color(0.2,0.1,0.3),Vector3(sx*0.15,1.98,0.35),false); gm.rotation_degrees.x=90
+		var gl:=TorusMesh.new(); gl.inner_radius=0.06; gl.outer_radius=0.077
+		var gm:=mesh(ay.root,gl,Color(0.2,0.1,0.3),Vector3(sx*0.11,2.29,0.27),false); gm.rotation_degrees.x=90
 	add_npc(ay.root,Vector3(-1.5,0,-26),"gate","",[["أياني","صباح الخير. انت الطالب الجديد؟ أنا أياني، رئيسة الفصل.","rana_calm"],["أياني","الفصل كله بيتقيّم بالنقاط. خلي بالك، أنا مش هسيبك تسبقني بسهولة.","rana_close"],["أياني","بس لو احتجت حاجة قولي. يلا بينا نشوف المدرسة.","rana_smile",[["أرد بثقة","العلاقات",5],["أسكت وأمشي","الدراسة",3]]]])
 	var ka:=make_boy(Color(0.9,0.68,0.52),Color(0.42,0.24,0.12),true)
 	add_npc(ka.root,Vector3(1.5,0,-58),"front","",[["كايتو","يا باشا! أنا كايتو، قاعد جنبك في الفصل.","youssef_laugh"],["كايتو","متقلقش، هعرّفك على كل حاجة. أول حاجة: الكافيه بعد المدرسة عليّ!","youssef_smile"],["كايتو","بس أياني دي شكلها هتبقى منافستك الأولى، خلي بالك 😄","youssef_joy"]])
