@@ -74,7 +74,7 @@ def build(kind):
             x=-0.26+k*0.13
             cone(HA,(x,-0.22,H+0.3),0.075,0.24,(-70,0,-x*60),8)
         ell(HA,(0,0.1,H-0.05),(0.4,0.36,0.34),seg=14,rings=8)
-    S=0.82; Hn=2.3 if girl else 2.3
+    S=0.72; Hn=2.27
     for o in objs:
         for v in o.data.vertices:
             v.co.x*=S; v.co.y*=S; v.co.z=(v.co.z-H)*S+Hn
