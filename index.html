@@ -1,3 +1,3 @@
 <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>حياتي - لعبة أنمي</title></head><body style="background:#0b1230;color:#f5d68a;font-family:sans-serif;text-align:center;padding-top:40vh">جاري التحميل...<script>
-(async()=>{const N=23;const r=await Promise.all(Array.from({length:N},(_,i)=>fetch('c'+i+'.txt').then(async x=>new TextDecoder('utf-8').decode(await x.arrayBuffer()))));document.open();document.write(r.join(''));document.close();})();
+(async()=>{const N=23;const r=await Promise.all(Array.from({length:N},(_,i)=>fetch('c'+i+'.txt').then(async x=>new TextDecoder('utf-8').decode(await x.arrayBuffer()).replace(/\n$/,''))));document.open();document.write(r.join(''));document.close();})();
 </script></body></html>
