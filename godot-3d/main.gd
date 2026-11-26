@@ -784,6 +784,7 @@ func _physics_process(_d):
 		if frames==40 and 'rel' in OS.get_cmdline_user_args(): mode='play'; add_aff('كايتو',4); add_aff('أياني',7); add_aff('مومو',1); open_phone(); open_app(5)
 		if frames==40 and 'ward' in OS.get_cmdline_user_args(): mode='play'; apply_outfit(1); open_phone(); open_app(6)
 		if frames==40 and 'year' in OS.get_cmdline_user_args(): mode='play'; add_aff('أياني',7); stats['الدراسة']=80; hud_min=28*1440.0+600.0
+		if frames==40 and 'lib' in OS.get_cmdline_user_args(): mode='play'; scene_layer.visible=false; travel('library')
 		if frames==40 and 'quest' in OS.get_cmdline_user_args(): mode='play'; qadd('talk','a'); qadd('park'); open_phone(); open_app(7)
 		if frames==40 and 'phone7' in OS.get_cmdline_user_args(): mode='play'; open_phone()
 		if frames==42 and 'city' in OS.get_cmdline_user_args(): city_map.visible=true; player.position=Vector3(0,0,-60)
@@ -864,7 +865,7 @@ func build_phone():
 	var mh:=vs.y-90.0; var mw:=mh*595.0/600.0; var mp:=Vector2(vs.x/2-mw/2,70)
 	var mt:=TextureRect.new(); mt.texture=img_tex("res://art/map.jpg"); mt.expand_mode=TextureRect.EXPAND_IGNORE_SIZE; mt.size=Vector2(mw,mh); mt.position=mp; map_layer.add_child(mt)
 	map_layer.add_child(lbl("خريطة تلة ساكورا",40,Vector2(vs.x/2-150,8),Color(0.9,0.3,0.4)))
-	var places=[["المدرسة","school",Vector2(160,70)],["البيت","home",Vector2(340,85)],["الكافيه","cafe",Vector2(180,315)],["السوبر ماركت","store",Vector2(500,380)],["الحديقة","park",Vector2(260,400)],["كونبيني","konbini",Vector2(330,290)]]
+	var places=[["المدرسة","school",Vector2(160,70)],["البيت","home",Vector2(340,85)],["الكافيه","cafe",Vector2(180,315)],["السوبر ماركت","store",Vector2(500,380)],["الحديقة","park",Vector2(260,400)],["كونبيني","konbini",Vector2(330,290)],["المكتبة","library",Vector2(470,230)]]
 	for p in places:
 		var b:=Button.new(); b.text=p[0]; b.size=Vector2(150,50); b.position=mp+p[2]*(mh/600.0)-Vector2(75,25)
 		b.add_theme_font_override("font",ar); b.add_theme_font_size_override("font_size",24)
@@ -947,7 +948,7 @@ func travel(key:String):
 		hud_min+=20.0; hud_clock.queue_redraw(); energy=mini(5,energy+1); hearts.queue_redraw()
 		if in_room!='': exit_room()
 		player.position=Vector3(14.0,0,-10.5); player.rotation.y=-PI/2; return
-	var rooms={"school":"class","home":"home","cafe":"cafe","store":"store","konbini":"konbini"}
+	var rooms={"school":"class","home":"home","cafe":"cafe","store":"store","konbini":"konbini","library":"library"}
 	if rooms.has(key):
 		hud_min+=30.0; hud_clock.queue_redraw(); enter_room(rooms[key]); return
 	var bgs={"school":"school_front","home":"in_room","cafe":"in_cafe","store":"in_store","park":"ex_hill","konbini":"ex_konbini"}
@@ -975,6 +976,7 @@ func build_room(kind:String):
 	batching=true
 	var floor_c:=Color(0.72,0.5,0.32); var wall_c:=Color(1,0.93,0.82)
 	if kind=='konbini' or kind=='store': floor_c=Color(0.92,0.94,0.98); wall_c=Color(0.85,0.95,1)
+	if kind=='library': floor_c=Color(0.6,0.42,0.3); wall_c=Color(0.95,0.88,0.75)
 	if kind=='class': floor_c=Color(0.8,0.65,0.45); wall_c=Color(0.95,0.95,0.88)
 	if kind=='home': floor_c=Color(0.85,0.7,0.55); wall_c=Color(1,0.88,0.92)
 	B(o,Vector3(10.6,0.2,8.8),floor_c,Vector3(0,-0.2,0))
@@ -998,6 +1000,7 @@ func build_room(kind:String):
 		'store': konbini_props(o,true)
 		'home': home_props(o)
 		'class': class_props(o)
+		'library': library_props(o)
 	prop_end()
 var pb:={}
 var pb_mat:={}
@@ -1075,6 +1078,19 @@ func class_props(o:Vector3):
 	prop(F,'trashcan',o+Vector3(4.6,0,3.2),0.0,S)
 	var lb:=Label3D.new(); lb.text="الفصل 2-أ"; lb.font=ar; lb.font_size=120; lb.pixel_size=0.006; lb.modulate=Color(1,1,0.9); lb.outline_modulate=Color(0.1,0.25,0.2); lb.outline_size=16
 	lb.position=o+Vector3(0,1.8,-4.0); add_child(lb)
+func library_props(o:Vector3):
+	var F:='furniture'; var S:=2.5
+	for k in range(4): prop(F,'bookcaseClosedWide',o+Vector3(-3.6+k*2.4,0,-3.7),0.0,S)
+	for z in [-1.4,0.6]: prop(F,'bookcaseOpen',o+Vector3(-4.9,0,z),1.57,S); prop(F,'bookcaseOpen',o+Vector3(4.9,0,z),-1.57,S)
+	for p in [Vector3(-1.6,0,1.6),Vector3(1.6,0,1.6)]:
+		prop(F,'tableRound',o+p,0.0,S); prop(F,'chairCushion',o+p+Vector3(-1.1,0,0),1.57,S); prop(F,'chairCushion',o+p+Vector3(1.1,0,0),-1.57,S)
+		prop(F,'books',o+p+Vector3(0,0.9,0),0.0,2.0)
+	prop(F,'desk',o+Vector3(-3.4,0,-1.9),0.0,S)
+	prop(F,'rugRectangle',o+Vector3(0,0.02,0.5),0.0,3.6)
+	prop(F,'pottedPlant',o+Vector3(-4.5,0,3.0),0.0,S); prop(F,'pottedPlant',o+Vector3(4.5,0,3.0),0.0,S)
+	prop(F,'lampWall',o+Vector3(-5.1,2.5,0.5),1.57,S); prop(F,'lampWall',o+Vector3(5.1,2.5,0.5),-1.57,S)
+	var lb:=Label3D.new(); lb.text="مكتبة النور"; lb.font=ar; lb.font_size=140; lb.pixel_size=0.006; lb.modulate=Color(1,0.9,0.6); lb.outline_modulate=Color(0.3,0.15,0.1); lb.outline_size=24
+	lb.position=o+Vector3(0.0,2.9,-4.0); add_child(lb)
 func cafe_props(o:Vector3):
 	var F:='furniture'; var S:=2.5
 	for k in range(6): prop(F,'kitchenCabinet',o+Vector3(-3.1+k*1.25,0,-3.2),0.0,S)
@@ -1106,6 +1122,9 @@ func room_extras(kind:String):
 		'konbini','store':
 			var cs:=make_girl(Color(1,0.88,0.8),Color(0.3,0.25,0.2),Color(0.2,0.6,0.35),Color(0.2,0.6,0.35),Color(1,1,1),false)
 			spawn_room_npc(kind,cs.root,Vector3(-3.5,0,-2.3),"r_shop",[["البائعة","أهلاً وسهلاً! اتفضل، عروض النهاردة على الأونيجيري والعصير.","rana_smile",[["أشتري أكل (-٥ فلوس)","الصحة",8,-1],["أتفرج بس","المجتمع",2,0]]]],0.0)
+		'library':
+			var hu:=make_girl(Color(0.98,0.84,0.74),Color(0.55,0.3,0.15),Color(0.5,0.7,0.9),Color(0.9,0.9,0.95),Color(1,0.5,0.6),true)
+			spawn_room_npc(kind,hu.root,Vector3(0.0,0,-1.6),"r_huda",[["هدى","أهلاً في مكتبة النور! الهدوء هنا بيخلي المذاكرة أسهل بكتير.","rana_calm",[["أذاكر ساعة","الدراسة",10,-1],["أقرا رواية","الصحة",4,0]]]])
 		'home':
 			var cat:=Node3D.new(); mesh(cat,sph(0.22),Color(1,0.95,0.9),Vector3(0,0.22,0)); mesh(cat,sph(0.15),Color(1,0.95,0.9),Vector3(0,0.42,0.2))
 			for sx in [-1,1]: mesh(cat,sph(0.05),Color(1,0.7,0.5),Vector3(sx*0.09,0.58,0.2))
@@ -1172,7 +1191,7 @@ var aff_day:={}
 var rel_seen:={}
 var cur_key:=""
 var rel_queue:=[]
-var npc_of:={"gate":"أياني","class":"أياني","r_class_a":"أياني","front":"كايتو","cafe":"كايتو","r_cafe_k":"كايتو","momo":"مومو","m1":"كايتو","w1":"سعيد","w2":"ميرا","w3":"دودي","w4":"هدى"}
+var npc_of:={"gate":"أياني","class":"أياني","r_class_a":"أياني","front":"كايتو","cafe":"كايتو","r_cafe_k":"كايتو","momo":"مومو","m1":"كايتو","w1":"سعيد","w2":"ميرا","w3":"دودي","w4":"هدى","r_huda":"هدى"}
 func rel_title(v:int)->String:
 	if v>=10: return "قريبين جداً"
 	if v>=6: return "أعز أصحاب"
