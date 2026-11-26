@@ -571,6 +571,7 @@ func advance():
 		scene_layer.visible=false; mode='play'; phone_btn.visible=true; refresh_badge()
 		var who:String=npc_of.get(cur_key,"")
 		var day:=int(hud_min/1440.0)
+		if who!="": qadd('talk',who)
 		if who!="" and aff_day.get(who,-1)!=day: aff_day[who]=day; add_aff(who,1)
 		if rel_queue.size()>0:
 			var sc:Array=rel_queue.pop_front(); scene_done.erase("rel_"+str(Time.get_ticks_msec())); start_scene("rel_"+str(Time.get_ticks_msec()),"",sc)
@@ -772,6 +773,7 @@ func _physics_process(_d):
 		if frames==40 and 'map' in OS.get_cmdline_user_args(): mode='play'; open_map()
 		if frames==40 and 'rel' in OS.get_cmdline_user_args(): mode='play'; add_aff('كايتو',4); add_aff('أياني',7); add_aff('مومو',1); open_phone(); open_app(5)
 		if frames==40 and 'ward' in OS.get_cmdline_user_args(): mode='play'; apply_outfit(1); open_phone(); open_app(6)
+		if frames==40 and 'quest' in OS.get_cmdline_user_args(): mode='play'; qadd('talk','a'); qadd('park'); open_phone(); open_app(7)
 		if frames==40 and 'phone7' in OS.get_cmdline_user_args(): mode='play'; open_phone()
 		if frames==42 and 'city' in OS.get_cmdline_user_args(): city_map.visible=true; player.position=Vector3(0,0,-60)
 		if frames==40 and 'phone' in OS.get_cmdline_user_args(): mode='play'; open_phone()
@@ -832,7 +834,7 @@ func build_phone():
 	var sb:=StyleBoxFlat.new(); sb.bg_color=Color(0.14,0.15,0.3); sb.set_corner_radius_all(36); sb.set_border_width_all(6); sb.border_color=Color(0.05,0.05,0.1); body.add_theme_stylebox_override("panel",sb); phone_layer.add_child(body)
 	var sc:=ColorRect.new(); sc.color=Color(0.75,0.88,1); sc.size=body.size-Vector2(30,60); sc.position=body.position+Vector2(15,30); phone_layer.add_child(sc)
 	phone_layer.add_child(lbl("الهاتف",34,body.position+Vector2(110,40),Color(0.1,0.1,0.3)))
-	var apps=[["الخريطة",Color(1,0.8,0.5),0],["المخزون",Color(0.7,0.85,1),1],["المتجر",Color(1,0.7,0.8),2],["الإحصائيات",Color(0.7,1,0.8),3],["الإعدادات",Color(0.85,0.8,1),4],["العلاقات",Color(1,0.75,0.85),5],["الدولاب",Color(0.95,0.85,0.6),6]]
+	var apps=[["الخريطة",Color(1,0.8,0.5),0],["المخزون",Color(0.7,0.85,1),1],["المتجر",Color(1,0.7,0.8),2],["الإحصائيات",Color(0.7,1,0.8),3],["الإعدادات",Color(0.85,0.8,1),4],["العلاقات",Color(1,0.75,0.85),5],["الدولاب",Color(0.95,0.85,0.6),6],["المهام",Color(0.8,0.95,0.7),7]]
 	for a in apps:
 		var b:=Button.new(); b.size=Vector2(130,92); b.position=body.position+Vector2(25+(a[2]%2)*155,95+int(a[2]/2)*105)
 		var sbb:=StyleBoxFlat.new(); sbb.bg_color=a[1]; sbb.set_corner_radius_all(26); sbb.set_border_width_all(4); sbb.border_color=Color(1,1,1)
@@ -928,6 +930,7 @@ func travel(key:String):
 		map_layer.visible=false; phone_layer.visible=true; mode='phone'; travel_note.text="تعبان! روح البيت وخد نوم."; return
 	map_layer.visible=false; mode='play'; phone_layer.visible=false; phone_layer.position.y=0
 	if key=="park":
+		qadd('park')
 		hud_min+=20.0; hud_clock.queue_redraw(); energy=mini(5,energy+1); hearts.queue_redraw()
 		if in_room!='': exit_room()
 		player.position=Vector3(14.0,0,-10.5); player.rotation.y=-PI/2; return
@@ -1149,6 +1152,7 @@ func open_app(k:int):
 	if k==4: show_settings()
 	if k==5: show_rel()
 	if k==6: show_wardrobe()
+	if k==7: show_quests()
 
 var aff:={"كايتو":0,"أياني":0,"مومو":0}
 var aff_day:={}
@@ -1181,6 +1185,31 @@ func rel_scene(who:String,lv:int)->Array:
 		"مومو6": return [["مومو","مياو! (مومو بتجيلك كل ما تعدي الشارع دلوقتي)","youssef_joy"]]
 		"مومو10": return [["مومو","مرررر... (مومو قررت إنك صاحبها للأبد)","youssef_joy"],["أنا","[نهاية القطة: عندك رفيق مخلص]","youssef_smile"]]
 	return [["أنا","...",f]]
+var qday:=-1
+var qp:={}
+var qdone:={}
+var qdefs:={"talk":["اتكلم مع ٢ من أصحابك",2,20],"park":["روح الحديقة",1,10],"buy":["اشتري حاجة من المتجر",1,10],"eat":["كُل أو اشرب حاجة",1,10]}
+func qadd(k:String,who:="")->void:
+	var d:=int(hud_min/1440.0)
+	if d!=qday: qday=d; qp={}; qdone={}
+	if k=="talk":
+		var l:Array=qp.get("talkw",[])
+		if who in l: return
+		l.append(who); qp["talkw"]=l; qp["talk"]=l.size()
+	else: qp[k]=qp.get(k,0)+1
+	var q:Array=qdefs[k]
+	if not qdone.has(k) and qp.get(k,0)>=q[1]:
+		qdone[k]=true; stats['الفلوس']=clampi(stats['الفلوس']+q[2],0,100); sfx('bong')
+		if travel_note: travel_note.text="خلصت مهمة: %s (+%d فلوس)"%[q[0],q[2]]
+func show_quests():
+	var d:=int(hud_min/1440.0)
+	if d!=qday: qday=d; qp={}; qdone={}
+	app_head("مهام النهاردة",Color(0.4,0.65,0.35)); var vs:=get_viewport().get_visible_rect().size; var y:=110.0
+	for k in qdefs.keys():
+		var q:Array=qdefs[k]; var ok:=qdone.has(k)
+		app_layer.add_child(lbl(("✓ " if ok else "• ")+q[0]+"  ("+str(mini(qp.get(k,0),q[1]))+"/"+str(q[1])+")  +"+str(q[2])+" فلوس",30,Vector2(vs.x/2-300,y),Color(0.8,1,0.8) if ok else Color(1,1,1)))
+		y+=75
+	app_layer.add_child(lbl("المهام بتتجدد كل يوم",24,Vector2(vs.x/2-120,y+20),Color(1,1,0.85)))
 var outfit_i:=0
 var outfits:=[["يونيفورم المدرسة",Color(0.17,0.3,0.6),Color(0.17,0.3,0.6),Color(1,0.35,0.5)],["فستان الصيف",Color(0.3,0.8,0.7),Color(1,0.8,0.3),Color(0.3,0.8,0.7)],["كاجوال وردي",Color(0.35,0.4,0.6),Color(1,0.65,0.78),Color(1,1,1)],["ستايل أحمر",Color(0.15,0.15,0.2),Color(0.85,0.15,0.2),Color(1,0.9,0.4)],["أخضر هادي",Color(0.95,0.95,0.9),Color(0.4,0.75,0.5),Color(0.9,0.5,0.3)],["شتوي بنفسجي",Color(0.25,0.2,0.35),Color(0.55,0.35,0.8),Color(1,0.8,0.9)]]
 func apply_outfit(i:int):
@@ -1221,7 +1250,7 @@ func show_inv():
 		var it:Array=items[nm]; var n:String=nm
 		app_btn("%s ×%d  (استخدم)"%[nm,inv[nm]],Vector2(vs.x/2-300,y),Vector2(600,64),Color(1,0.95,0.7),func(): (gift_pick(n) if n=="دبدوب هدية" else use_item(n))); y+=76
 func use_item(nm:String):
-	var it:Array=items[nm]; inv[nm]-=1; energy=clampi(energy+it[1],0,5); stats[it[2]]=clampi(stats[it[2]]+it[3],0,100); hearts.queue_redraw(); sfx('open'); show_inv()
+	var it:Array=items[nm]; inv[nm]-=1; energy=clampi(energy+it[1],0,5); stats[it[2]]=clampi(stats[it[2]]+it[3],0,100); hearts.queue_redraw(); qadd('eat'); sfx('open'); show_inv()
 func show_shop():
 	app_head("المتجر",Color(0.85,0.5,0.65)); var vs:=get_viewport().get_visible_rect().size; var y:=90.0
 	for nm in items.keys():
@@ -1230,7 +1259,7 @@ func show_shop():
 func buy(nm:String):
 	var it:Array=items[nm]
 	if stats['الفلوس']<it[0]: sfx('click'); return
-	stats['الفلوس']-=it[0]; inv[nm]=inv.get(nm,0)+1; sfx('bong'); show_shop()
+	stats['الفلوس']-=it[0]; inv[nm]=inv.get(nm,0)+1; qadd('buy'); sfx('bong'); show_shop()
 func show_settings():
 	app_head("الإعدادات",Color(0.55,0.5,0.75)); var vs:=get_viewport().get_visible_rect().size
 	app_btn("الصوت: "+("شغال" if snd_on else "مقفول"),Vector2(vs.x/2-250,140),Vector2(500,70),Color(1,0.95,0.7),func(): snd_on=not snd_on; AudioServer.set_bus_mute(0,not snd_on); show_settings())
