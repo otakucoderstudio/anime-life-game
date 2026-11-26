@@ -177,7 +177,30 @@ func world_row(ns:bool,c:float,t:float,idx:int,sak:bool):
 		vending(vp,(90.0 if ns else 0.0) if true else 0.0,Color(0.9,0.2,0.25))
 	if idx%2==0:
 		pole(Vector3(c+5.1,0,t) if ns else Vector3(t,0,c+5.1))
+
+func build_park():
+	# park behind the right-side opening of the main street (x 9..60, z -19..-2)
+	box(self,Vector3(51,0.12,18),Color(0.45,0.72,0.4),Vector3(34.5,0.0,-10.5),false)
+	box(self,Vector3(51,0.14,3),Color(0.9,0.84,0.7),Vector3(34.5,0.0,-10.5),false)
+	box(self,Vector3(8,0.14,17),Color(0.9,0.84,0.7),Vector3(13.0,0.0,-10.5),false)
+	box(self,Vector3(3,0.14,17),Color(0.9,0.84,0.7),Vector3(34.5,0.0,-10.5),false)
+	pglb("fountain",Vector3(34.5,0.1,-10.5),0.0)
+	for k in range(5):
+		var x:=20.0+k*9.0
+		pglb("bench",Vector3(x,0.1,-7.2),0.0,Color(1,1,1),Color(1,1,1))
+		pglb("bench",Vector3(x+4.0,0.1,-13.8),180.0)
+		pglb("lamp",Vector3(x+2.0,0.1,-5.0),0.0)
+		pglb("lamp",Vector3(x+2.0,0.1,-16.0),0.0)
+	for k in range(6):
+		var fx:=18.0+k*7.5
+		pglb("flowers",Vector3(fx,0.1,-3.2),0.0,Color(1,1,1),[Color(1,0.5,0.6),Color(1,0.85,0.3),Color(0.8,0.6,1)][k%3])
+		pglb("flowers",Vector3(fx+3.0,0.1,-18.0),0.0,Color(1,1,1),[Color(1,0.85,0.3),Color(1,0.5,0.6),Color(0.9,0.9,1)][k%3])
+	for k in range(7):
+		sakura(Vector3(16.0+k*7.0+(k%2)*2.0,0.1,-2.2-(k%3)*0.6),k+3)
+		sakura(Vector3(18.0+k*7.0,0.1,-18.5+(k%2)*0.4),k+1)
+	for k in range(4): sakura(Vector3(27.0+k*10.0,0.1,-10.5+(1 if k%2==0 else -1)*5.0),k+9)
 func build_world():
+	build_park()
 	var gA:=Vector2(-28.8,-48.7); var gB:=Vector2(-90,-110)
 	# N-S side streets
 	for x0 in [-70.0,70.0]:
@@ -225,7 +248,7 @@ func build_street():
 		for k in range(8): box(self,Vector3(8.0,0.01,0.55),Color(1,1,1),Vector3(0,0.025,zc-k*1.0),false)
 	var cols=[Color(0.9,0.84,0.72),Color(0.7,0.78,0.85),Color(0.86,0.7,0.62),Color(0.78,0.82,0.7),Color(0.92,0.9,0.86),Color(0.68,0.66,0.74)]
 	for i in range(10):
-		for side in ([] if i==4 or i==5 else [-1,1]):
+		for side in ([] if i==4 or i==5 else ([-1] if i==1 or i==2 else [-1,1])):
 			var h=7.0+float((i*7+side*3+20)%5)*2.2
 			var z=-float(i)*9.5+4
 			building(side,z,h,cols[(i+(1 if side>0 else 0))%cols.size()],i)
@@ -690,7 +713,7 @@ func _process(dt):
 
 var frames:=0
 
-var walk_rects:=[Rect2(-8.5,-120,17,126),Rect2(-78.5,-114,17,120),Rect2(61.5,-114,17,120),Rect2(-112,-47.25,224,17),Rect2(-112,-108.5,224,17)]
+var walk_rects:=[Rect2(-8.5,-120,17,126),Rect2(8,-19.5,53,18),Rect2(-78.5,-114,17,120),Rect2(61.5,-114,17,120),Rect2(-112,-47.25,224,17),Rect2(-112,-108.5,224,17)]
 func clamp_walk(p:Vector3)->Vector3:
 	if in_room!='':
 		return Vector3(clamp(p.x,bnd.position.x,bnd.end.x),p.y,clamp(p.z,bnd.position.y,bnd.end.y))
@@ -727,6 +750,7 @@ func _physics_process(_d):
 			if frames==52 and rk in OS.get_cmdline_user_args(): for p in room_pts: scene_done[p.key]=true
 			if frames==52 and rk in OS.get_cmdline_user_args(): player.position+=Vector3(-2.0,0,-1.5) if rk!='home' else Vector3(-1.5,0,-3.0)
 		if frames==20 and 'street' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20)
+		if frames==20 and 'park' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(24,0,-5.5); player.rotation.y=-1.2
 		if frames==20 and 'world' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-30)
 		if frames==5 and 'dusk' in OS.get_cmdline_user_args(): hud_min=17.5*60+(14*1440.0 if not "winter" in OS.get_cmdline_user_args() else 22*1440.0); env_t=0.0
 		if frames==59: print('STAT nodes=',get_tree().get_node_count(),' draws=',RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME),' prims=',RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME))

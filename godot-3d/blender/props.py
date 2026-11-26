@@ -121,8 +121,45 @@ def sakura(seed):
             v.co*=n
         fin(o,pk[(i+seed)%4],ACC)
     done('sakura','%s/props/sakura_%d.glb'%(os.path.expanduser('~/gp'),seed))
+
+def bench():
+    clear()
+    W=(0.55,0.36,0.22)
+    bx(0,(0,0,0.45),(1.5,0.5,0.08),W,FIX,bev=0.03)
+    bx(0,(0,0.22,0.78),(1.5,0.08,0.45),W,FIX,bev=0.03)
+    for x in (-0.65,0.65): bx(0,(x,0,0.22),(0.08,0.44,0.45),(0.25,0.25,0.3),FIX,bev=0.02)
+    done('bench','%s/props/bench.glb'%os.path.expanduser('~/gp'))
+def fountain():
+    clear()
+    ST=(0.82,0.82,0.86); WT=(0.55,0.8,0.95)
+    cyl((0,0,0.25),2.2,0.5,ST,FIX,seg=24)
+    cyl((0,0,0.52),1.95,0.1,WT,FIX,seg=24)
+    cyl((0,0,0.9),0.35,0.8,ST,FIX,seg=16,r2=0.25)
+    cyl((0,0,1.4),1.0,0.2,ST,FIX,seg=20,r2=0.8)
+    cyl((0,0,1.52),0.85,0.05,WT,FIX,seg=20)
+    cyl((0,0,1.9),0.12,0.8,ST,FIX,seg=10)
+    ell((0,0,2.4),(0.28,0.28,0.35),WT,FIX,10,7)
+    done('fountain','%s/props/fountain.glb'%os.path.expanduser('~/gp'))
+def lamp():
+    clear()
+    cyl((0,0,1.7),0.07,3.4,(0.3,0.25,0.35),FIX,seg=8,r2=0.05)
+    cyl((0,0,0.12),0.18,0.24,(0.3,0.25,0.35),FIX,seg=8)
+    ell((0,0,3.5),(0.26,0.26,0.3),(1,0.93,0.65),FIX,10,7)
+    cyl((0,0,3.8),0.3,0.1,(0.3,0.25,0.35),FIX,seg=10,r2=0.05)
+    done('lamp','%s/props/lamp.glb'%os.path.expanduser('~/gp'))
+def flowers():
+    clear(); rnd=random.Random(5)
+    bx(0,(0,0,0.15),(2.0,1.0,0.3),(0.5,0.35,0.25),FIX,bev=0.05)
+    ell((0,0,0.35),(0.95,0.45,0.18),(0.4,0.7,0.35),FIX,10,6)
+    for k in range(10):
+        x=rnd.uniform(-0.8,0.8); y=rnd.uniform(-0.35,0.35)
+        ell((x,y,0.5),(0.09,0.09,0.09),(1,1,1),ACC,6,4)
+    done('flowers','%s/props/flowers.glb'%os.path.expanduser('~/gp'))
+
 which=sys.argv[-1]
 if which=='b':
     for i,h in enumerate((7.0,9.2,11.4,13.6,15.8)): building(h,i)
+elif which=='park':
+    bench(); fountain(); lamp(); flowers()
 elif which=='p':
     bike(); vending(); pole(); sakura(0); sakura(1); sakura(2)
