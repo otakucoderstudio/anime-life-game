@@ -722,6 +722,7 @@ func _process(dt):
 	apply_tod(dt)
 	var hh=int(hud_min/60.0)%12; if hh==0: hh=12
 	var day=1+int(hud_min/1440.0)
+	if day>=29 and not year_shown and mode=='play' and in_room=='': year_shown=true; show_year_end()
 	var ht="يوم %d، %s، %s"%[day,tod(),["ربيع","صيف","خريف","شتاء"][int((day-1)/7)%4]]
 	if ht!=hud_time.text: hud_time.text=ht
 	if int(hud_min)%5==0 and int(hud_min)!=last_min: last_min=int(hud_min); hud_clock.queue_redraw()
@@ -782,6 +783,7 @@ func _physics_process(_d):
 		if frames==40 and 'map' in OS.get_cmdline_user_args(): mode='play'; open_map()
 		if frames==40 and 'rel' in OS.get_cmdline_user_args(): mode='play'; add_aff('كايتو',4); add_aff('أياني',7); add_aff('مومو',1); open_phone(); open_app(5)
 		if frames==40 and 'ward' in OS.get_cmdline_user_args(): mode='play'; apply_outfit(1); open_phone(); open_app(6)
+		if frames==40 and 'year' in OS.get_cmdline_user_args(): mode='play'; add_aff('أياني',7); stats['الدراسة']=80; hud_min=28*1440.0+600.0
 		if frames==40 and 'quest' in OS.get_cmdline_user_args(): mode='play'; qadd('talk','a'); qadd('park'); open_phone(); open_app(7)
 		if frames==40 and 'phone7' in OS.get_cmdline_user_args(): mode='play'; open_phone()
 		if frames==42 and 'city' in OS.get_cmdline_user_args(): city_map.visible=true; player.position=Vector3(0,0,-60)
@@ -1221,6 +1223,19 @@ func show_quests():
 		app_layer.add_child(lbl(("✓ " if ok else "• ")+q[0]+"  ("+str(mini(qp.get(k,0),q[1]))+"/"+str(q[1])+")  +"+str(q[2])+" فلوس",30,Vector2(vs.x/2-300,y),Color(0.8,1,0.8) if ok else Color(1,1,1)))
 		y+=75
 	app_layer.add_child(lbl("المهام بتتجدد كل يوم",24,Vector2(vs.x/2-120,y+20),Color(1,1,0.85)))
+var year_shown:=false
+func show_year_end():
+	phone_layer.visible=false; app_layer.visible=true; mode='phone'
+	app_head("السنة الأولى",Color(0.9,0.55,0.45)); var vs:=get_viewport().get_visible_rect().size
+	var best:String="كايتو"; for k in aff.keys(): if aff[k]>aff[best]: best=k
+	var bs:String="الدراسة"; for k in stats.keys(): if k!='الفلوس' and stats[k]>stats[bs]: bs=k
+	var ttl:String={"الدراسة":"الطالب المثالي","العلاقات":"قلب الفصل","الصحة":"بطل الطاقة","المجتمع":"نجم الحي"}.get(bs,"طالب ساكورا هيل")
+	var y:=100.0
+	app_layer.add_child(lbl("عدّت سنة كاملة في ساكورا هيل!",36,Vector2(vs.x/2-230,y),Color(1,1,0.9))); y+=70
+	app_layer.add_child(lbl("لقبك: "+ttl,40,Vector2(vs.x/2-170,y),Color(1,0.95,0.6))); y+=75
+	app_layer.add_child(lbl("أقرب صاحب ليك: %s (%d/10 قلوب)"%[best,aff[best]],30,Vector2(vs.x/2-240,y),Color(1,1,1))); y+=60
+	for k in stats.keys(): if k!='الفلوس': app_layer.add_child(lbl("%s: %d"%[k,stats[k]],28,Vector2(vs.x/2-80,y),Color(1,1,1))); y+=44
+	app_layer.add_child(lbl("ارجع واكمل سنة تانية!",26,Vector2(vs.x/2-120,y+10),Color(1,1,0.85)))
 var outfit_i:=0
 var outfits:=[["يونيفورم المدرسة",Color(0.17,0.3,0.6),Color(0.17,0.3,0.6),Color(1,0.35,0.5)],["فستان الصيف",Color(0.3,0.8,0.7),Color(1,0.8,0.3),Color(0.3,0.8,0.7)],["كاجوال وردي",Color(0.35,0.4,0.6),Color(1,0.65,0.78),Color(1,1,1)],["ستايل أحمر",Color(0.15,0.15,0.2),Color(0.85,0.15,0.2),Color(1,0.9,0.4)],["أخضر هادي",Color(0.95,0.95,0.9),Color(0.4,0.75,0.5),Color(0.9,0.5,0.3)],["شتوي بنفسجي",Color(0.25,0.2,0.35),Color(0.55,0.35,0.8),Color(1,0.8,0.9)]]
 func apply_outfit(i:int):
