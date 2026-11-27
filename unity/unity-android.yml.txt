@@ -1,4 +1,4 @@
-name: .github/workflows/unity-android.yml
+name: Unity Android build
 on:
   workflow_dispatch:
   push:
