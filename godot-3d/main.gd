@@ -69,8 +69,15 @@ func cap(r:float,h:float)->CapsuleMesh:
 func sph(r:float)->SphereMesh:
 	var m:=SphereMesh.new(); m.radius=r; m.height=r*2; m.radial_segments=12; m.rings=6; return m
 
+var loading_layer:CanvasLayer=null
 func _ready():
 	RenderingServer.global_shader_parameter_add('snow',RenderingServer.GLOBAL_VAR_TYPE_FLOAT,0.0)
+	if not ('shot' in OS.get_cmdline_user_args()):
+		loading_layer=CanvasLayer.new(); loading_layer.layer=100; add_child(loading_layer)
+		var lbg:=ColorRect.new(); lbg.color=Color(0.1,0.08,0.18); lbg.set_anchors_preset(Control.PRESET_FULL_RECT); loading_layer.add_child(lbg)
+		var llb:=Label.new(); llb.text="جاري التحميل...\nأنمي لايف"; llb.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER; llb.vertical_alignment=VERTICAL_ALIGNMENT_CENTER; llb.set_anchors_preset(Control.PRESET_FULL_RECT); llb.add_theme_font_size_override("font_size",44); llb.add_theme_color_override("font_color",Color(1,0.85,0.95)); loading_layer.add_child(llb)
+		await get_tree().process_frame
+		await get_tree().process_frame
 	RenderingServer.global_shader_parameter_add('night',RenderingServer.GLOBAL_VAR_TYPE_FLOAT,0.0)
 	env=Environment.new()
 	var sky:=ProceduralSkyMaterial.new()
@@ -101,6 +108,7 @@ func _ready():
 	petal_fx()
 	build_select(); build_scene_ui(); build_phone(); spawn_npcs(); spawn_peds(); spawn_cars(); build_audio()
 	if 'shot' in OS.get_cmdline_user_args() and not ('select' in OS.get_cmdline_user_args()): pick('girl')
+	if loading_layer!=null: loading_layer.queue_free(); loading_layer=null
 
 var jp:Font=load("res://fonts/jp_s.ttf")
 var ar:Font=load("res://fonts/arabic.ttf")
@@ -1082,6 +1090,7 @@ func door_check(dt:float):
 			fade_to(func(): print('DOOR_EXIT'); exit_room(); door_cd=1.2)
 
 func _process(dt):
+	if loading_layer!=null: return
 	door_check(dt)
 	vrm_pose()
 	phys_step(minf(dt,0.05))
@@ -1152,10 +1161,10 @@ func _process(dt):
 	else:
 		for n in [legl,legr,arml,armr]: n.rotation.x=lerp(n.rotation.x,0.0,10*dt)
 		player.position.y=0
-	var target=player.position+(Vector3(0,5.6,5.6) if (in_room!='' and in_room!='kyoto' and in_room!='shinjuku' and in_room!='osaka' and in_room!='sendai' and in_room!='hiroshima') else Vector3(0,3.6,6.0))
+	var target=player.position+(Vector3(0,5.6,5.6) if (in_room!='' and in_room!='kyoto' and in_room!='shinjuku' and in_room!='osaka' and in_room!='sendai' and in_room!='hiroshima' and in_room!='okinawa') else Vector3(0,3.6,6.0))
 	if get_tree().root.has_meta("x"): return
 	cam.position=cam.position.lerp(target,min(1.0,6*dt))
-	cam.look_at(player.position+(Vector3(0,0.3,-2.0) if (in_room!='' and in_room!='kyoto' and in_room!='shinjuku' and in_room!='osaka' and in_room!='sendai' and in_room!='hiroshima') else Vector3(0,2.6,-3.0)))
+	cam.look_at(player.position+(Vector3(0,0.3,-2.0) if (in_room!='' and in_room!='kyoto' and in_room!='shinjuku' and in_room!='osaka' and in_room!='sendai' and in_room!='hiroshima' and in_room!='okinawa') else Vector3(0,2.6,-3.0)))
 	petals.position=player.position+Vector3(0,5,-4)
 
 var frames:=0
@@ -1234,6 +1243,7 @@ func clamp_walk(p:Vector3)->Vector3:
 	return best
 
 func _physics_process(_d):
+	if loading_layer!=null: return
 	if "shot" in OS.get_cmdline_user_args():
 		frames+=1
 		if frames<8: joy_vec=Vector2(0.0,-1)
@@ -1269,6 +1279,7 @@ func _physics_process(_d):
 		if frames==50: print('PERF tris=',Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME),' calls=',Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME))
 		if frames==40 and 'settingsapp' in OS.get_cmdline_user_args(): mode='play'; open_phone(); open_app(4); fps_on=true; fps_lbl.visible=true
 		if frames==30 and 'osaka' in OS.get_cmdline_user_args(): mode='play'; scene_layer.visible=false; enter_room('osaka')
+		if frames==30 and 'okinawa' in OS.get_cmdline_user_args(): mode='play'; scene_layer.visible=false; enter_room('okinawa')
 		if frames==30 and 'hiroshima' in OS.get_cmdline_user_args(): mode='play'; scene_layer.visible=false; enter_room('hiroshima')
 		if frames==30 and 'sendai' in OS.get_cmdline_user_args(): mode='play'; scene_layer.visible=false; enter_room('sendai')
 		if frames==44 and 'mapicons' in OS.get_cmdline_user_args(): mv_filter=0; mv_locate(); mv_zoom=2.9; mv_pan=-(WDIST[1][2]*mv_size*2.9-mv_size*0.5)+Vector2(0,40); mv_clamp()
@@ -1693,6 +1704,7 @@ func build_room(kind:String):
 	if kind=='kyoto': build_kyoto(o); flush_batches(); batching=false; return
 	if kind=='shinjuku': build_shinjuku(o); flush_batches(); batching=false; return
 	if kind=='osaka': build_osaka(o); flush_batches(); batching=false; return
+	if kind=='okinawa': build_okinawa(o); flush_batches(); batching=false; return
 	if kind=='hiroshima': build_hiroshima(o); flush_batches(); batching=false; return
 	if kind=='sendai': build_sendai(o); flush_batches(); batching=false; return
 	var floor_c:=Color(0.72,0.5,0.32); var wall_c:=Color(1,0.93,0.82)
@@ -1883,6 +1895,7 @@ func enter_room(kind:String):
 	in_room=kind; var o:Vector3=room_org[kind]
 	bnd=Rect2(o.x-4.8,o.z-3.6,9.6,7.6)
 	player.position=o+Vector3(0,0,3.2); cam.position=player.position+Vector3(0,5.6,5.6)
+	if kind=='okinawa': bnd=Rect2(o.x-10.5,o.z-24,21.0,26); player.position=o+Vector3(0,0,0.6); cam.position=player.position+Vector3(0,3.6,6.0)
 	if kind=='hiroshima': bnd=Rect2(o.x-10.5,o.z-26,21.0,28); player.position=o+Vector3(0,0,0.6); cam.position=player.position+Vector3(0,3.6,6.0)
 	if kind=='sendai': bnd=Rect2(o.x-9.0,o.z-42,18.0,44); player.position=o+Vector3(3.5,0,0.6); cam.position=player.position+Vector3(0,3.6,6.0)
 	if kind=='osaka': bnd=Rect2(o.x-1.9,o.z-42,7.6,44); player.position=o+Vector3(1.5,0,0.6); cam.position=player.position+Vector3(0,3.6,6.0)
@@ -1890,6 +1903,7 @@ func enter_room(kind:String):
 	if kind=='kyoto': bnd=Rect2(o.x-10.5,o.z-34,21,36); player.position=o+Vector3(0,0,0.6); cam.position=player.position+Vector3(0,3.6,6.0)
 	petals.visible=false
 	env.ambient_light_color=Color(1,0.86,0.68); env.ambient_light_energy=0.55; sun.light_energy=0.55; env.adjustment_saturation=1.3
+	if kind=='okinawa': env.ambient_light_color=Color(1,0.96,0.9); env.ambient_light_energy=0.36; sun.light_energy=0.6; sun.light_color=Color(1,0.92,0.78); petals.visible=false; env.adjustment_saturation=1.3; loc_lbl.text='أوكيناوا (نسخة أولى)'
 	if kind=='hiroshima': env.ambient_light_color=Color(0.95,0.9,0.95); env.ambient_light_energy=0.42; sun.light_energy=0.7; sun.light_color=Color(1,0.85,0.7); petals.visible=false; env.adjustment_saturation=1.2; loc_lbl.text='هيروشيما (نسخة أولى)'
 	if kind=='sendai': env.ambient_light_color=Color(0.9,0.92,1.0); env.ambient_light_energy=0.4; sun.light_energy=0.7; sun.light_color=Color(1,0.9,0.75); petals.visible=false; env.adjustment_saturation=1.2; loc_lbl.text='سينداي (نسخة أولى)'
 	if kind=='osaka': env.ambient_light_color=Color(0.85,0.7,0.8); env.ambient_light_energy=0.34; sun.light_energy=0.36; sun.light_color=Color(1,0.7,0.6); petals.visible=false; env.adjustment_saturation=1.3; loc_lbl.text='أوساكا (نسخة أولى)'
@@ -2266,7 +2280,7 @@ const WCITIES=[
 	["أوساكا","大阪",Vector2(0.34,0.60),true,"مدينة الأكل والملاهي. نسخة أولى صغيرة: شارع القناة بالنيون.","نسخة أولى صغيرة (مش المدينة كاملة)",5,["15000","02:30"]],
 	["هيروشيما","広島",Vector2(0.28,0.73),true,"مدينة السلام والجزر. نسخة أولى صغيرة: ساحل وبوابة توري عائمة.","نسخة أولى صغيرة (مش المدينة كاملة)",15,["19500","04:00"]],
 	["سينداي","仙台",Vector2(0.55,0.20),true,"مدينة الأشجار. نسخة أولى صغيرة: شارع كبير بأشجار الزلكوفا.","نسخة أولى صغيرة (مش المدينة كاملة)",20,["11000","01:30"]],
-	["أوكيناوا","沖縄",Vector2(0.46,0.86),false,"جزر وشواطئ. هتتفتح بعدين.","مقفلة: لسه مش مبنية",25,["18000","03:00"]],
+	["أوكيناوا","沖縄",Vector2(0.46,0.86),true,"جزر وشواطئ. نسخة أولى صغيرة: شاطئ بنخيل ومحلات.","نسخة أولى صغيرة (مش المدينة كاملة)",25,["18000","03:00"]],
 ]
 const WDIST=[
 	["شينجوكو","新宿",Vector2(0.26,0.25),1,true,"مركز تسوق ومكاتب وحياة ليلية. اختبار مباني: شارع واحد بالليل."],
@@ -2360,6 +2374,8 @@ func world_refresh():
 	wi_weather.text=("الطقس: مطر" if rain_on else "الطقس: صافي")
 func world_enter():
 	if not WCITIES[wi_sel][3]: return
+	if wi_sel==5:
+		world_layer.visible=false; map_layer.visible=false; mode='play'; phone_layer.visible=false; phone_layer.position.y=0; enter_room('okinawa'); return
 	if wi_sel==3:
 		world_layer.visible=false; map_layer.visible=false; mode='play'; phone_layer.visible=false; phone_layer.position.y=0; enter_room('hiroshima'); return
 	if wi_sel==4:
@@ -2907,3 +2923,43 @@ func build_hiroshima(o:Vector3):
 		pglb("lamp",o+Vector3(-8.0,0.3,-2.0-q*5.5),0.0); pglb("lamp",o+Vector3(8.0,0.3,-4.0-q*5.5),0.0)
 	glow_box(Vector3(1.6,0.04,0.5),Color(0.5,1.0,0.7),o+Vector3(0,0.4,1.6),1.8)
 	tag("広島",o+Vector3(0,6.0,-27.0),0,0.03,Color(1,0.9,0.8),jp)
+
+func palm(p:Vector3,sc:float,seed:int):
+	var tr:=MeshInstance3D.new(); var cm:=CylinderMesh.new(); cm.top_radius=0.12*sc; cm.bottom_radius=0.2*sc; cm.height=4.2*sc; tr.mesh=cm
+	var tm:=StandardMaterial3D.new(); tm.albedo_color=Color(0.5,0.38,0.26); tr.material_override=tm; tr.position=p+Vector3(0.3*sc,2.1*sc,0); tr.rotation_degrees.z=-6; add_child(tr)
+	for q in range(7):
+		var lf:=MeshInstance3D.new(); var bm:=BoxMesh.new(); bm.size=Vector3(2.4*sc,0.06,0.5*sc); lf.mesh=bm
+		var gm:=StandardMaterial3D.new(); gm.albedo_color=Color(0.2+0.03*(q%3),0.55,0.25); lf.material_override=gm
+		lf.position=p+Vector3(0.5*sc,4.2*sc,0); lf.rotation_degrees=Vector3(0,q*51.0+seed*17.0,-22); lf.position+=Vector3(cos(deg_to_rad(q*51.0+seed*17.0))*1.0*sc,0,-sin(deg_to_rad(q*51.0+seed*17.0))*1.0*sc); add_child(lf)
+
+func build_okinawa(o:Vector3):
+	var names:=["tb_kanban_shop_2f_01","tb_shop_house_3f_01","tb_kanban_shop_2f_01","tb_shop_house_3f_01"]
+	var widths:=[6.98,7.0,6.98,7.0]
+	var signs:=["沖縄そば","海","ちんすこう","守礼"]
+	box(self,Vector3(90,0.2,130),Color(0.78,0.68,0.5),o+Vector3(0,-0.1,-20),false)
+	var sea:=MeshInstance3D.new(); var pm:=PlaneMesh.new(); pm.size=Vector2(90,44); sea.mesh=pm
+	var sm:=StandardMaterial3D.new(); sm.albedo_color=Color(0.1,0.62,0.7); sm.metallic=0.2; sm.roughness=0.2; sea.material_override=sm; sea.position=o+Vector3(0,0.03,-38); add_child(sea)
+	box(self,Vector3(26,0.12,34),Color(0.8,0.7,0.5),o+Vector3(0,0.0,-8),false)
+	box(self,Vector3(5.0,0.14,34),Color(0.7,0.66,0.62),o+Vector3(0,0.02,-8),false)
+	for q in range(8):
+		for sx in [-1,1]: palm(o+Vector3(sx*4.4,0.1,-1.5-q*3.8),1.0,q+sx)
+	shu("japanese-snack-shop",o+Vector3(-10.5,0.1,-20.0),90.0,0.22)
+	shu("japanese-street-market",o+Vector3(10.5,0.1,-18.0),-90.0,0.22)
+	var k:=0
+	for side in [-1,1]:
+		var cur:=2.0 if side<0 else -12.0
+		var i:=0
+		while i<2:
+			var idx:=(i*2+(0 if side<0 else 1))%names.size(); var w:float=widths[idx]
+			var n:Node3D=(load("res://models/kobo/"+names[idx]+".glb") as PackedScene).instantiate()
+			n.position=Vector3(o.x+(-12.3 if side<0 else 12.3),0,o.z+cur)
+			n.rotation_degrees.y=90.0 if side<0 else -90.0
+			add_child(n)  # natural Kobo palette colours, no tint
+			var zc:float=(cur-w*0.5) if side<0 else (cur+w*0.5)
+			tag(signs[(i+k*2)%signs.size()],o+Vector3(side*11.9,3.2,zc),90.0*side if side>0 else 90.0,0.014,Color(1,0.95,0.7),jp,Color(0.1,0.25,0.3))
+			if side<0: cur-=w+0.3
+			else: cur+=w+0.3
+			i+=1
+		k+=1
+	glow_box(Vector3(1.6,0.04,0.5),Color(0.5,1.0,0.7),o+Vector3(0,0.4,1.6),1.8)
+	tag("沖縄",o+Vector3(0,6.0,-26.0),0,0.03,Color(1,1,0.8),jp)

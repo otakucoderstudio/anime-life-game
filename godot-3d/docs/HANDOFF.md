@@ -1,6 +1,6 @@
 # Handoff (anime-life-game, godot-3d)
 
-Updated 2026-11-27 13:30 (Cairo). Latest verified tag: **v3d-1.19** (1.09 Kyoto zone, 1.10 Shinjuku test street, 1.11 four graphics levels and untinted Kobo colours) (APK on GitHub releases only). Only ONE agent publishes a new tag at a time; the successor first reproduces the build, then asks the parent before tagging.
+Updated 2026-11-27 13:30 (Cairo). Latest verified tag: **v3d-1.20** (1.09 Kyoto zone, 1.10 Shinjuku test street, 1.11 four graphics levels and untinted Kobo colours) (APK on GitHub releases only). Only ONE agent publishes a new tag at a time; the successor first reproduces the build, then asks the parent before tagging.
 
 ## Current priority (user decisions)
 1. One city zone per release, Kyoto first. Cheap first version: small own-made zone, own palette and one landmark. Never present a city as real if it is a Tokyo copy, say so.
@@ -12,7 +12,7 @@ The user wants quality and honesty over speed. Reports to the user go through th
 ## Rules
 - Free tools/hosting only. No signups or paid items without the user's explicit yes (ask the parent).
 - UI in Egyptian Arabic, Japanese names in Arabic script, slice of life, no combat.
-- Target phone Honor X6c (Helio G81 Ultra) is NOT tested on a real device. Every release says so. Real FPS is unknown.
+- Target phone Honor X6c (Helio G81 Ultra): first real-device report (owner, 2026-11-27, APK 1.19): takes a short while to load, then runs normally, no crash reported. Save, close and reopen: owner answered "yep" (progress kept; informal, one word, not a detailed test). Also reported running "very good" on an OPPO A15 (low-end phone, owner's word, no FPS or graphics-level details): keep the low graphics level and auto fallback working. Real FPS numbers still unmeasured. Keep load time in mind: add a loading screen and lazy loading where cheap (zones are built on first entry).
 - Not publishing the game publicly for now. Voice (VOICEVOX) needs approval, never answered.
 - Do not restructure the project from pasted layouts. One system per release.
 
@@ -36,4 +36,4 @@ Private GDD File (his 10 phases, map section, concept images): https://files.ins
 All in main.gd: street (build_street, street_details), phone, world map (build_worldmap, world_select), district map (build_districts, mv_* functions for zoom/LOD/icons/filter, mv_shibuya), nav bar (build_nav, nav_go).
 
 ## Known gaps
-No real-device test; map places are display only; other districts and cities locked/generic; animations are still the VRoid defaults; pinch zoom untested on a phone.
+Only one informal real-device report (loads slowly, then runs; save not confirmed); map places are display only; other districts and cities locked/generic; animations are still the VRoid defaults; pinch zoom untested on a phone.
