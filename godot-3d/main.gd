@@ -181,7 +181,7 @@ func world_row(ns:bool,c:float,t:float,idx:int,sak:bool):
 		var bp:=Vector3(c+6.3,0.2,t-3) if ns else Vector3(t-3,0.2,c+6.3)
 		bike(bp,90.0 if ns else 0.0,Color(0.3,0.5,0.8)); 
 		var vp:=Vector3(c-6.2,0.2,t+1) if ns else Vector3(t+1,0.2,c-6.2)
-		vending(vp,(90.0 if ns else 0.0) if true else 0.0,Color(0.9,0.2,0.25))
+		vending2(vp-Vector3(0,0.2,0),(90.0 if ns else 0.0),Color(0.9,0.2,0.25),0)
 	if idx%2==0:
 		pole(Vector3(c+5.1,0,t) if ns else Vector3(t,0,c+5.1))
 
@@ -235,6 +235,42 @@ func bike(p:Vector3,ry:float,c:Color):
 func vending(p:Vector3,ry:float,c:Color):
 	solids.append([Vector2(p.x,p.z),0.45])
 	pglb("vending",p-Vector3(0,0.2,0),ry,Color(1,1,1),c)
+
+func vending2(p:Vector3,ry:float,body:Color,kind:int=0):
+	var g:=Node3D.new(); g.position=p; g.rotation_degrees.y=ry; add_child(g)
+	var jp:Font=load("res://fonts/jp.ttf")
+	var vtag:=func(par:Node3D,txt:String,pos:Vector3,ry2:float,size:float,col:Color,font:Font,ol:Color):
+		var l:=Label3D.new(); l.text=txt; l.font=font; l.font_size=96; l.pixel_size=size; l.position=pos; l.modulate=col; l.outline_modulate=ol; l.outline_size=16; par.add_child(l)
+	box(g,Vector3(0.98,1.86,0.8),body,Vector3(0,0.93,0))
+	box(g,Vector3(1.04,0.3,0.86),body.lightened(0.25),Vector3(0,1.95,0.02))
+	box(g,Vector3(0.9,0.2,0.03),Color(0.1,0.1,0.18),Vector3(0,1.93,0.455))
+	box(g,Vector3(0.62,0.1,0.03),Color(0.12,0.14,0.25),Vector3(-0.1,1.62,0.43)); box(g,Vector3(0.62,0.1,0.03),Color(0.12,0.14,0.25),Vector3(-0.1,1.62,0.43))
+	box(g,Vector3(0.9,0.03,0.6),body.darkened(0.3),Vector3(0,0.02,0.02))
+	# glass window with drinks
+	box(g,Vector3(0.66,1.02,0.05),Color(0.8,0.93,1.0),Vector3(-0.1,1.1,0.4))
+	var cc:=[Color(0.95,0.25,0.3),Color(0.25,0.6,0.95),Color(0.35,0.8,0.45),Color(1.0,0.8,0.25),Color(0.95,0.55,0.75),Color(0.6,0.45,0.9)]
+	for r in range(4):
+		box(g,Vector3(0.64,0.03,0.1),Color(0.55,0.6,0.7),Vector3(-0.1,0.66+r*0.26,0.44))
+		for k in range(5):
+			var c:=CylinderMesh.new(); c.top_radius=0.045; c.bottom_radius=0.045; c.height=0.15; c.radial_segments=8
+			mesh(g,c,cc[(r*2+k+kind)%6],Vector3(-0.3+k*0.1,0.75+r*0.26,0.45),true,0.012)
+			box(g,Vector3(0.07,0.025,0.01),Color(1,1,1),Vector3(-0.3+k*0.1,0.59+r*0.26,0.47),false)
+	# buttons column
+	box(g,Vector3(0.2,1.02,0.05),body.darkened(0.15),Vector3(0.34,1.1,0.4))
+	for r in range(5):
+		box(g,Vector3(0.1,0.1,0.03),Color(1,1,1) if r%2==0 else Color(0.95,0.35,0.4),Vector3(0.34,0.8+r*0.17,0.44))
+	box(g,Vector3(0.1,0.04,0.03),Color(0.2,0.2,0.25),Vector3(0.34,0.68,0.44))
+	# pickup flap and coin slot
+	box(g,Vector3(0.7,0.24,0.04),Color(0.12,0.12,0.16),Vector3(-0.06,0.2,0.41))
+	box(g,Vector3(0.12,0.2,0.04),Color(0.2,0.2,0.26),Vector3(0.34,0.28,0.41))
+	# signs
+	vtag.call(g,"自動販売機",Vector3(0,1.93,0.475),0.0,0.0015,Color(1,0.95,0.6),jp,Color(0.15,0.1,0.2))
+	vtag.call(g,"つめた〜い",Vector3(-0.3,1.62,0.455),0.0,0.0006,Color(0.7,0.9,1.0),jp,Color(0.1,0.2,0.4))
+	vtag.call(g,"あったか〜い",Vector3(0.12,1.62,0.455),0.0,0.0006,Color(1,0.85,0.6),jp,Color(0.5,0.15,0.1))
+	vtag.call(g,"取り出し口",Vector3(-0.06,0.2,0.47),0.0,0.001,Color(0.9,0.9,0.95),jp,Color(0.05,0.05,0.1))
+	vtag.call(g,"¥150",Vector3(0.34,0.55,0.47),0.0,0.0009,Color(1,0.95,0.4),jp,Color(0.3,0.15,0.0))
+	var l:=OmniLight3D.new(); l.position=Vector3(0,1.1,0.9); l.light_color=Color(0.8,0.92,1.0); l.light_energy=0.9; l.omni_range=3.5; g.add_child(l)
+	solids.append([Vector2(p.x,p.z),0.5])
 
 func shop(side:int,z:float,kind:int):
 	var fx=side*(13.5-3.55)
@@ -320,9 +356,9 @@ func build_street():
 		sakura(Vector3(5.9,0,-float(i)*9.5-6),i+3) if i%2==1 else null
 		if i%3==0:
 			bike(Vector3(-6.3,0.2,-float(i)*9.5-4),90,Color(0.3,0.5,0.8)); bike(Vector3(-6.3,0.2,-float(i)*9.5-5.0),90,Color(0.85,0.4,0.4))
-			vending(Vector3(6.2,0.2,-float(i)*9.5+1),-90,Color(0.9,0.2,0.25))
+			vending2(Vector3(6.2,0.0,-float(i)*9.5+1),-90,Color(0.9,0.2,0.25),0)
 		if i%3==1:
-			vending(Vector3(-6.2,0.2,-float(i)*9.5-1),90,Color(0.2,0.5,0.9)); bike(Vector3(6.3,0.2,-float(i)*9.5-2),90,Color(0.3,0.7,0.5))
+			vending2(Vector3(-6.2,0.0,-float(i)*9.5-1),90,Color(0.2,0.5,0.9),1); bike(Vector3(6.3,0.2,-float(i)*9.5-2),90,Color(0.3,0.7,0.5))
 		if i%2==0:
 			pole(Vector3(-5.1,0,-float(i)*9.5)); pole(Vector3(5.1,0,-float(i)*9.5))
 	build_world()
@@ -1135,6 +1171,10 @@ func _physics_process(_d):
 					if 'kbld' in OS.get_cmdline_user_args(): kn.scale=Vector3(8,8,8)
 			if 'kcars' in OS.get_cmdline_user_args(): cam.fov=50; cam.position=Vector3(-1.5,2.4,-3.0); cam.look_at(Vector3(-1.2,0.6,-8.0))
 			else: cam.fov=60; cam.position=Vector3(-3.0,6.0,10.0); cam.look_at(Vector3(-3.0,6.0,-14.0))
+		if frames==20 and 'vend' in OS.get_cmdline_user_args():
+			scene_layer.visible=false; mode='play'; get_tree().root.set_meta('x',true); player.position=Vector3(0,0,20)
+			vending2(Vector3(-1.4,0,-8.0),0.0,Color(0.9,0.2,0.25),0); vending2(Vector3(0,0,-8.0),0.0,Color(0.2,0.5,0.9),1); vending2(Vector3(1.4,0,-8.0),0.0,Color(0.25,0.7,0.5),2)
+			cam.fov=40; cam.position=Vector3(0.1,1.5,-4.2); cam.look_at(Vector3(0,1.0,-8.0))
 		if frames==20 and 'stn' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(2,0,-22); get_tree().root.set_meta('x',true); cam.fov=60; cam.position=Vector3(-2,3.0,-4); cam.look_at(Vector3(18,3.0,-14))
 		if frames==20 and ('bot' in OS.get_cmdline_user_args() or 'botf' in OS.get_cmdline_user_args() or 'app' in OS.get_cmdline_user_args()):
 			scene_layer.visible=false; mode='play'; phone_layer.visible=true; app_full='botf' in OS.get_cmdline_user_args(); open_app(10 if 'app' not in OS.get_cmdline_user_args() else 7)
