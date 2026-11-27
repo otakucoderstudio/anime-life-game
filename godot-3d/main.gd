@@ -414,6 +414,7 @@ func skyline():
 func build_street():
 	batching=true
 	skyline()
+	make_doors()
 	box(self,Vector3(320,0.2,320),Color(0.42,0.62,0.36),Vector3(0,-0.25,-50),false)
 	strip(true,0.0,6.0,-112.0,[Vector2(-28.8,-48.7),Vector2(-90,-110)])
 	var wet:=MeshInstance3D.new(); var wp:=PlaneMesh.new(); wp.size=Vector2(9.0,118.0); wet.mesh=wp
@@ -1028,7 +1029,41 @@ func load_game():
 func _notification(what):
 	if what==NOTIFICATION_APPLICATION_PAUSED or what==NOTIFICATION_WM_GO_BACK_REQUEST or what==NOTIFICATION_APPLICATION_FOCUS_OUT:
 		if mode!='select' and not ('shot' in OS.get_cmdline_user_args()): save_game()
+var doors:=[]
+var door_cd:=0.0
+var door_mats:={}
+var fade_rect:ColorRect=null
+var fading:=false
+func make_doors():
+	var defs=[[1,-14.0,"cafe","الكافيه",Color(1.0,0.75,0.4)],[-1,-18.0,"konbini","كونبيني",Color(0.5,1.0,0.7)],[1,-40.0,"store","المحل",Color(0.6,0.8,1.0)],[-1,-46.0,"library","المكتبة",Color(1.0,0.85,0.5)],[-1,-70.0,"boutique","بوتيك",Color(1.0,0.6,0.8)],[1,-64.0,"home","البيت",Color(1.0,0.9,0.6)]]
+	for d in defs:
+		var side:int=d[0]; var z:float=d[1]
+		glow_box(Vector3(0.12,2.3,1.6),d[4],Vector3(side*8.45,1.15,z),2.2)
+		var t:=Label3D.new(); t.text=d[3]; t.font=ar; t.font_size=64; t.pixel_size=0.008; t.position=Vector3(side*8.3,2.75,z); t.rotation_degrees.y=-90.0 if side>0 else 90.0
+		t.modulate=Color(1,1,1); t.outline_modulate=Color(0.25,0.1,0.2); t.outline_size=14; t.shaded=false; add_child(t)
+		doors.append({"p":Vector3(side*8.3,0,z),"kind":d[2],"side":side})
+func fade_to(cb:Callable):
+	if fade_rect==null:
+		fade_rect=ColorRect.new(); fade_rect.color=Color(0,0,0,0); fade_rect.mouse_filter=Control.MOUSE_FILTER_IGNORE; fade_rect.size=Vector2(4000,4000); fade_rect.z_index=100; ui.add_child(fade_rect)
+	fading=true
+	var tw:=create_tween(); tw.tween_property(fade_rect,"color:a",1.0,0.22); tw.tween_callback(cb); tw.tween_property(fade_rect,"color:a",0.0,0.3); tw.tween_callback(func(): fading=false)
+func door_check(dt:float):
+	if door_cd>0.0: door_cd-=dt
+	if fading or mode!='play' or door_cd>0.0: return
+	if in_room=='':
+		for d in doors:
+			if player.position.distance_to(d.p)<1.0:
+				var kd:String=d.kind; var sd:int=d.side; var dp:Vector3=d.p
+				fade_to(func():
+					enter_room(kd); street_ret=Vector3(sd*6.2,0,dp.z); hud_min+=10.0; door_cd=1.2)
+				return
+	else:
+		var o:Vector3=room_org[in_room]
+		if player.position.z>o.z+3.35 and absf(player.position.x-o.x)<1.6:
+			fade_to(func(): exit_room(); door_cd=1.2)
+
 func _process(dt):
+	door_check(dt)
 	vrm_pose()
 	phys_step(minf(dt,0.05))
 	if fit_pending: fit_pending=false; fit_labels()
@@ -1277,6 +1312,7 @@ func _physics_process(_d):
 		if frames==20 and 'talk' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(-68.5,0,-17.5)
 		if frames==30 and 'talk' in OS.get_cmdline_user_args(): start_scene('w1','',npcs[5].lines)
 		if frames==20 and 'momo' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(0,0,-6)
+		if frames==20 and 'doortest' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(8.0,0,-14.0)
 		if frames==20 and 'bench' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; energy=2; player.position=Vector3(20.0,0,-7.2)
 		if frames==20 and ('night' in OS.get_cmdline_user_args() or 'deep' in OS.get_cmdline_user_args()): scene_layer.visible=false; mode='play'; player.position=Vector3(0,0,-6); hud_min=(2.0 if 'deep' in OS.get_cmdline_user_args() else 22.0)*60.0; env_t=0.0; player.position=Vector3(0,0,-8)
 		if frames==20 and ('rain' in OS.get_cmdline_user_args() or 'mist' in OS.get_cmdline_user_args()): scene_layer.visible=false; mode='play'; player.position=Vector3(0,0,-6); env_t=0.0
@@ -1800,6 +1836,8 @@ func enter_room(kind:String):
 	env.ambient_light_color=Color(1,0.86,0.68); env.ambient_light_energy=0.8; env.adjustment_saturation=1.3
 	for p in room_pts: scene_done.erase(p.key)
 	exit_btn.visible=true
+	if not door_mats.has(kind):
+		door_mats[kind]=true; glow_box(Vector3(1.6,0.04,0.5),Color(0.5,1.0,0.7),o+Vector3(0,0.03,3.8),1.8)
 	sfx('bong'); play_bg('cafe' if kind=='cafe' else 'street')
 func exit_room():
 	in_room=''; bnd=Rect2(-8.5,-120,17,126); player.position=street_ret; exit_btn.visible=false; petals.visible=true; env_t=0.0; env.ambient_light_color=Color(0.86,0.9,1.0); env.ambient_light_energy=0.55; env.adjustment_saturation=1.2
