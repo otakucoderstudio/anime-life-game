@@ -384,9 +384,9 @@ func _collect(n:Node,out:Dictionary):
 func hair_t(h:Color)->Color:
 	return Color(minf(h.r*2.2+0.15,2.0),minf(h.g*2.2+0.1,2.0),minf(h.b*2.2+0.1,2.0))
 func make_girl(skin:Color,hair:Color,top:Color,skirtc:Color,ribbon:Color,long_hair:=true,glasses:=false)->Dictionary:
-	return vrm_char('res://models/shino.glb',hair_t(hair),1.05,Color(1,1,1).lerp(top,0.55)*1.25,Color(1,1,1).lerp(skin,0.3)*1.08)
+	return vrm_char('res://models/shino_hq.glb',hair_t(hair),1.05,Color(1,1,1).lerp(top,0.55)*1.25,Color(1,1,1).lerp(skin,0.3)*1.08)
 func make_boy(skin:Color,hair:Color,spiky:bool,tie:=Color(0.7,0.1,0.15))->Dictionary:
-	return vrm_char('res://models/fumi.glb',hair_t(hair),0.92,Color(1,1,1).lerp(tie,0.35)*1.1,Color(1,1,1).lerp(skin,0.3)*1.05)
+	return vrm_char('res://models/fumi_hq.glb',hair_t(hair),0.92,Color(1,1,1).lerp(tie,0.35)*1.1,Color(1,1,1).lerp(skin,0.3)*1.05)
 func make_girl_old2(skin:Color,hair:Color,top:Color,skirtc:Color,ribbon:Color,long_hair:=true,glasses:=false)->Dictionary:
 	var iris:=Color(0.35,0.2,0.65) if hair.v<0.5 else Color(0.2,0.45,0.7)
 	var kn:=("girl_long" if long_hair else "girl_bob")+("_g" if glasses else "")
@@ -517,7 +517,7 @@ func vrm_pose():
 
 func build_player():
 	player=Node3D.new(); add_child(player)
-	var g:=vrm_char('res://models/shino.glb',Color(0.8,0.5,0.32),1.05)
+	var g:=vrm_char('res://models/shino_hq.glb',Color(0.8,0.5,0.32),1.05)
 	player.add_child(g.root); legl=g.legl; legr=g.legr; arml=g.arml; armr=g.armr
 	player.position=Vector3(0,0,2)
 	var cols=[[Color(1,0.85,0.75),Color(0.95,0.5,0.6),Color(1,0.7,0.8),Color(0.9,0.5,0.6),Color(1,1,0.4)],[Color(1,0.87,0.78),Color(0.2,0.55,0.55),Color(0.9,0.95,1),Color(0.7,0.4,0.6),Color(0.4,0.9,1)],[Color(0.95,0.8,0.7),Color(0.85,0.7,0.3),Color(1,0.9,0.6),Color(0.5,0.5,0.8),Color(1,0.5,0.3)]]
@@ -1083,9 +1083,9 @@ func _physics_process(_d):
 		if frames==20 and 'snow' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20); hud_min=21*1440.0+600.0
 		if frames==20 and 'cmp' in OS.get_cmdline_user_args():
 			scene_layer.visible=false; mode='play'; player.position=Vector3(0,0,-6); get_tree().root.set_meta('x',true)
-			var vr:Node3D=(load('res://models/shino.glb') as PackedScene).instantiate(); add_child(vr); vr.position=Vector3(1.0,0,-6); vr.rotation_degrees.y=0
+			var vr:Node3D=(load('res://models/shino_hq.glb') as PackedScene).instantiate(); add_child(vr); vr.position=Vector3(1.0,0,-6); vr.rotation_degrees.y=0
 			var og=vrm_char('res://models/fumi_src.glb'); add_child(og.root); og.root.position=Vector3(-0.6,0,-6); og.root.rotation_degrees.y=180; player.visible=false
-			vr.queue_free(); var vs=vrm_char('res://models/fumi.glb'); add_child(vs.root); vs.root.position=Vector3(0.9,0,-6); vs.root.rotation_degrees.y=180
+			vr.queue_free(); var vs=vrm_char('res://models/fumi_hq.glb'); add_child(vs.root); vs.root.position=Vector3(0.9,0,-6); vs.root.rotation_degrees.y=180
 		if frames>=20 and frames<60 and 'cmp' in OS.get_cmdline_user_args(): cam.fov=40; cam.position=Vector3(0.15,1.2,-9.0); cam.look_at(Vector3(0.15,0.95,-6))
 		if frames>=20 and frames<70 and 'phys' in OS.get_cmdline_user_args():
 			scene_layer.visible=false; mode='play'; get_tree().root.set_meta('x',true)
