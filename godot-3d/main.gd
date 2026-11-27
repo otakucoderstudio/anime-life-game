@@ -733,7 +733,7 @@ func update_peds(dt:float):
 			if hr<12: greets+=["صباح الخير!","صباح النور!"]
 			elif hr<18: greets+=["يوم حلو النهاردة","عاش، نهارك سعيد"]
 			else: greets+=["مساء الخير","ليلة حلوة!","خلي بالك من نفسك"]
-			bl.text=greets[randi()%greets.size()]; bl.visible=true; p.bt=2.5
+			subtitle(greets[randi()%greets.size()],2.5); p.bt=2.5
 			if p.gday!=gd: p.gday=gd; stats['المجتمع']=clampi(stats['المجتمع']+1,0,100); qadd('greet')
 		var sw:=sin(Time.get_ticks_msec()*0.006+p.ph)*0.6
 		var dd2:Dictionary=p.d
@@ -805,9 +805,9 @@ func _process(dt):
 			if energy<5: energy+=1; hearts.queue_redraw()
 			stats['الصحة']=clampi(stats['الصحة']+1,0,100)
 			player_say("قعدت ارتاحت شوية على الكنبة"); qadd("rest")
-	if bench_t>0.0:
-		bench_t-=dt
-		if bench_t<=0.0 and bench_lb!=null: bench_lb.visible=false
+	if sub_t>0.0:
+		sub_t-=dt
+		if sub_t<=0.0 and sub_panel!=null: sub_panel.visible=false
 	if int(hud_min)%5==0 and int(hud_min)!=last_min: last_min=int(hud_min); hud_clock.queue_redraw()
 	var v:=joy_vec
 	var k:=Input.get_vector("ui_left","ui_right","ui_up","ui_down")
@@ -1489,10 +1489,21 @@ func sfx(n:String,pitch:=1.0):
 	var key={"click":"click1","blip":"click2","foot":"foot","bong":"bong","open":"open"}.get(n,n)
 	var p:AudioStreamPlayer=sfxp[sfx_i]; sfx_i=(sfx_i+1)%sfxp.size(); p.stream=snd.get(key); p.pitch_scale=pitch; p.play()
 
+var sub_panel:PanelContainer=null
+var sub_lbl:Label=null
+func subtitle(t:String,secs:=3.0):
+	if sub_panel==null:
+		sub_panel=PanelContainer.new(); var sb:=StyleBoxFlat.new(); sb.bg_color=Color(0.1,0.08,0.2,0.82); sb.set_corner_radius_all(16); sb.set_border_width_all(2); sb.border_color=Color(1,0.75,0.88)
+		sb.content_margin_left=28; sb.content_margin_right=28; sb.content_margin_top=10; sb.content_margin_bottom=12; sub_panel.add_theme_stylebox_override("panel",sb)
+		sub_lbl=Label.new(); sub_lbl.add_theme_font_override("font",ar); sub_lbl.add_theme_font_size_override("font_size",32); sub_lbl.add_theme_color_override("font_color",Color(1,1,1)); sub_lbl.text_direction=Control.TEXT_DIRECTION_RTL; sub_lbl.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+		sub_panel.add_child(sub_lbl); sub_panel.mouse_filter=Control.MOUSE_FILTER_IGNORE; sub_lbl.mouse_filter=Control.MOUSE_FILTER_IGNORE; ui.add_child(sub_panel); sub_panel.visible=false
+	sub_lbl.text=t; sub_panel.visible=true; bench_t=secs
+	var vs:=get_viewport().get_visible_rect().size
+	sub_panel.size=Vector2.ZERO; sub_panel.reset_size(); sub_panel.position=Vector2((vs.x-sub_panel.size.x)*0.5,vs.y-sub_panel.size.y-24.0)
+	sub_t=secs
+var sub_t:=0.0
 func player_say(t:String):
-	if bench_lb==null:
-		bench_lb=Label3D.new(); bench_lb.font=ar; bench_lb.font_size=64; bench_lb.pixel_size=0.007; bench_lb.billboard=BaseMaterial3D.BILLBOARD_ENABLED; bench_lb.no_depth_test=true; bench_lb.outline_modulate=Color(0.25,0.1,0.2); bench_lb.outline_size=14; bench_lb.position=Vector3(0,2.9,0); player.add_child(bench_lb)
-	bench_lb.text=t; bench_lb.visible=true; bench_t=3.5
+	subtitle(t,3.5)
 
 func apply_tod(dt:float):
 	if rain_p!=null: rain_p.stream_paused=(in_room!='' or not rain_on)
