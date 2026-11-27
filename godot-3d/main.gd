@@ -75,7 +75,7 @@ func _ready():
 	env=Environment.new()
 	var sky:=ProceduralSkyMaterial.new()
 	sky.sky_top_color=Color(0.2,0.5,0.95); sky.sky_horizon_color=Color(0.8,0.9,1.0); sky.ground_horizon_color=Color(0.85,0.9,0.95); sky.ground_bottom_color=Color(0.6,0.65,0.7)
-	var s:=Sky.new(); var psm:=PanoramaSkyMaterial.new(); psm.panorama=load('res://art/sky.jpg'); s.sky_material=psm
+	var s:=Sky.new(); var psm:=PanoramaSkyMaterial.new(); psm.panorama=load('res://models/sky.hdr'); s.sky_material=psm
 	env.background_mode=Environment.BG_SKY; env.sky=s
 	env.ambient_light_source=Environment.AMBIENT_SOURCE_COLOR; env.ambient_light_color=Color(0.86,0.9,1.0); env.ambient_light_energy=0.55
 	env.glow_enabled=true; env.glow_intensity=0.35; env.glow_bloom=0.08; env.glow_hdr_threshold=1.2; env.glow_blend_mode=Environment.GLOW_BLEND_MODE_SOFTLIGHT; env.tonemap_mode=Environment.TONE_MAPPER_FILMIC; env.tonemap_exposure=0.7; env.adjustment_enabled=true; env.adjustment_saturation=1.5; env.adjustment_contrast=1.25; env.adjustment_brightness=1.03
@@ -278,11 +278,20 @@ func building(side:int,z:float,h:float,c:Color,i:int):
 	var vi:int=clampi(int(round((h-7.0)/2.2)),0,4)
 	kbuild(Vector3(side*13.9,0,z),-90.0 if side<0 else 90.0,i+(1 if side>0 else 0))
 
+func toonify(root:Node,tint:Color,th:float,shade:=Color(0.55,0.5,0.8)):
+	for mi in root.find_children('*','MeshInstance3D',true,false):
+		var m3:=mi as MeshInstance3D
+		for i in m3.mesh.get_surface_count():
+			var bm:=m3.mesh.surface_get_material(i) as BaseMaterial3D
+			if bm==null: continue
+			m3.set_surface_override_material(i,toon_mat(bm.albedo_texture,tint,shade,th,0.0,0.3,bm.albedo_color))
 const KB:=["building-a","building-d","building-h","building-k","building-n","building-skyscraper-a","building-skyscraper-c"]
 func kbuild(pos:Vector3,ry:float,k:int):
 	var nm:String=KB[(k*3+1)%KB.size()]
 	var n:Node3D=(load("res://models/kbld/"+nm+".glb") as PackedScene).instantiate()
 	n.scale=Vector3(7.5,7.5,7.5); n.position=pos; n.rotation_degrees.y=ry
+	var pal:=[Color(1.0,0.93,0.86),Color(0.92,0.96,1.0),Color(1.0,0.88,0.9),Color(0.93,1.0,0.92),Color(1.0,0.97,0.82),Color(0.9,0.9,1.0)]
+	toonify(n,pal[k%pal.size()],0.012)
 	add_child(n)
 
 func build_street():
@@ -791,7 +800,7 @@ func spawn_cars():
 	var defs=[[0,-60.0,1.0],[0,-20.0,-1.0],[3,-30.0,1.0],[4,40.0,-1.0],[3,60.0,-1.0]]
 	for i in range(defs.size()):
 		var n:=Node3D.new(); add_child(n)
-		var kn:Node3D=(load('res://models/kcar/'+['taxi','sedan','suv','police','delivery'][i%5]+'.glb') as PackedScene).instantiate(); n.add_child(kn); kn.rotation_degrees.y=KCAR_YAW; kn.scale=Vector3(1.15,1.15,1.15)
+		var kn:Node3D=(load('res://models/kcar/'+['taxi','sedan','suv','police','delivery'][i%5]+'.glb') as PackedScene).instantiate(); n.add_child(kn); kn.rotation_degrees.y=KCAR_YAW; kn.scale=Vector3(1.15,1.15,1.15); toonify(kn,Color(1,1,1),0.008)
 		cars.append({"n":n,"si":defs[i][0],"t":defs[i][1],"dir":defs[i][2]})
 func update_cars(dt:float):
 	for c in cars:
@@ -1861,7 +1870,7 @@ func show_settings():
 	app_btn("الصوت: "+("شغال" if snd_on else "مقفول"),Vector2(vs.x/2-250,140),Vector2(500,70),Color(1,0.95,0.7),func(): snd_on=not snd_on; AudioServer.set_bus_mute(0,not snd_on); show_settings())
 	app_btn("الجرافيك: "+("عالي" if hq else "عادي (أخف)"),Vector2(vs.x/2-250,240),Vector2(500,70),Color(1,0.95,0.7),func(): hq=not hq; apply_gfx(); show_settings())
 	app_btn("لعبة جديدة (يمسح التقدم)",Vector2(vs.x/2-250,340),Vector2(500,70),Color(1,0.75,0.75),func(): DirAccess.remove_absolute(ProjectSettings.globalize_path('user://save.json')); get_tree().reload_current_scene())
-	var cr:=lbl("شكر وتقدير (كله مجاني):\nالشخصيات: VRoid Project / pixiv (CC0)\nالسيارات والمباني والصوت: Kenney (CC0)",20,Vector2(12,430))
+	var cr:=lbl("شكر وتقدير (كله مجاني):\nالشخصيات: VRoid Project / pixiv (CC0)\nالسيارات والمباني والصوت: Kenney (CC0)\nالسما: Poly Haven – Belfast Sunset (CC0)",20,Vector2(12,430))
 	cr.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART; cr.custom_minimum_size=Vector2(vs.x-24,0); cr.size=Vector2(vs.x-24,100); cr.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT; app_layer.add_child(cr)
 # audio
 var mus:AudioStreamPlayer; var amb:AudioStreamPlayer; var sfxp:Array=[]; var sfx_i:=0; var snd:={}
