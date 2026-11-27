@@ -84,6 +84,7 @@ func _ready():
 	sun=DirectionalLight3D.new(); sun.rotation_degrees=Vector3(-42,-55,0); sun.light_color=Color(1,0.9,0.72); sun.light_energy=0.7; sun.shadow_enabled=true; sun.directional_shadow_max_distance=38; sun.directional_shadow_mode=DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS; sun.shadow_blur=1.6; sun.light_energy=1.15; sun.shadow_opacity=0.75; add_child(sun)
 	if OS.has_feature('mobile'):
 		get_viewport().scaling_3d_scale=0.6; Engine.max_fps=30
+	if 'hq' in OS.get_cmdline_user_args(): hq=true; apply_gfx()
 	build_street()
 	build_player()
 	spawn_kickables()
@@ -1820,10 +1821,18 @@ func buy(nm:String):
 	var it:Array=items[nm]
 	if stats['الفلوس']<it[0]: sfx('click'); return
 	stats['الفلوس']-=it[0]; inv[nm]=inv.get(nm,0)+1; qadd('buy'); sfx('bong'); show_shop()
+func apply_gfx():
+	var vp:=get_viewport(); vp.scaling_3d_scale=0.85 if hq else 0.6
+	vp.msaa_3d=Viewport.MSAA_2X if hq else Viewport.MSAA_DISABLED
+	if sun:
+		sun.directional_shadow_mode=DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS if hq else DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS
+		sun.directional_shadow_max_distance=60.0 if hq else 38.0; sun.shadow_blur=2.2 if hq else 1.6
+	if env:
+		env.glow_intensity=0.5 if hq else 0.35; env.glow_bloom=0.14 if hq else 0.08; env.glow_hdr_threshold=1.0 if hq else 1.2
 func show_settings():
 	app_head("الإعدادات",Color(0.55,0.5,0.75)); var vs:=avs()
 	app_btn("الصوت: "+("شغال" if snd_on else "مقفول"),Vector2(vs.x/2-250,140),Vector2(500,70),Color(1,0.95,0.7),func(): snd_on=not snd_on; AudioServer.set_bus_mute(0,not snd_on); show_settings())
-	app_btn("الجرافيك: "+("عالي" if hq else "عادي (أخف)"),Vector2(vs.x/2-250,240),Vector2(500,70),Color(1,0.95,0.7),func(): hq=not hq; get_viewport().scaling_3d_scale=0.85 if hq else 0.6; show_settings())
+	app_btn("الجرافيك: "+("عالي" if hq else "عادي (أخف)"),Vector2(vs.x/2-250,240),Vector2(500,70),Color(1,0.95,0.7),func(): hq=not hq; apply_gfx(); show_settings())
 	app_btn("لعبة جديدة (يمسح التقدم)",Vector2(vs.x/2-250,340),Vector2(500,70),Color(1,0.75,0.75),func(): DirAccess.remove_absolute(ProjectSettings.globalize_path('user://save.json')); get_tree().reload_current_scene())
 	var cr:=lbl("شكر وتقدير (كله مجاني):\nالشخصيات: VRoid Project / pixiv (CC0)\nالسيارات والمباني والصوت: Kenney (CC0)",20,Vector2(12,430))
 	cr.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART; cr.custom_minimum_size=Vector2(vs.x-24,0); cr.size=Vector2(vs.x-24,100); cr.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT; app_layer.add_child(cr)
