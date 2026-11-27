@@ -733,7 +733,7 @@ func update_peds(dt:float):
 			elif hr<18: greets+=["يوم حلو النهاردة","عاش، نهارك سعيد"]
 			else: greets+=["مساء الخير","ليلة حلوة!","خلي بالك من نفسك"]
 			bl.text=greets[randi()%greets.size()]; bl.visible=true; p.bt=2.5
-			if p.gday!=gd: p.gday=gd; stats['المجتمع']=clampi(stats['المجتمع']+1,0,100)
+			if p.gday!=gd: p.gday=gd; stats['المجتمع']=clampi(stats['المجتمع']+1,0,100); qadd('greet')
 		var sw:=sin(Time.get_ticks_msec()*0.006+p.ph)*0.6
 		var dd2:Dictionary=p.d
 		dd2.legl.rotation.x=sw; dd2.legr.rotation.x=-sw; dd2.arml.rotation.x=-sw*0.8; dd2.armr.rotation.x=sw*0.8
@@ -803,7 +803,7 @@ func _process(dt):
 			bench_cd=40.0; hud_min+=20.0; hud_clock.queue_redraw()
 			if energy<5: energy+=1; hearts.queue_redraw()
 			stats['الصحة']=clampi(stats['الصحة']+1,0,100)
-			player_say("قعدت ارتاحت شوية على الكنبة")
+			player_say("قعدت ارتاحت شوية على الكنبة"); qadd("rest")
 	if bench_t>0.0:
 		bench_t-=dt
 		if bench_t<=0.0 and bench_lb!=null: bench_lb.visible=false
@@ -875,7 +875,7 @@ func _physics_process(_d):
 		if frames==40 and 'year' in OS.get_cmdline_user_args(): mode='play'; add_aff('أياني',7); stats['الدراسة']=80; hud_min=28*1440.0+600.0
 		if frames==40 and 'lib' in OS.get_cmdline_user_args(): mode='play'; scene_layer.visible=false; travel('library')
 		if frames==40 and 'bout' in OS.get_cmdline_user_args(): mode='play'; scene_layer.visible=false; travel('boutique')
-		if frames==40 and 'quest' in OS.get_cmdline_user_args(): mode='play'; qadd('talk','a'); qadd('park'); open_phone(); open_app(7)
+		if frames==40 and 'quest' in OS.get_cmdline_user_args(): mode='play'; qadd('talk','a'); qadd('park'); qadd('rest'); qadd('greet'); qadd('greet'); open_phone(); open_app(7)
 		if frames==40 and 'phone7' in OS.get_cmdline_user_args(): mode='play'; open_phone()
 		if frames==42 and 'city' in OS.get_cmdline_user_args(): city_map.visible=true; player.position=Vector3(0,0,-60)
 		if frames==40 and 'phone' in OS.get_cmdline_user_args(): mode='play'; open_phone()
@@ -1348,7 +1348,7 @@ func rel_scene(who:String,lv:int)->Array:
 var qday:=-1
 var qp:={}
 var qdone:={}
-var qdefs:={"talk":["اتكلم مع ٢ من أصحابك",2,20],"park":["روح الحديقة",1,10],"buy":["اشتري حاجة من المتجر",1,10],"eat":["كُل أو اشرب حاجة",1,10]}
+var qdefs:={"talk":["اتكلم مع ٢ من أصحابك",2,20],"park":["روح الحديقة",1,10],"buy":["اشتري حاجة من المتجر",1,10],"eat":["كُل أو اشرب حاجة",1,10],"rest":["ارتاح على كنبة في الحديقة",1,10],"greet":["سلّم على ٣ ناس في الشارع",3,15]}
 func qadd(k:String,who:="")->void:
 	var d:=int(hud_min/1440.0)
 	if d!=qday: qday=d; qp={}; qdone={}
