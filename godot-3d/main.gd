@@ -308,6 +308,31 @@ func station(p:Vector3):
 	tag("渋谷駅",p+Vector3(-5.45,5.75,0),-90.0,0.012,Color(1,1,1),load("res://fonts/jp.ttf"))
 	tag("محطة شيبويا",p+Vector3(-5.4,4.3,0),-90.0,0.012,Color(1,0.95,0.7),ar)
 
+func izk(nm:String,pos:Vector3,ry:float=0.0,sc:float=1.0)->Node3D:
+	var n:Node3D=(load("res://models/izk/"+nm+".glb") as PackedScene).instantiate()
+	n.position=pos; n.rotation_degrees.y=ry; n.scale=Vector3(sc,sc,sc); add_child(n); return n
+func node_aabb(n:Node)->AABB:
+	var bb:=AABB(); var first:=true
+	for mi in n.find_children('*','MeshInstance3D',true,false):
+		var a:AABB=(mi as MeshInstance3D).global_transform*(mi as MeshInstance3D).get_aabb()
+		if first: bb=a; first=false
+		else: bb=bb.merge(a)
+	return bb
+
+func izk_front(side:int,z:float,i:int):
+	var ry:float=90.0 if side<0 else -90.0
+	var fx:float=side*8.7
+	var pal:=[Color(1.0,0.93,0.86),Color(0.92,0.96,1.0),Color(1.0,0.88,0.9),Color(0.93,1.0,0.92),Color(1.0,0.97,0.82),Color(0.9,0.9,1.0)]
+	var tint:Color=pal[(i*2+(1 if side>0 else 0))%pal.size()]
+	var ground:=["shopfront_shutter_bay","ramen_shop_front_bay","izakaya_front_bay","shopfront_shutter_bay_shutter_up"]
+	var floors:=2+((i*5+(1 if side>0 else 0))%3)
+	for b in range(2):
+		var zz:float=z-2.35+b*4.7
+		var g:=izk(ground[(i+b*2+(1 if side>0 else 0))%ground.size()],Vector3(fx,0,zz),ry); toonify(g,tint,0.008)
+		for f in range(floors):
+			var up:=izk("upper_storey_balcony_bay" if (f==0 and (i+b)%2==0) else "upper_storey_bay",Vector3(fx,3.2+f*2.8,zz),ry); toonify(up,tint,0.008)
+		var cap:=izk("alley_roof_cap_bay",Vector3(fx,3.2+floors*2.8,zz),ry); toonify(cap,tint.darkened(0.15),0.008)
+
 func glow_box(size:Vector3,c:Color,pos:Vector3,energy:float=1.6):
 	var m:=MeshInstance3D.new(); var b:=BoxMesh.new(); b.size=size; m.mesh=b
 	var mt:=StandardMaterial3D.new(); mt.albedo_color=c; mt.emission_enabled=true; mt.emission=c; mt.emission_energy_multiplier=energy; mt.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED
@@ -333,6 +358,7 @@ func building(side:int,z:float,h:float,c:Color,i:int):
 	var kind:=i+(1 if side>0 else 0)
 	var vi:int=clampi(int(round((h-7.0)/2.2)),0,4)
 	kbuild(Vector3(side*13.9,0,z),-90.0 if side<0 else 90.0,i+(1 if side>0 else 0))
+	izk_front(side,z,i)
 	facade_detail(side,z,i)
 
 func toonify(root:Node,tint:Color,th:float,shade:=Color(0.55,0.5,0.8)):
@@ -355,6 +381,9 @@ func build_street():
 	batching=true
 	box(self,Vector3(320,0.2,320),Color(0.42,0.62,0.36),Vector3(0,-0.25,-50),false)
 	strip(true,0.0,6.0,-112.0,[Vector2(-28.8,-48.7),Vector2(-90,-110)])
+	var wet:=MeshInstance3D.new(); var wp:=PlaneMesh.new(); wp.size=Vector2(9.0,118.0); wet.mesh=wp
+	var wm:=StandardMaterial3D.new(); wm.albedo_color=Color(0.25,0.28,0.45,0.42); wm.transparency=BaseMaterial3D.TRANSPARENCY_ALPHA; wm.metallic=0.9; wm.metallic_specular=1.0; wm.roughness=0.1
+	wet.material_override=wm; wet.position=Vector3(0,0.035,-53); add_child(wet)
 	for c in range(4):
 		var zc=-c*36.0-6
 		for k in range(8): box(self,Vector3(8.0,0.01,0.55),Color(1,1,1),Vector3(0,0.025,zc-k*1.0),false)
@@ -1192,6 +1221,12 @@ func _physics_process(_d):
 					if 'kbld' in OS.get_cmdline_user_args(): kn.scale=Vector3(8,8,8)
 			if 'kcars' in OS.get_cmdline_user_args(): cam.fov=50; cam.position=Vector3(-1.5,2.4,-3.0); cam.look_at(Vector3(-1.2,0.6,-8.0))
 			else: cam.fov=60; cam.position=Vector3(-3.0,6.0,10.0); cam.look_at(Vector3(-3.0,6.0,-14.0))
+		if frames==20 and 'izk' in OS.get_cmdline_user_args():
+			scene_layer.visible=false; mode='play'; get_tree().root.set_meta('x',true); player.position=Vector3(0,0,20)
+			var nms:=["alley_wall_bay","upper_storey_bay","upper_storey_balcony_bay","shopfront_shutter_bay","ramen_shop_front_bay","izakaya_front_bay","alley_roof_cap_bay"]
+			for q in range(nms.size()):
+				var nn:=izk(nms[q],Vector3(-9.0+q*3.2,0,-10.0)); print("AABB ",nms[q]," ",node_aabb(nn))
+			cam.fov=60; cam.position=Vector3(0,3,-3); cam.look_at(Vector3(0,2,-10))
 		if frames==20 and 'vend' in OS.get_cmdline_user_args():
 			scene_layer.visible=false; mode='play'; get_tree().root.set_meta('x',true); player.position=Vector3(0,0,20)
 			vending2(Vector3(-1.4,0,-8.0),0.0,Color(0.9,0.2,0.25),0); vending2(Vector3(0,0,-8.0),0.0,Color(0.2,0.5,0.9),1); vending2(Vector3(1.4,0,-8.0),0.0,Color(0.25,0.7,0.5),2)
@@ -1931,7 +1966,7 @@ func show_settings():
 	app_btn("الصوت: "+("شغال" if snd_on else "مقفول"),Vector2(vs.x/2-250,140),Vector2(500,70),Color(1,0.95,0.7),func(): snd_on=not snd_on; AudioServer.set_bus_mute(0,not snd_on); show_settings())
 	app_btn("الجرافيك: "+("عالي" if hq else "عادي (أخف)"),Vector2(vs.x/2-250,240),Vector2(500,70),Color(1,0.95,0.7),func(): hq=not hq; apply_gfx(); show_settings())
 	app_btn("لعبة جديدة (يمسح التقدم)",Vector2(vs.x/2-250,340),Vector2(500,70),Color(1,0.75,0.75),func(): DirAccess.remove_absolute(ProjectSettings.globalize_path('user://save.json')); get_tree().reload_current_scene())
-	var cr:=lbl("شكر وتقدير (كله مجاني):\nالشخصيات: VRoid Project / pixiv (CC0)\nالسيارات والمباني والصوت: Kenney (CC0)\nالسما: Poly Haven – Belfast Sunset (CC0)",20,Vector2(12,430))
+	var cr:=lbl("شكر وتقدير (كله مجاني):\nالشخصيات: VRoid Project / pixiv (CC0)\nالسيارات والمباني والصوت: Kenney (CC0)\nواجهات الشوارع اليابانية: 3DAssets.dev Izakaya Alley (CC0)\nالسما: Poly Haven – Belfast Sunset (CC0)",20,Vector2(12,430))
 	cr.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART; cr.custom_minimum_size=Vector2(vs.x-24,0); cr.size=Vector2(vs.x-24,100); cr.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT; app_layer.add_child(cr)
 # audio
 var mus:AudioStreamPlayer; var amb:AudioStreamPlayer; var sfxp:Array=[]; var sfx_i:=0; var snd:={}
