@@ -308,11 +308,32 @@ func station(p:Vector3):
 	tag("渋谷駅",p+Vector3(-5.45,5.75,0),-90.0,0.012,Color(1,1,1),load("res://fonts/jp.ttf"))
 	tag("محطة شيبويا",p+Vector3(-5.4,4.3,0),-90.0,0.012,Color(1,0.95,0.7),ar)
 
+func glow_box(size:Vector3,c:Color,pos:Vector3,energy:float=1.6):
+	var m:=MeshInstance3D.new(); var b:=BoxMesh.new(); b.size=size; m.mesh=b
+	var mt:=StandardMaterial3D.new(); mt.albedo_color=c; mt.emission_enabled=true; mt.emission=c; mt.emission_energy_multiplier=energy; mt.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED
+	m.material_override=mt; m.position=pos; add_child(m)
+func facade_detail(side:int,z:float,i:int):
+	var jp:Font=load("res://fonts/jp.ttf")
+	var words:=["ラーメン","居酒屋","カラオケ","薬局","書店","喫茶","ゲーム","寿司"]
+	var cols:=[Color(1.0,0.3,0.4),Color(0.2,0.8,1.0),Color(1.0,0.8,0.2),Color(0.5,1.0,0.5),Color(1.0,0.5,0.9)]
+	var w:String=words[(i*3+(1 if side>0 else 0))%words.size()]
+	var c:Color=cols[(i+(1 if side>0 else 0))%cols.size()]
+	var x:=side*6.6; var y:=5.6+float(i%3)*0.9; var zz:=z+2.0
+	var txt:=""
+	for k in range(w.length()): txt+=w[k]+("\n" if k<w.length()-1 else "")
+	var hgt:=0.95*w.length()+0.4
+	glow_box(Vector3(1.2,hgt,0.12),Color(0.08,0.06,0.12),Vector3(x,y,zz),1.0)
+	glow_box(Vector3(1.32,hgt+0.12,0.06),c,Vector3(x,y,zz-0.08),3.5)
+	var l:=Label3D.new(); l.text=txt; l.font=jp; l.font_size=96; l.pixel_size=0.0095; l.position=Vector3(x,y,zz+0.075); l.modulate=Color(1,1,1); l.outline_modulate=c.darkened(0.6); l.outline_size=10; l.shaded=false; add_child(l)
+	for r in range(3):
+		box(self,Vector3(0.7,0.4,0.5),Color(0.78,0.8,0.82),Vector3(side*7.6,3.6,z-1.5+r*1.1),false)
+
 func building(side:int,z:float,h:float,c:Color,i:int):
 	var cols=[Color(0.95,0.3,0.3),Color(0.25,0.55,0.95),Color(0.35,0.75,0.5),Color(0.95,0.7,0.2)]
 	var kind:=i+(1 if side>0 else 0)
 	var vi:int=clampi(int(round((h-7.0)/2.2)),0,4)
 	kbuild(Vector3(side*13.9,0,z),-90.0 if side<0 else 90.0,i+(1 if side>0 else 0))
+	facade_detail(side,z,i)
 
 func toonify(root:Node,tint:Color,th:float,shade:=Color(0.55,0.5,0.8)):
 	for mi in root.find_children('*','MeshInstance3D',true,false):
