@@ -465,6 +465,18 @@ func add_glasses(g:Dictionary):
 
 
 var vrms:=[]
+var toon2sh:Shader; var outl2sh:Shader
+var white_tex:ImageTexture
+func toon_mat(tex:Texture2D,tint:Color,shade:Color,th:float,scissor:=0.0,rim:=0.35,base:=Color(1,1,1))->Material:
+	if tex==null:
+		if white_tex==null: white_tex=ImageTexture.create_from_image(Image.create_empty(2,2,false,Image.FORMAT_RGBA8)); var im:=Image.create(2,2,false,Image.FORMAT_RGBA8); im.fill(Color(1,1,1,1)); white_tex=ImageTexture.create_from_image(im)
+		tex=white_tex; tint=tint*base; scissor=0.0
+	if toon2sh==null: toon2sh=load("res://toon2.gdshader"); outl2sh=load("res://outline2.gdshader")
+	var m:=ShaderMaterial.new(); m.shader=toon2sh
+	m.set_shader_parameter("tex",tex); m.set_shader_parameter("tint",tint); m.set_shader_parameter("shade_color",shade); m.set_shader_parameter("scissor",scissor); m.set_shader_parameter("rim",rim)
+	if th>0.0:
+		var o:=ShaderMaterial.new(); o.shader=outl2sh; o.set_shader_parameter("thickness",th); o.set_shader_parameter("tex",tex); o.set_shader_parameter("scissor",scissor); m.next_pass=o
+	return m
 func vrm_char(path:String,hair_tint:Color=Color(1,1,1),sc:float=1.12,cloth_t:Color=Color(1,1,1),skin_t:Color=Color(1,1,1))->Dictionary:
 	var d:={}
 	var root:=Node3D.new(); d.root=root
@@ -486,8 +498,12 @@ func vrm_char(path:String,hair_tint:Color=Color(1,1,1),sc:float=1.12,cloth_t:Col
 				var rn:=m.resource_name
 				m.vertex_color_use_as_albedo=false
 				if rn.find('_SKIN')>=0 or rn.find('_CLOTH')>=0: m.transparency=BaseMaterial3D.TRANSPARENCY_DISABLED; m.cull_mode=BaseMaterial3D.CULL_DISABLED
-				if rn.find('_HAIR')>=0 and hair_tint!=Color(1,1,1):
-					var m2:=m.duplicate(); m2.albedo_color=hair_tint; mi.set_surface_override_material(i,m2)
+				if rn.find('_HAIR')>=0:
+					mi.set_surface_override_material(i,toon_mat(m.albedo_texture,hair_tint if hair_tint!=Color(1,1,1) else m.albedo_color,Color(0.55,0.5,0.75),0.006,0.5,0.5,m.albedo_color))
+				elif rn.find('_CLOTH')>=0:
+					mi.set_surface_override_material(i,toon_mat(m.albedo_texture,cloth_t,Color(0.55,0.5,0.8),0.007,0.5,0.35,m.albedo_color))
+				elif rn.find('_SKIN')>=0:
+					mi.set_surface_override_material(i,toon_mat(m.albedo_texture,skin_t,Color(0.95,0.7,0.72),0.006,0.5,0.25,m.albedo_color))
 				elif rn.find('_EYE')>=0 or rn.find('_FACE')>=0:
 					var m5:=m.duplicate(); m5.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED
 					m5.transparency=BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR; m5.alpha_scissor_threshold=0.35; m5.cull_mode=BaseMaterial3D.CULL_DISABLED
