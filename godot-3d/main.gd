@@ -369,12 +369,18 @@ func load_char(kind:String,mt:Material)->Dictionary:
 func _collect(n:Node,out:Dictionary):
 	if n is MeshInstance3D: out[String(n.name)]=n
 	for c in n.get_children(): _collect(c,out)
+func hair_t(h:Color)->Color:
+	return Color(minf(h.r*2.2+0.15,2.0),minf(h.g*2.2+0.1,2.0),minf(h.b*2.2+0.1,2.0))
 func make_girl(skin:Color,hair:Color,top:Color,skirtc:Color,ribbon:Color,long_hair:=true,glasses:=false)->Dictionary:
+	return vrm_char('res://models/shino.glb',hair_t(hair),1.05)
+func make_boy(skin:Color,hair:Color,spiky:bool,tie:=Color(0.7,0.1,0.15))->Dictionary:
+	return vrm_char('res://models/fumi.glb',hair_t(hair),0.92)
+func make_girl_old2(skin:Color,hair:Color,top:Color,skirtc:Color,ribbon:Color,long_hair:=true,glasses:=false)->Dictionary:
 	var iris:=Color(0.35,0.2,0.65) if hair.v<0.5 else Color(0.2,0.45,0.7)
 	var kn:=("girl_long" if long_hair else "girl_bob")+("_g" if glasses else "")
 	if glasses and long_hair: kn="girl_ayani"
 	return load_char(kn,cmat(skin,hair,top,skirtc,ribbon,iris))
-func make_boy(skin:Color,hair:Color,spiky:bool,tie:=Color(0.7,0.1,0.15))->Dictionary:
+func make_boy_old2(skin:Color,hair:Color,spiky:bool,tie:=Color(0.7,0.1,0.15))->Dictionary:
 	var iris:=Color(0.25,0.35,0.2) if spiky else Color(0.2,0.25,0.55)
 	return load_char("boy_kaito" if spiky else "boy_soft",cmat(skin,hair,Color(0.14,0.22,0.45),Color(0.5,0.52,0.56),tie,iris))
 
@@ -445,9 +451,52 @@ func box_mesh(x:float,y:float,z:float)->BoxMesh:
 func add_glasses(g:Dictionary):
 	pass
 
+
+var vrms:=[]
+func vrm_char(path:String,hair_tint:Color=Color(1,1,1),sc:float=1.12)->Dictionary:
+	var d:={}
+	var root:=Node3D.new(); d.root=root
+	var hold:=Node3D.new(); root.add_child(hold); hold.rotation_degrees.y=180; hold.scale=Vector3(sc,sc,sc)
+	var inst:Node3D=(load(path) as PackedScene).instantiate(); hold.add_child(inst)
+	var sk:Skeleton3D=inst.find_child('Skeleton3D',true,false)
+	var names={'legl':'J_Bip_L_UpperLeg','legr':'J_Bip_R_UpperLeg','arml':'J_Bip_L_UpperArm','armr':'J_Bip_R_UpperArm'}
+	var info:={}
+	for k in names:
+		var pn:=Node3D.new(); pn.name=k; root.add_child(pn); d[k]=pn
+		var bi:=sk.find_bone(names[k]); info[k]=[bi,sk.get_bone_rest(bi).basis.get_rotation_quaternion()]
+	# arms down from T-pose
+	info.armdown={'arml':Quaternion(Vector3(0,0,1),1.35),'armr':Quaternion(Vector3(0,0,1),-1.35)}
+	for mi in sk.get_children():
+		if mi is MeshInstance3D:
+			for i in mi.mesh.get_surface_count():
+				var m:BaseMaterial3D=mi.mesh.surface_get_material(i)
+				if m==null: continue
+				var rn:=m.resource_name
+				m.vertex_color_use_as_albedo=false
+				if rn.find('_SKIN')>=0 or rn.find('_CLOTH')>=0: m.transparency=BaseMaterial3D.TRANSPARENCY_DISABLED; m.cull_mode=BaseMaterial3D.CULL_DISABLED
+				if rn.find('_HAIR')>=0 and hair_tint!=Color(1,1,1):
+					var m2:=m.duplicate(); m2.albedo_color=hair_tint; mi.set_surface_override_material(i,m2)
+	for mi in inst.find_children('*','MeshInstance3D',true,false):
+		(mi as MeshInstance3D).cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	vrms.append({'sk':sk,'info':info,'root':root,'d':d})
+	return d
+func vrm_pose():
+	for v in vrms:
+		if not is_instance_valid(v.sk): continue
+		var info=v.info
+		for k in ['legl','legr','arml','armr']:
+			var bi:int=info[k][0]; var rq:Quaternion=info[k][1]
+			var rot:float=v.d[k].rotation.x
+			var q:Quaternion=rq
+			if k.begins_with('arm'):
+				q=rq*info.armdown[k]*Quaternion(Vector3(1,0,0),rot*0.8)
+			else:
+				q=rq*Quaternion(Vector3(1,0,0),rot)
+			v.sk.set_bone_pose_rotation(bi,q)
+
 func build_player():
 	player=Node3D.new(); add_child(player)
-	var g:=load_char('girl_sakura',cmat(Color(0.99,0.82,0.7),Color(0.36,0.2,0.12),Color(0.13,0.15,0.3),Color(0.13,0.15,0.28),Color(0.78,0.1,0.17),Color(0.4,0.25,0.15)))
+	var g:=vrm_char('res://models/shino.glb',Color(0.8,0.5,0.32),1.05)
 	player.add_child(g.root); legl=g.legl; legr=g.legr; arml=g.arml; armr=g.armr
 	player.position=Vector3(0,0,2)
 	var cols=[[Color(1,0.85,0.75),Color(0.95,0.5,0.6),Color(1,0.7,0.8),Color(0.9,0.5,0.6),Color(1,1,0.4)],[Color(1,0.87,0.78),Color(0.2,0.55,0.55),Color(0.9,0.95,1),Color(0.7,0.4,0.6),Color(0.4,0.9,1)],[Color(0.95,0.8,0.7),Color(0.85,0.7,0.3),Color(1,0.9,0.6),Color(0.5,0.5,0.8),Color(1,0.5,0.3)]]
@@ -811,6 +860,7 @@ func _notification(what):
 	if what==NOTIFICATION_APPLICATION_PAUSED or what==NOTIFICATION_WM_GO_BACK_REQUEST or what==NOTIFICATION_APPLICATION_FOCUS_OUT:
 		if mode!='select' and not ('shot' in OS.get_cmdline_user_args()): save_game()
 func _process(dt):
+	vrm_pose()
 	if fit_pending: fit_pending=false; fit_labels()
 	if mode=='play' and not ('shot' in OS.get_cmdline_user_args()):
 		save_t+=dt
@@ -945,6 +995,12 @@ func _physics_process(_d):
 		if frames==20 and 'outw' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20); apply_outfit(3)
 		if frames==20 and 'newst' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(-68.5,0,-14); player.rotation.y=PI
 		if frames==20 and 'snow' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20); hud_min=21*1440.0+600.0
+		if frames==20 and 'cmp' in OS.get_cmdline_user_args():
+			scene_layer.visible=false; mode='play'; player.position=Vector3(0,0,-6); get_tree().root.set_meta('x',true)
+			var vr:Node3D=(load('res://models/shino.glb') as PackedScene).instantiate(); add_child(vr); vr.position=Vector3(1.0,0,-6); vr.rotation_degrees.y=0
+			var og=vrm_char('res://models/fumi_src.glb'); add_child(og.root); og.root.position=Vector3(-0.6,0,-6); og.root.rotation_degrees.y=180; player.visible=false
+			vr.queue_free(); var vs=vrm_char('res://models/fumi.glb'); add_child(vs.root); vs.root.position=Vector3(0.9,0,-6); vs.root.rotation_degrees.y=180
+		if frames>=20 and frames<60 and 'cmp' in OS.get_cmdline_user_args(): cam.fov=40; cam.position=Vector3(0.15,1.2,-9.0); cam.look_at(Vector3(0.15,0.95,-6))
 		if frames==20 and 'stn' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(2,0,-22); get_tree().root.set_meta('x',true); cam.fov=60; cam.position=Vector3(-2,3.0,-4); cam.look_at(Vector3(18,3.0,-14))
 		if frames==20 and ('bot' in OS.get_cmdline_user_args() or 'botf' in OS.get_cmdline_user_args() or 'app' in OS.get_cmdline_user_args()):
 			scene_layer.visible=false; mode='play'; phone_layer.visible=true; app_full='botf' in OS.get_cmdline_user_args(); open_app(10 if 'app' not in OS.get_cmdline_user_args() else 7)
