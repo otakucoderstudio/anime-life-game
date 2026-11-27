@@ -381,9 +381,14 @@ func building(side:int,z:float,h:float,c:Color,i:int):
 	var cols=[Color(0.95,0.3,0.3),Color(0.25,0.55,0.95),Color(0.35,0.75,0.5),Color(0.95,0.7,0.2)]
 	var kind:=i+(1 if side>0 else 0)
 	var vi:int=clampi(int(round((h-7.0)/2.2)),0,4)
-	kbuild(Vector3(side*13.9,0,z),-90.0 if side<0 else 90.0,i+(1 if side>0 else 0))
-	izk_front(side,z,i)
-	facade_detail(side,z,i)
+	var nms:=["tb_tenant_building_7f_01","tb_shop_house_3f_01","tb_pencil_building_6f_01","tb_kanban_shop_2f_01","tb_office_building_8f_01","tb_shop_house_3f_01","tb_pencil_building_6f_01","tb_tenant_building_7f_01","tb_kanban_shop_2f_01","tb_shop_house_3f_01"]
+	var wds:=[8.09,7.0,5.09,6.98,8.5,7.0,5.09,8.09,6.98,7.0]
+	var ki:int=(i*3+(1 if side>0 else 0)*4)%nms.size()
+	var kn:Node3D=(load("res://models/kobo/"+nms[ki]+".glb") as PackedScene).instantiate()
+	var kw:float=wds[ki]
+	kn.position=Vector3(side*8.6,0,z+kw*0.5-0.3 if side<0 else z-kw*0.5+0.3)
+	kn.rotation_degrees.y=90.0 if side<0 else -90.0
+	add_child(kn)  # natural Kobo palette colours, no tint
 	street_props(side,z,i)
 
 func toonify(root:Node,tint:Color,th:float,shade:=Color(0.55,0.5,0.8)):
