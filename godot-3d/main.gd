@@ -951,10 +951,42 @@ func spawn_cars():
 		var n:=Node3D.new(); add_child(n)
 		var kn:Node3D=(load('res://models/kcar/'+['taxi','sedan','suv','police','delivery','hatchback-sports','sedan','hatchback-sports'][i%8]+'.glb') as PackedScene).instantiate(); n.add_child(kn); kn.rotation_degrees.y=KCAR_YAW; kn.scale=Vector3(1.15,1.15,1.15); toonify(kn,Color(1,1,1),0.008)
 		cars.append({"n":n,"si":defs[i][0],"t":defs[i][1],"dir":defs[i][2]})
+	for d2 in [[0,build_truck(),-45.0,1.0],[0,build_moto(),-10.0,-1.0],[0,build_moto(),-70.0,1.0],[0,build_truck(),30.0,-1.0]]:
+		var n2:=Node3D.new(); add_child(n2); n2.add_child(d2[1]); toonify(d2[1],Color(1,1,1),0.008)
+		cars.append({"n":n2,"si":d2[0],"t":d2[2],"dir":d2[3]})
+	add_bumps()
+func cyl_w(r:float,w:float)->CylinderMesh:
+	var m:=CylinderMesh.new(); m.top_radius=r; m.bottom_radius=r; m.height=w; m.radial_segments=12; return m
+func wheel(par:Node,x:float,y:float,z:float,r:float):
+	var mi:=mesh(par,cyl_w(r,0.16),Color(0.1,0.1,0.12),Vector3(x,y,z)); mi.rotation_degrees.z=90
+func build_truck()->Node3D:
+	var n:=Node3D.new()
+	box(n,Vector3(1.9,0.3,5.2),Color(0.2,0.2,0.24),Vector3(0,0.55,0))
+	box(n,Vector3(1.9,0.95,1.4),Color(0.9,0.9,0.92),Vector3(0,1.2,1.9))
+	box(n,Vector3(1.7,0.45,0.05),Color(0.5,0.75,0.95),Vector3(0,1.4,2.62))
+	box(n,Vector3(2.0,1.9,3.5),Color(0.95,0.7,0.2),Vector3(0,1.55,-0.7))
+	for z in [1.8,-1.4,-2.1]:
+		for x in [-0.95,0.95]: wheel(n,x,0.38,z,0.38)
+	return n
+func build_moto()->Node3D:
+	var n:=Node3D.new()
+	box(n,Vector3(0.35,0.35,1.2),Color(0.85,0.15,0.2),Vector3(0,0.75,0))
+	box(n,Vector3(0.3,0.12,0.7),Color(0.1,0.1,0.12),Vector3(0,1.0,-0.3))
+	box(n,Vector3(0.7,0.08,0.08),Color(0.2,0.2,0.2),Vector3(0,1.15,0.55))
+	for z in [0.75,-0.75]: wheel(n,0,0.34,z,0.34)
+	return n
+func add_bumps():
+	for z in [-26.0,-52.0,-78.0]:
+		for i in range(8):
+			var c:=Color(0.95,0.8,0.1) if i%2==0 else Color(0.12,0.12,0.12)
+			box(self,Vector3(0.9,0.09,0.55),c,Vector3(-3.15+i*0.9,0.045,z),false)
 func update_cars(dt:float):
 	for c in cars:
 		var st:Array=ped_streets[c.si]; var lo:float=minf(st[2],st[3]); var hi:float=maxf(st[2],st[3])
 		var sp:=7.0
+		if st[0] and st[1]==0.0:
+			for bz in [-26.0,-52.0,-78.0]:
+				if absf(c.t-bz)<2.5: sp=3.0
 		var pp:float=player.position.z if st[0] else player.position.x
 		var lat:float=absf((player.position.x-st[1]) if st[0] else (player.position.z-st[1]))
 		var ahead:float=(pp-c.t)*c.dir
@@ -1391,6 +1423,7 @@ func _physics_process(_d):
 			if 'app' not in OS.get_cmdline_user_args():
 				for q in ['ازيك','احكيلي عن طوكيو','ضحكني','انت بتحب الفيزياء']: ai_edit.text=q; ai_send()
 		if frames>=20 and frames<60 and 'carc' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(0,0,-5); get_tree().root.set_meta('x',true); cars[0].t=-30.0; var cp:Vector3=cars[0].n.position; cam.fov=45; cam.position=cp+Vector3(-3.6,1.5,-6.0); cam.look_at(cp+Vector3(0,0.8,0))
+		if frames==20 and 'veh' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-14); cars[8].t=-27.0; cars[9].t=-33.0
 		if frames==20 and 'cars' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-22); cars[0].t=-30.0; cars[1].t=-34.0
 		if frames==20 and 'greet' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; peds[0].si=0; peds[0].off=7.5; peds[0].t=-20.0; player.position=Vector3(7.5,0,-16.5)
 		if frames==20 and 'talk' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(-68.5,0,-17.5)
