@@ -410,7 +410,7 @@ func add_glasses(g:Dictionary):
 
 func build_player():
 	player=Node3D.new(); add_child(player)
-	var g:=make_girl(Color(1,0.88,0.8),Color(0.3,0.2,0.55),Color(0.17,0.3,0.6),Color(0.17,0.3,0.6),Color(1,0.35,0.5))
+	var g:=make_girl(Color(1,0.88,0.8),Color(0.36,0.2,0.12),Color(0.17,0.3,0.6),Color(0.17,0.3,0.6),Color(1,0.35,0.5))
 	player.add_child(g.root); legl=g.legl; legr=g.legr; arml=g.arml; armr=g.armr
 	player.position=Vector3(0,0,2)
 	var cols=[[Color(1,0.85,0.75),Color(0.95,0.5,0.6),Color(1,0.7,0.8),Color(0.9,0.5,0.6),Color(1,1,0.4)],[Color(1,0.87,0.78),Color(0.2,0.55,0.55),Color(0.9,0.95,1),Color(0.7,0.4,0.6),Color(0.4,0.9,1)],[Color(0.95,0.8,0.7),Color(0.85,0.7,0.3),Color(1,0.9,0.6),Color(0.5,0.5,0.8),Color(1,0.5,0.3)]]
