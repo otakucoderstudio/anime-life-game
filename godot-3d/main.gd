@@ -903,6 +903,8 @@ func _physics_process(_d):
 			get_viewport().get_texture().get_image().save_png("/tmp/shot1.png"); get_tree().quit()
 
 var energy:=5
+var rain_p:AudioStreamPlayer=null
+var rain_on:=false
 var rain:CPUParticles3D=null
 var stars:MeshInstance3D=null
 var bench_cd:=0.0
@@ -1456,6 +1458,9 @@ func build_audio():
 	mus=AudioStreamPlayer.new(); mus.volume_db=-13; add_child(mus); amb=AudioStreamPlayer.new(); amb.volume_db=-17; add_child(amb)
 	for i in range(4):
 		var p:=AudioStreamPlayer.new(); p.volume_db=-6; add_child(p); sfxp.append(p)
+	var rst=load("res://audio/rain.ogg")
+	if rst:
+		rst.loop=true; rain_p=AudioStreamPlayer.new(); rain_p.stream=rst; rain_p.volume_db=-16; rain_p.autoplay=true; rain_p.stream_paused=true; add_child(rain_p)
 	var fst=load("res://audio/fountain.ogg")
 	if fst:
 		fst.loop=true; var fp:=AudioStreamPlayer3D.new(); fp.stream=fst; fp.position=Vector3(34.5,1.0,-10.5); fp.unit_size=5.0; fp.max_distance=32.0; fp.volume_db=-4; fp.autoplay=true; add_child(fp)
@@ -1471,6 +1476,7 @@ func sfx(n:String,pitch:=1.0):
 	var p:AudioStreamPlayer=sfxp[sfx_i]; sfx_i=(sfx_i+1)%sfxp.size(); p.stream=snd.get(key); p.pitch_scale=pitch; p.play()
 
 func apply_tod(dt:float):
+	if rain_p!=null: rain_p.stream_paused=(in_room!='' or not rain_on)
 	if rain!=null and player!=null: rain.position=player.position+Vector3(0,8,0)
 	if in_room!='': return
 	env_t-=dt
@@ -1489,7 +1495,7 @@ func apply_tod(dt:float):
 		rain.direction=Vector3(0.1,-1,0); rain.spread=2.0; rain.initial_velocity_min=16.0; rain.initial_velocity_max=19.0; rain.gravity=Vector3(0,-6,0)
 		var qm:=QuadMesh.new(); qm.size=Vector2(0.02,0.55); var rm:=StandardMaterial3D.new(); rm.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED; rm.albedo_color=Color(0.85,0.92,1.0,0.55); rm.transparency=BaseMaterial3D.TRANSPARENCY_ALPHA; rm.billboard_mode=BaseMaterial3D.BILLBOARD_PARTICLES; rm.disable_fog=true
 		qm.material=rm; rain.mesh=qm; rain.local_coords=false; rain.emitting=false; add_child(rain)
-	rain.emitting=rainy
+	rain.emitting=rainy; rain_on=rainy
 	if rainy: sc=sc.darkened(0.25); am=am.darkened(0.15)
 	var day:=int(hud_min/1440.0); var si:=int(day/7)%4
 	var tint:Color=[Color(1,0.97,1),Color(1,1,0.94),Color(1,0.93,0.86),Color(0.92,0.96,1.04)][si]
