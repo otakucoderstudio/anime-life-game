@@ -1,0 +1,16 @@
+name: Unity alf
+on:
+  workflow_dispatch:
+jobs:
+  alf:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create activation request file
+        run: |
+          mkdir -p out
+          docker run --rm -v "$PWD/out:/out" -w /out unityci/editor:ubuntu-2022.3.45f1-base-3 unity-editor -batchmode -nographics -createManualActivationFile -logfile - || true
+          ls -la out
+      - uses: actions/upload-artifact@v4
+        with:
+          name: unity-alf
+          path: out/*.alf
