@@ -1264,7 +1264,7 @@ func _physics_process(_d):
 		if frames==40 and 'ward' in OS.get_cmdline_user_args(): mode='play'; apply_outfit(1); open_phone(); open_app(6)
 		if frames==40 and 'mapapp' in OS.get_cmdline_user_args(): mode='play'; open_phone(); open_app(0)
 		if frames==30 and 'kyoto' in OS.get_cmdline_user_args(): mode='play'; scene_layer.visible=false; enter_room('kyoto')
-		if frames==60 and 'kyoto2' in OS.get_cmdline_user_args(): player.position=room_org['kyoto']+Vector3(0,0,-14); cam.position=player.position+Vector3(0,3.6,6.0)
+		if frames==40 and 'kyoto2' in OS.get_cmdline_user_args(): player.position=room_org['kyoto']+Vector3(0,0,-17); cam.position=player.position+Vector3(0,3.6,6.0)
 		if frames==30 and 'shinjuku' in OS.get_cmdline_user_args(): mode='play'; scene_layer.visible=false; enter_room('shinjuku')
 		if frames==50: print('PERF tris=',Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME),' calls=',Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME))
 		if frames==40 and 'settingsapp' in OS.get_cmdline_user_args(): mode='play'; open_phone(); open_app(4); fps_on=true; fps_lbl.visible=true
@@ -1306,6 +1306,14 @@ func _physics_process(_d):
 			if frames==30: kicks[1].n.position=Vector3(5.6,0.3,-4.2); kicks[0].vel=Vector3(0,0,-4); kicks[0].ang=Vector3(-14,0,0)
 			if frames==36: kicks[0].vel=Vector3(0.5,3.5,-2)
 			cam.fov=45; cam.position=Vector3(3.5,2.0,-0.5); cam.look_at(Vector3(5.8,0.5,-5.0))
+		if frames>=20 and frames<70 and 'shgal' in OS.get_cmdline_user_args():
+			scene_layer.visible=false; mode='play'; get_tree().root.set_meta('x',true); player.position=Vector3(0,0,40)
+			if frames==20:
+				var nm=['low-poly-shinto-shrine','torii-shrine-gate-set','japanese-machiya-townhouse','traditional-japanese-inn','japanese-tea-house','japanese-snack-shop','ramen-street-stall','five-storey-pagoda']
+				var x:=-4.5*nm.size()
+				for q in nm:
+					var kn:Node3D=(load('res://models/shuriken/'+q+'.glb') as PackedScene).instantiate(); add_child(kn); var bb:=node_aabb(kn); kn.position=Vector3(x,0,0); x+=bb.size.x+3.0; print('SH ',q,' ',bb.size)
+			cam.fov=55; cam.position=Vector3(0,9,46); cam.look_at(Vector3(0,3,0))
 		if frames>=20 and frames<70 and ('kcars' in OS.get_cmdline_user_args() or 'kbld' in OS.get_cmdline_user_args()):
 			scene_layer.visible=false; mode='play'; get_tree().root.set_meta('x',true); player.position=Vector3(0,0,20)
 			if frames==20:
@@ -2686,6 +2694,8 @@ func build_kyoto(o:Vector3):
 	for k in range(5):
 		for side in [-1,1]: kyoto_tree(o,side*(5.4+float((k*3)%2)*0.9),-6.0-k*6.5,k+(side+1))
 	kyoto_pagoda(o,-32.0)
+	for q in [["low-poly-shinto-shrine",-8.5,-21.0,90.0],["japanese-tea-house",8.5,-14.0,-90.0],["japanese-machiya-townhouse",8.2,-23.0,-90.0]]:
+		var sh:Node3D=(load("res://models/shuriken/"+q[0]+".glb") as PackedScene).instantiate(); sh.scale=Vector3(0.25,0.25,0.25); sh.position=o+Vector3(q[1],0,q[2]); sh.rotation_degrees.y=q[3]; add_child(sh)
 	# exit marker and signs
 	glow_box(Vector3(1.6,0.04,0.5),Color(0.5,1.0,0.7),o+Vector3(0,0.1,1.6),1.8)
 	tag("京都",o+Vector3(0,5.6,-8.0),0,0.02,Color(1,0.9,0.7),jp)
