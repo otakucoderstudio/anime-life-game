@@ -179,7 +179,9 @@ func world_row(ns:bool,c:float,t:float,idx:int,sak:bool):
 		var vi:int=clampi(int(round((h-7.0)/2.2)),0,4)
 		var pos:=Vector3(c+side*13.5,0,t) if ns else Vector3(t,0,c+side*13.5)
 		var ry:float=(0.0 if side<0 else 180.0) if ns else (-90.0 if side<0 else 90.0)
-		pglb("bld_"+str(vi),pos,ry,Color(1,1,1),Color(1,1,1))
+		var bn:String=["tb_tenant_building_7f_01","tb_mansion_5f_01","tb_pencil_building_6f_01","tb_mansion_5f_01","tb_tenant_building_7f_01"][vi]
+		var bw:=load("res://models/kobo/"+bn+".glb") as PackedScene
+		var bk:Node3D=bw.instantiate(); bk.position=pos+(Vector3(side*4.0,0,6.0) if ns else Vector3(6.0,0,side*4.0)); bk.rotation_degrees.y=ry; add_child(bk)
 	if sak:
 		var pp:=Vector3(c-5.9,0,t) if ns else Vector3(t,0,c-5.9)
 		sakura(pp,idx)
@@ -389,6 +391,11 @@ func building(side:int,z:float,h:float,c:Color,i:int):
 	kn.position=Vector3(side*8.6,0,z+kw*0.5-0.3 if side<0 else z-kw*0.5+0.3)
 	kn.rotation_degrees.y=90.0 if side<0 else -90.0
 	add_child(kn)  # natural Kobo palette colours, no tint
+	var jpf:Font=load("res://fonts/jp.ttf")
+	var jw:=["ラーメン","居酒屋","カラオケ","薬局","書店","喫茶","ゲーム","寿司"]
+	var jc:=[Color(1.0,0.3,0.4),Color(0.2,0.8,1.0),Color(1.0,0.8,0.2),Color(0.5,1.0,0.5),Color(1.0,0.5,0.9)]
+	var jcol:Color=jc[(i+(1 if side>0 else 0))%jc.size()]
+	tag(jw[(i*3+(1 if side>0 else 0))%jw.size()],Vector3(side*7.95,3.1,z),90.0*side if side>0 else 90.0,0.014,jcol.lightened(0.3),jpf,jcol.darkened(0.5))
 	street_props(side,z,i)
 
 func toonify(root:Node,tint:Color,th:float,shade:=Color(0.55,0.5,0.8)):
