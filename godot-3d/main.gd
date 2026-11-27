@@ -488,6 +488,11 @@ func vrm_char(path:String,hair_tint:Color=Color(1,1,1),sc:float=1.12,cloth_t:Col
 				if rn.find('_SKIN')>=0 or rn.find('_CLOTH')>=0: m.transparency=BaseMaterial3D.TRANSPARENCY_DISABLED; m.cull_mode=BaseMaterial3D.CULL_DISABLED
 				if rn.find('_HAIR')>=0 and hair_tint!=Color(1,1,1):
 					var m2:=m.duplicate(); m2.albedo_color=hair_tint; mi.set_surface_override_material(i,m2)
+				elif rn.find('_EYE')>=0 or rn.find('_FACE')>=0:
+					var m5:=m.duplicate(); m5.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED
+					m5.transparency=BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR; m5.alpha_scissor_threshold=0.35; m5.cull_mode=BaseMaterial3D.CULL_DISABLED
+					if rn.find('_EYE')>=0: m5.albedo_color=Color(1.9,1.7,1.7) if rn.find('Iris')>=0 else Color(1,1,1)
+					mi.set_surface_override_material(i,m5)
 				elif rn.find('_CLOTH')>=0 and cloth_t!=Color(1,1,1):
 					var m3:=m.duplicate(); m3.albedo_color=cloth_t; mi.set_surface_override_material(i,m3)
 				elif rn.find('_SKIN')>=0 and skin_t!=Color(1,1,1):
