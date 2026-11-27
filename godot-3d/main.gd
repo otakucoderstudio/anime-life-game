@@ -2685,7 +2685,18 @@ func kyoto_tree(o:Vector3,x:float,z:float,i:int):
 	var cy:=CylinderMesh.new(); cy.top_radius=0.14; cy.bottom_radius=0.22; cy.height=1.8; cy.radial_segments=8
 	mesh(self,cy,Color(0.35,0.22,0.15),o+Vector3(x,0.9,z))
 	var cols:=[Color(0.9,0.25,0.12),Color(0.95,0.5,0.15),Color(0.8,0.15,0.15),Color(0.95,0.7,0.2)]
-	for k in range(3): mesh(self,sph(0.9-k*0.1),cols[(i+k)%4],o+Vector3(x+(k-1)*0.5,2.2+k*0.35,z+(k%2)*0.4-0.2))
+	var kind:int=i%3
+	if kind==0:
+		for k in range(3): mesh(self,sph(0.9-k*0.1),cols[(i+k)%4],o+Vector3(x+(k-1)*0.5,2.2+k*0.35,z+(k%2)*0.4-0.2))
+	elif kind==1:
+		# pine: stacked dark-green cones
+		for k in range(4):
+			var cn:=CylinderMesh.new(); cn.top_radius=0.0; cn.bottom_radius=1.15-k*0.22; cn.height=1.0; cn.radial_segments=9
+			mesh(self,cn,Color(0.14,0.36+k*0.03,0.2),o+Vector3(x,1.7+k*0.7,z))
+	else:
+		# ginkgo: tall golden oval crown
+		var gk:=sph(1.0)
+		for k in range(3): mesh(self,gk,Color(0.98,0.8-0.05*k,0.2),o+Vector3(x+(k-1)*0.25,2.6+k*0.55,z+(k%2)*0.3-0.15))
 	solids.append([Vector2(o.x+x,o.z+z),0.3])
 func kyoto_lantern(o:Vector3,x:float,z:float):
 	var gr:=Color(0.62,0.62,0.6)
