@@ -26,6 +26,10 @@ void fragment(){
 	float broad = vn(vec2(wp.x+wp.z, wp.y)*0.22);
 	float fine = vn(vec2(wp.x+wp.z, wp.y)*1.7);
 	c *= 0.9 + 0.14*broad + 0.05*fine;
+	float fl = fract(wp.y/3.3);
+	float ledge = smoothstep(0.0,0.03,fl)*(1.0-smoothstep(0.05,0.09,fl));
+	c *= 1.0 - wall*ledge*0.22;
+	c *= 1.0 + wall*smoothstep(0.09,0.13,fl)*(1.0-smoothstep(0.13,0.17,fl))*0.0;
 	c *= mix(1.0, mix(0.78,1.0,smoothstep(0.0,3.0,wp.y)), wall);
 	if(COLOR.a >= 0.25 && COLOR.a < 0.75){
 		float g = smoothstep(0.0,14.0,wp.y);

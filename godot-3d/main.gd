@@ -238,6 +238,12 @@ func shop(side:int,z:float,kind:int):
 		tag(["コンビニ 24","ラーメン","本屋","カフェ"][kind%4],Vector3(fx-side*0.85,3.05,z),ry,0.011,Color(1,1,1),jp)
 		tag(["كونبيني ٢٤ ساعة","مطعم رامن","مكتبة","كافيه"][kind%4],Vector3(fx-side*0.85,2.5,z),ry,0.008,Color(1,0.95,0.7),ar)
 
+func planter(p:Vector3,i:int):
+	box(self,Vector3(0.9,0.5,0.9),Color(0.62,0.4,0.3),p+Vector3(0,0.25,0),false)
+	var gc:Color=[Color(0.3,0.68,0.34),Color(0.42,0.75,0.3),Color(0.25,0.6,0.4)][i%3]
+	mesh(self,sph(0.62),gc,p+Vector3(0,0.85,0),false,0.0)
+	if i%2==0: mesh(self,sph(0.14),[Color(1,0.5,0.7),Color(1,0.85,0.3),Color(1,1,1)][int(i/2)%3],p+Vector3(0.25,1.2,0.15),false,0.0)
+
 func building(side:int,z:float,h:float,c:Color,i:int):
 	var cols=[Color(0.95,0.3,0.3),Color(0.25,0.55,0.95),Color(0.35,0.75,0.5),Color(0.95,0.7,0.2)]
 	var kind:=i+(1 if side>0 else 0)
@@ -258,6 +264,8 @@ func build_street():
 			var z=-float(i)*9.5+4
 			building(side,z,h,cols[(i+(1 if side>0 else 0))%cols.size()],i)
 			shop(side,z,i+(1 if side>0 else 0))
+			planter(Vector3(side*9.1,0,z+3.2+float((i*3)%3)*0.4),i)
+			planter(Vector3(side*9.1,0,z-3.0),i+2)
 		sakura(Vector3(-5.9,0,-float(i)*9.5-1),i) if i%2==0 else null
 		if i%2==0: pglb("lamp",Vector3(5.7,0.1,-float(i)*9.5-8.6),0.0)
 		else: pglb("lamp",Vector3(-5.7,0.1,-float(i)*9.5-3.0),180.0)
