@@ -710,7 +710,7 @@ func _nox():
 func build_ui():
 	var cl:=CanvasLayer.new(); add_child(cl); ui=cl
 	var f:Font=load("res://fonts/arabic.ttf")
-	var lb:=Label.new(); lb.text="شيبويا، طوكيو"; lb.add_theme_font_override("font",f); lb.add_theme_font_size_override("font_size",34)
+	var lb:=Label.new(); loc_lbl=lb; lb.text="شيبويا، طوكيو"; lb.add_theme_font_override("font",f); lb.add_theme_font_size_override("font_size",34)
 	lb.add_theme_color_override("font_outline_color",Color(0.3,0.1,0.4)); lb.add_theme_constant_override("outline_size",10)
 	lb.position=Vector2(24,20); lb.text_direction=Control.TEXT_DIRECTION_RTL; cl.add_child(lb)
 	hud_time=Label.new(); hud_time.add_theme_font_override("font",f); hud_time.add_theme_font_size_override("font_size",20); hud_time.add_theme_color_override("font_color",Color(1,1,1))
@@ -1134,10 +1134,10 @@ func _process(dt):
 	else:
 		for n in [legl,legr,arml,armr]: n.rotation.x=lerp(n.rotation.x,0.0,10*dt)
 		player.position.y=0
-	var target=player.position+(Vector3(0,5.6,5.6) if in_room!='' else Vector3(0,3.6,6.0))
+	var target=player.position+(Vector3(0,5.6,5.6) if (in_room!='' and in_room!='kyoto') else Vector3(0,3.6,6.0))
 	if get_tree().root.has_meta("x"): return
 	cam.position=cam.position.lerp(target,min(1.0,6*dt))
-	cam.look_at(player.position+(Vector3(0,0.3,-2.0) if in_room!='' else Vector3(0,2.6,-3.0)))
+	cam.look_at(player.position+(Vector3(0,0.3,-2.0) if (in_room!='' and in_room!='kyoto') else Vector3(0,2.6,-3.0)))
 	petals.position=player.position+Vector3(0,5,-4)
 
 var frames:=0
@@ -1245,6 +1245,8 @@ func _physics_process(_d):
 		if frames==40 and 'rel' in OS.get_cmdline_user_args(): mode='play'; add_aff('كايتو',4); add_aff('أياني',7); add_aff('مومو',1); open_phone(); open_app(5)
 		if frames==40 and 'ward' in OS.get_cmdline_user_args(): mode='play'; apply_outfit(1); open_phone(); open_app(6)
 		if frames==40 and 'mapapp' in OS.get_cmdline_user_args(): mode='play'; open_phone(); open_app(0)
+		if frames==30 and 'kyoto' in OS.get_cmdline_user_args(): mode='play'; scene_layer.visible=false; enter_room('kyoto')
+		if frames==60 and 'kyoto2' in OS.get_cmdline_user_args(): player.position=room_org['kyoto']+Vector3(0,0,-14); cam.position=player.position+Vector3(0,3.6,6.0)
 		if frames==44 and 'mapicons' in OS.get_cmdline_user_args(): mv_filter=0; mv_locate(); mv_zoom=2.9; mv_pan=-(WDIST[1][2]*mv_size*2.9-mv_size*0.5)+Vector2(0,40); mv_clamp()
 		if frames==44 and 'districtz' in OS.get_cmdline_user_args(): mv_zoom=3.4; mv_pan=-(WDIST[1][2]*mv_size*3.4-mv_size*0.5); mv_clamp(); mv.queue_redraw()
 		if frames==40 and ('districts' in OS.get_cmdline_user_args() or 'mapicons' in OS.get_cmdline_user_args() or 'districtz' in OS.get_cmdline_user_args()): mode='play'; open_phone(); open_app(0); world_refresh(); world_layer.visible=true; district_layer.visible=true; district_select(1)
@@ -1656,6 +1658,7 @@ func build_room(kind:String):
 	var idx:=room_org.size()
 	var o:=Vector3(300+idx*40,0,0); room_org[kind]=o
 	batching=true
+	if kind=='kyoto': build_kyoto(o); flush_batches(); batching=false; return
 	var floor_c:=Color(0.72,0.5,0.32); var wall_c:=Color(1,0.93,0.82)
 	if kind=='konbini' or kind=='store': floor_c=Color(0.92,0.94,0.98); wall_c=Color(0.85,0.95,1)
 	if kind=='boutique': floor_c=Color(0.95,0.85,0.88); wall_c=Color(1,0.9,0.95)
@@ -1844,15 +1847,17 @@ func enter_room(kind:String):
 	in_room=kind; var o:Vector3=room_org[kind]
 	bnd=Rect2(o.x-4.8,o.z-3.6,9.6,7.6)
 	player.position=o+Vector3(0,0,3.2); cam.position=player.position+Vector3(0,5.6,5.6)
+	if kind=='kyoto': bnd=Rect2(o.x-10.5,o.z-34,21,36); player.position=o+Vector3(0,0,0.6); cam.position=player.position+Vector3(0,3.6,6.0)
 	petals.visible=false
 	env.ambient_light_color=Color(1,0.86,0.68); env.ambient_light_energy=0.55; sun.light_energy=0.55; env.adjustment_saturation=1.3
+	if kind=='kyoto': env.ambient_light_color=Color(1,0.88,0.75); env.ambient_light_energy=0.42; sun.light_energy=0.62; sun.light_color=Color(1,0.78,0.55); petals.visible=true; env.adjustment_saturation=1.15; loc_lbl.text='كيوتو (نسخة أولى)'
 	for p in room_pts: scene_done.erase(p.key)
 	exit_btn.visible=true
 	if not door_mats.has(kind):
 		door_mats[kind]=true; glow_box(Vector3(1.6,0.04,0.5),Color(0.5,1.0,0.7),o+Vector3(0,0.03,3.8),1.8)
 	sfx('bong'); play_bg('cafe' if kind=='cafe' else 'street')
 func exit_room():
-	in_room=''; bnd=Rect2(-8.5,-120,17,126); player.position=street_ret; exit_btn.visible=false; petals.visible=true; env_t=0.0; env.ambient_light_color=Color(0.86,0.9,1.0); env.ambient_light_energy=0.45; sun.light_energy=1.15; env.adjustment_saturation=1.2
+	in_room=''; bnd=Rect2(-8.5,-120,17,126); player.position=street_ret; exit_btn.visible=false; petals.visible=true; env_t=0.0; env.ambient_light_color=Color(0.86,0.9,1.0); env.ambient_light_energy=0.45; sun.light_energy=1.15; sun.light_color=Color(1,0.84,0.6); env.adjustment_saturation=1.2; loc_lbl.text='شيبويا، طوكيو'
 	cam.position=player.position+Vector3(0,3.6,6.0); sfx('bong'); play_bg('street')
 
 var app_layer:Control
@@ -2186,7 +2191,7 @@ func spawn_petals():
 var world_layer:Control; var wi_name:Label; var wi_jp:Label; var wi_desc:Label; var wi_stats:Label; var wi_enter:Button; var wi_note:Label; var wi_sel:=0
 const WCITIES=[
 	["طوكيو","東京",Vector2(0.50,0.36),true,"أكبر مدن اليابان. شيبويا والشارع والمدرسة والبيت.","السكان: 37 مليون\nالمناطق: 9 (شيبويا مفتوحة)",1,["12500","02:45"]],
-	["كيوتو","京都",Vector2(0.39,0.47),false,"مدينة المعابد والأضرحة. هتتفتح لما نبنيها.","مقفلة: لسه مش مبنية",10,["14200","02:15"]],
+	["كيوتو","京都",Vector2(0.39,0.47),true,"مدينة المعابد والأضرحة. نسخة أولى صغيرة: شارع المعبد وبوابات توري وبجودا.","نسخة أولى صغيرة (مش المدينة كاملة)",10,["14200","02:15"]],
 	["أوساكا","大阪",Vector2(0.34,0.60),false,"مدينة الأكل والملاهي. هتتفتح لما نبنيها.","مقفلة: لسه مش مبنية",5,["15000","02:30"]],
 	["هيروشيما","広島",Vector2(0.28,0.73),false,"مدينة السلام والجزر. هتتفتح بعدين.","مقفلة: لسه مش مبنية",15,["19500","04:00"]],
 	["سينداي","仙台",Vector2(0.55,0.20),false,"مدينة الشجر في الشمال. هتتفتح بعدين.","مقفلة: لسه مش مبنية",20,["11000","01:30"]],
@@ -2204,7 +2209,7 @@ const WDIST=[
 	["كوتو","江東",Vector2(0.66,0.42),8,false,"مصانع وبحر. هتتفتح بعدين."],
 ]
 const WTRAVEL=[["قطار شينكانسن",1.0,"fast"],["قطار عادي",0.45,"slow"],["طيران داخلي",1.45,"air"],["عبّارة بحرية",0.3,"ferry"]]
-var mv_filter:=0; var mv_you:=false; var mv:Control; var mv_size:Vector2; var mv_zoom:=1.0; var mv_pan:=Vector2.ZERO; var mv_bg:Texture2D; var mv_lbl:Label; var mv_drag:=false; var mv_moved:=0.0; var district_note:Label; var district_layer:Control; var wd_name:Label; var wd_desc:Label; var wd_go:Button; var wd_sel:=1
+var loc_lbl:Label; var mv_filter:=0; var mv_you:=false; var mv:Control; var mv_size:Vector2; var mv_zoom:=1.0; var mv_pan:=Vector2.ZERO; var mv_bg:Texture2D; var mv_lbl:Label; var mv_drag:=false; var mv_moved:=0.0; var district_note:Label; var district_layer:Control; var wd_name:Label; var wd_desc:Label; var wd_go:Button; var wd_sel:=1
 var wi_travel_sel:=0; var wi_card:Label; var wi_money:Label; var wi_energy:Label; var wi_time:Label; var wi_weather:Label
 var mf_cache:Font=null
 func mf()->Font:
@@ -2284,6 +2289,8 @@ func world_refresh():
 	wi_weather.text=("الطقس: مطر" if rain_on else "الطقس: صافي")
 func world_enter():
 	if not WCITIES[wi_sel][3]: return
+	if wi_sel==1:
+		world_layer.visible=false; map_layer.visible=false; mode='play'; phone_layer.visible=false; phone_layer.position.y=0; enter_room('kyoto'); return
 	district_layer.visible=true; district_select(1)
 func build_districts(vs:Vector2):
 	district_layer=Control.new(); district_layer.size=vs; district_layer.visible=false; world_layer.add_child(district_layer)
@@ -2556,3 +2563,68 @@ func mv_shibuya(c:Vector2,r:float,z:float):
 		mv.draw_rect(Rect2(X+Vector2(-tsz.x*0.5-4,-sp*1.5),tsz+Vector2(8,2)),Color(0,0,0,0.7)); mv.draw_string(F,X+Vector2(-tsz.x*0.5,-sp*1.5+tsz.y-3),tx,HORIZONTAL_ALIGNMENT_LEFT,-1,15,Color(1,1,1))
 		tx="الحديقة"; tsz=F.get_string_size(tx,HORIZONTAL_ALIGNMENT_LEFT,-1,15)
 		mv.draw_rect(Rect2(pr.position+Vector2(pr.size.x*0.5-tsz.x*0.5-4,pr.size.y*0.1),tsz+Vector2(8,2)),Color(0,0,0,0.6)); mv.draw_string(F,pr.position+Vector2(pr.size.x*0.5-tsz.x*0.5,pr.size.y*0.1+tsz.y-3),tx,HORIZONTAL_ALIGNMENT_LEFT,-1,15,Color(1,1,1))
+
+
+func kb(o:Vector3,sz:Vector3,c:Color,p:Vector3,rotz:=0.0):
+	var n:=box(self,sz,c,o+p+Vector3(0,sz.y/2,0)); return n
+func kyoto_torii(o:Vector3,z:float):
+	var red:=Color(0.85,0.15,0.1); var blk:=Color(0.1,0.08,0.08)
+	for sx in [-1,1]:
+		var cy:=CylinderMesh.new(); cy.top_radius=0.2; cy.bottom_radius=0.24; cy.height=4.4; cy.radial_segments=10
+		mesh(self,cy,red,o+Vector3(sx*2.3,2.2,z),true,0.03); solids.append([Vector2(o.x+sx*2.3,o.z+z),0.4])
+	kb(o,Vector3(6.6,0.3,0.45),blk,Vector3(0,4.4,z)); kb(o,Vector3(6.2,0.16,0.5),red,Vector3(0,4.2,z)); kb(o,Vector3(5.2,0.22,0.3),red,Vector3(0,3.5,z))
+	kb(o,Vector3(0.5,0.7,0.12),Color(0.12,0.1,0.1),Vector3(0,3.55,z+0.1))
+func kyoto_tree(o:Vector3,x:float,z:float,i:int):
+	var cy:=CylinderMesh.new(); cy.top_radius=0.14; cy.bottom_radius=0.22; cy.height=1.8; cy.radial_segments=8
+	mesh(self,cy,Color(0.35,0.22,0.15),o+Vector3(x,0.9,z))
+	var cols:=[Color(0.9,0.25,0.12),Color(0.95,0.5,0.15),Color(0.8,0.15,0.15),Color(0.95,0.7,0.2)]
+	for k in range(3): mesh(self,sph(0.9-k*0.1),cols[(i+k)%4],o+Vector3(x+(k-1)*0.5,2.2+k*0.35,z+(k%2)*0.4-0.2))
+	solids.append([Vector2(o.x+x,o.z+z),0.3])
+func kyoto_lantern(o:Vector3,x:float,z:float):
+	var gr:=Color(0.62,0.62,0.6)
+	kb(o,Vector3(0.5,0.18,0.5),gr,Vector3(x,0,z)); kb(o,Vector3(0.22,0.8,0.22),gr,Vector3(x,0.18,z)); kb(o,Vector3(0.5,0.4,0.5),gr.lightened(0.1),Vector3(x,0.98,z)); glow_box(Vector3(0.26,0.2,0.26),Color(1,0.8,0.4),o+Vector3(x,1.18,z),2.0); kb(o,Vector3(0.7,0.14,0.7),gr.darkened(0.2),Vector3(x,1.38,z))
+	solids.append([Vector2(o.x+x,o.z+z),0.3])
+func kyoto_machiya(o:Vector3,side:int,z:float,i:int):
+	var wood:Color=[Color(0.45,0.28,0.17),Color(0.52,0.33,0.2),Color(0.38,0.24,0.15)][i%3]
+	var x:=side*8.2
+	kb(o,Vector3(4.6,3.6,5.6),wood,Vector3(x,0,z)); kb(o,Vector3(4.9,0.25,5.9),Color(0.15,0.15,0.18),Vector3(x-side*0.0,3.6,z)); kb(o,Vector3(5.2,0.3,6.2),Color(0.2,0.2,0.24),Vector3(x,3.85,z)); kb(o,Vector3(3.6,0.25,4.8),Color(0.15,0.15,0.18),Vector3(x,4.1,z))
+	var fx:=x-side*2.35
+	kb(o,Vector3(0.1,1.7,4.6),Color(0.92,0.86,0.7),Vector3(fx,0.3,z))
+	for k in range(5): kb(o,Vector3(0.14,1.7,0.08),Color(0.25,0.15,0.1),Vector3(fx-side*0.05,0.3,z-2.0+k*1.0))
+	kb(o,Vector3(1.2,0.9,0.12),Color(0.15,0.2,0.4),Vector3(fx-side*0.12,2.1,z)).rotation_degrees.y=90
+	var nc:Color=[Color(0.15,0.2,0.4),Color(0.5,0.1,0.15),Color(0.15,0.3,0.25)][i%3]
+	kb(o,Vector3(0.1,0.6,1.8),nc,Vector3(fx-side*0.1,2.35,z))
+	for k in range(2): mesh(self,sph(0.28),Color(1,0.3,0.2),o+Vector3(fx-side*0.5,3.0,z-1.6+k*3.2),false); glow_box(Vector3(0.16,0.16,0.16),Color(1,0.7,0.3),o+Vector3(fx-side*0.5,3.0,z-1.6+k*3.2),1.2)
+	solids.append([Vector2(o.x+fx+side*0.2,o.z+z),2.4])
+func kyoto_pagoda(o:Vector3,z:float):
+	var red:=Color(0.65,0.12,0.1); var dk:=Color(0.16,0.14,0.16)
+	kb(o,Vector3(9,0.6,9),Color(0.6,0.6,0.58),Vector3(0,0,z))
+	var y:=0.6; var w:=5.6
+	for t in range(5):
+		kb(o,Vector3(w,1.9,w),red,Vector3(0,y,z)); kb(o,Vector3(w+1.8,0.28,w+1.8),dk,Vector3(0,y+1.9,z)); kb(o,Vector3(w+1.0,0.2,w+1.0),Color(0.5,0.4,0.3),Vector3(0,y+1.7,z))
+		y+=2.2; w-=0.75
+	kb(o,Vector3(0.18,2.2,0.18),Color(0.85,0.7,0.2),Vector3(0,y,z))
+	solids.append([Vector2(o.x,o.z+z),3.2])
+	tag("五重塔",o+Vector3(0,2.3,z+3.0),0,0.012,Color(1,0.95,0.7),jp)
+func build_kyoto(o:Vector3):
+	var path:=Color(0.48,0.46,0.46); var gravel:=Color(0.5,0.45,0.38); var grass:=Color(0.42,0.58,0.3)
+	box(self,Vector3(60,0.2,90),grass,o+Vector3(0,-0.1,-16),false)
+	kb(o,Vector3(21,0.05,36),gravel,Vector3(0,0,-16))
+	kb(o,Vector3(5.2,0.08,36),path,Vector3(0,0.05,-16))
+	for k in range(36): kb(o,Vector3(5.2,0.09,0.05),Color(0.4,0.38,0.36),Vector3(0,0.05,0.8-k*1.0))
+	for z in [-8.0,-18.0,-27.5]: kyoto_torii(o,z)
+	var i:=0
+	for k in range(4):
+		for side in [-1,1]:
+			kyoto_machiya(o,side,-3.0-k*7.5,i); i+=1
+	for k in range(6):
+		for side in [-1,1]: kyoto_lantern(o,side*3.2,-2.0-k*5.0)
+	for k in range(5):
+		for side in [-1,1]: kyoto_tree(o,side*(5.4+float((k*3)%2)*0.9),-6.0-k*6.5,k+(side+1))
+	kyoto_pagoda(o,-32.0)
+	# exit marker and signs
+	glow_box(Vector3(1.6,0.04,0.5),Color(0.5,1.0,0.7),o+Vector3(0,0.1,1.6),1.8)
+	tag("京都",o+Vector3(0,5.6,-8.0),0,0.02,Color(1,0.9,0.7),jp)
+	tag("伏見稲荷風 (نسخة أولى)",o+Vector3(0,0.9,1.0),0,0.006,Color(1,1,1),ar)
+	tag("清水",o+Vector3(-8.2+2.3,2.3,-3.0),90,0.008,Color(1,1,1),jp)
+	tag("茶屋",o+Vector3(8.2-2.3,2.3,-10.5),-90,0.008,Color(1,1,1),jp)
