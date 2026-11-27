@@ -1381,6 +1381,8 @@ func show_year_end():
 	app_layer.add_child(lbl("عدّت سنة كاملة في ساكورا هيل!",36,Vector2(vs.x/2-230,y),Color(1,1,0.9))); y+=70
 	app_layer.add_child(lbl("لقبك: "+ttl,40,Vector2(vs.x/2-170,y),Color(1,0.95,0.6))); y+=75
 	app_layer.add_child(lbl("أقرب صاحب ليك: %s (%d/10 قلوب)"%[best,aff[best]],30,Vector2(vs.x/2-240,y),Color(1,1,1))); y+=60
+	var epi:String={"كايتو":"كايتو وعدك إنكم تفضلوا أصحاب حتى بعد التخرج.","أياني":"أياني كتبتلك رسالة طويلة وقالتلك إنك أحسن حاجة حصلتلها السنة دي.","هاروتو":"هاروتو قالك: السنة الجاية أنا اللي هسبقك!","ساكورا":"ساكورا حطت ورقة ساكورا في كتابك عشان تفتكر السنة دي."}.get(best,"صحابك في الحي مش هينسوك.")
+	app_layer.add_child(lbl(epi,24,Vector2(vs.x/2-300,y-4),Color(1,0.9,0.95))); y+=50
 	for k in stats.keys(): if k!='الفلوس': app_layer.add_child(lbl("%s: %d"%[k,stats[k]],28,Vector2(vs.x/2-80,y),Color(1,1,1))); y+=44
 	app_layer.add_child(lbl("ارجع واكمل سنة تانية!",26,Vector2(vs.x/2-120,y+10),Color(1,1,0.85)))
 var outfit_i:=0
