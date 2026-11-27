@@ -53,3 +53,11 @@ Sources: Sakura School Simulator store pages (App Store / Google Play), Persona 
 | P3 | Reputation system: how people see you changes their lines. Only positive and social, no violence. | Yandere Simulator | Free. |
 | P3 | Weekly "rival" or event story arc with a clear deadline (a friendly competition for class rep). | Yandere Simulator | Free, mostly writing. |
 Left out on purpose: combat, stalking, killing and any dark mechanics (Marwan wants slice-of-life only).
+
+## Physics pass (Godot, light)
+Rule: feel first, cost second. A small custom simulation is used instead of full rigid bodies, so it stays smooth on a weak phone.
+1. DONE (v0.76): solid props (vending machines push the player out), 16 kickable props (cans, cones, balls) with gravity, bounce, friction, rolling, and collisions with solids.
+2. Next: more solid props (lamp posts, trees, bikes), props that tip over (bikes, bins), doors that swing.
+3. Next: car physics (cars stop for the player, slow in turns, bump into props), a bike the player can ride.
+4. Later: clothing and hair sway (spring bones on the VRM), ragdoll-free character bump.
+5. Unity version: full PhysX rigid bodies, cloth, ragdoll-free but realistic vehicles, no budget limit.
