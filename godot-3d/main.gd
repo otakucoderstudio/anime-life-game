@@ -353,6 +353,24 @@ func facade_detail(side:int,z:float,i:int):
 	for r in range(3):
 		box(self,Vector3(0.7,0.4,0.5),Color(0.78,0.8,0.82),Vector3(side*7.6,3.6,z-1.5+r*1.1),false)
 
+func street_props(side:int,z:float,i:int):
+	var ry:float=90.0 if side<0 else -90.0
+	var fx:float=side*8.7
+	var ln:=izk("round_paper_lantern" if i%2==0 else "cylindrical_paper_lantern",Vector3(fx-side*0.6,2.6,z-0.2),ry,1.3)
+	glow_node(ln,Color(1.0,0.55,0.25),2.2)
+	var ln2:=izk("round_paper_lantern",Vector3(fx-side*0.6,2.6,z+3.6),ry,1.3)
+	glow_node(ln2,Color(1.0,0.45,0.3),2.2)
+	if i%2==1:
+		izk("noren_curtain",Vector3(fx-side*0.15,2.2,z+0.5),ry)
+	if i%3==0:
+		izk("a_frame_pavement_sign",Vector3(side*7.2,0,z+1.5),ry+20.0)
+	if i%4==2:
+		izk("utility_pole_with_transformer",Vector3(side*8.2,0,z-3.0),ry)
+func glow_node(n:Node,c:Color,e:float):
+	for mi in n.find_children('*','MeshInstance3D',true,false):
+		var m:=StandardMaterial3D.new(); m.albedo_color=c; m.emission_enabled=true; m.emission=c; m.emission_energy_multiplier=e
+		(mi as MeshInstance3D).material_override=m
+
 func building(side:int,z:float,h:float,c:Color,i:int):
 	var cols=[Color(0.95,0.3,0.3),Color(0.25,0.55,0.95),Color(0.35,0.75,0.5),Color(0.95,0.7,0.2)]
 	var kind:=i+(1 if side>0 else 0)
@@ -360,6 +378,7 @@ func building(side:int,z:float,h:float,c:Color,i:int):
 	kbuild(Vector3(side*13.9,0,z),-90.0 if side<0 else 90.0,i+(1 if side>0 else 0))
 	izk_front(side,z,i)
 	facade_detail(side,z,i)
+	street_props(side,z,i)
 
 func toonify(root:Node,tint:Color,th:float,shade:=Color(0.55,0.5,0.8)):
 	for mi in root.find_children('*','MeshInstance3D',true,false):
