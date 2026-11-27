@@ -136,7 +136,7 @@ func strip(ns:bool,c:float,t0:float,t1:float,gaps:Array):
 	var len:=absf(t1-t0); var mid:=(t0+t1)*0.5
 	var P=func(off:float,t:float,y:float)->Vector3: return Vector3(c+off,y,t) if ns else Vector3(t,y,c+off)
 	var S=func(w:float,l:float,h:float)->Vector3: return Vector3(w,h,l) if ns else Vector3(l,h,w)
-	box(self,S.call(9.0,len,0.2),Color(0.62,0.6,0.6),P.call(0.0,mid,-0.1),false)
+	box(self,S.call(9.0,len,0.2),Color(0.36,0.35,0.4),P.call(0.0,mid,-0.1),false)
 	# segments between gaps
 	var lo:=minf(t0,t1); var hi:=maxf(t0,t1)
 	var cuts:=[[lo,hi]]
@@ -246,7 +246,7 @@ func building(side:int,z:float,h:float,c:Color,i:int):
 
 func build_street():
 	batching=true
-	box(self,Vector3(320,0.2,320),Color(0.55,0.62,0.5),Vector3(0,-0.25,-50),false)
+	box(self,Vector3(320,0.2,320),Color(0.42,0.62,0.36),Vector3(0,-0.25,-50),false)
 	strip(true,0.0,6.0,-112.0,[Vector2(-28.8,-48.7),Vector2(-90,-110)])
 	for c in range(4):
 		var zc=-c*36.0-6
