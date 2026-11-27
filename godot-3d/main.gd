@@ -396,8 +396,24 @@ func kbuild(pos:Vector3,ry:float,k:int):
 	toonify(n,pal[k%pal.size()],0.012)
 	add_child(n)
 
+func skyline():
+	var names:=["tb_mansion_10f_01","tb_office_building_8f_01","tb_tower_mansion_24f_01","tb_tenant_building_7f_01","tb_mansion_10f_01_b","tb_pencil_building_6f_01","tb_office_building_8f_01_c","tb_mansion_5f_01","tb_mansion_10f_01_c","tb_office_building_8f_01_b"]
+	var pal:=[Color(1.0,0.93,0.86),Color(0.92,0.96,1.0),Color(1.0,0.88,0.9),Color(0.93,1.0,0.92),Color(1.0,0.97,0.82),Color(0.9,0.9,1.0)]
+	var k:=0
+	for side in [-1,1]:
+		var z:=-4.0
+		while z>-112.0:
+			var nm:String=names[(k*7+(1 if side>0 else 0)*3)%names.size()]
+			var n:Node3D=(load("res://models/kobo/"+nm+".glb") as PackedScene).instantiate()
+			var sc:=1.7
+			n.scale=Vector3(sc,sc,sc); n.position=Vector3(side*(26.0+float(k%3)*2.0),0,z); n.rotation_degrees.y=90.0 if side<0 else -90.0
+			toonify(n,pal[(k+side+1)%pal.size()],0.02)
+			add_child(n)
+			z-=22.0+float((k*5)%4)*3.0; k+=1
+
 func build_street():
 	batching=true
+	skyline()
 	box(self,Vector3(320,0.2,320),Color(0.42,0.62,0.36),Vector3(0,-0.25,-50),false)
 	strip(true,0.0,6.0,-112.0,[Vector2(-28.8,-48.7),Vector2(-90,-110)])
 	var wet:=MeshInstance3D.new(); var wp:=PlaneMesh.new(); wp.size=Vector2(9.0,118.0); wet.mesh=wp
@@ -1985,7 +2001,7 @@ func show_settings():
 	app_btn("الصوت: "+("شغال" if snd_on else "مقفول"),Vector2(vs.x/2-250,140),Vector2(500,70),Color(1,0.95,0.7),func(): snd_on=not snd_on; AudioServer.set_bus_mute(0,not snd_on); show_settings())
 	app_btn("الجرافيك: "+("عالي" if hq else "عادي (أخف)"),Vector2(vs.x/2-250,240),Vector2(500,70),Color(1,0.95,0.7),func(): hq=not hq; apply_gfx(); show_settings())
 	app_btn("لعبة جديدة (يمسح التقدم)",Vector2(vs.x/2-250,340),Vector2(500,70),Color(1,0.75,0.75),func(): DirAccess.remove_absolute(ProjectSettings.globalize_path('user://save.json')); get_tree().reload_current_scene())
-	var cr:=lbl("شكر وتقدير (كله مجاني):\nالشخصيات: VRoid Project / pixiv (CC0)\nالسيارات والمباني والصوت: Kenney (CC0)\nواجهات الشوارع اليابانية: 3DAssets.dev Izakaya Alley (CC0)\nالسما: Poly Haven – Belfast Sunset (CC0)",20,Vector2(12,430))
+	var cr:=lbl("شكر وتقدير (كله مجاني):\nالشخصيات: VRoid Project / pixiv (CC0)\nالسيارات والمباني والصوت: Kenney (CC0)\nواجهات الشوارع اليابانية: 3DAssets.dev Izakaya Alley (CC0)\nمباني الأفق: Assets by Kobo Assets\nالسما: Poly Haven – Belfast Sunset (CC0)",20,Vector2(12,410))
 	cr.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART; cr.custom_minimum_size=Vector2(vs.x-24,0); cr.size=Vector2(vs.x-24,100); cr.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT; app_layer.add_child(cr)
 # audio
 var mus:AudioStreamPlayer; var amb:AudioStreamPlayer; var sfxp:Array=[]; var sfx_i:=0; var snd:={}
@@ -2076,17 +2092,17 @@ func apply_tod(dt:float):
 		if tree_mat: (tree_mat as ShaderMaterial).set_shader_parameter("accent",Vector3(tc.srgb_to_linear().r,tc.srgb_to_linear().g,tc.srgb_to_linear().b))
 
 func spawn_petals():
-	var p:=GPUParticles3D.new(); p.amount=260; p.lifetime=7.0; p.preprocess=7.0
+	var p:=GPUParticles3D.new(); p.amount=120; p.lifetime=7.0; p.preprocess=7.0
 	p.visibility_aabb=AABB(Vector3(-20,-12,-40),Vector3(40,24,45))
 	var pm:=ParticleProcessMaterial.new()
-	pm.emission_shape=ParticleProcessMaterial.EMISSION_SHAPE_BOX; pm.emission_box_extents=Vector3(11,0.5,20)
+	pm.emission_shape=ParticleProcessMaterial.EMISSION_SHAPE_BOX; pm.emission_box_extents=Vector3(11,0.5,14)
 	pm.direction=Vector3(0.3,-1,0); pm.spread=15.0; pm.initial_velocity_min=0.5; pm.initial_velocity_max=1.1
 	pm.gravity=Vector3(0.25,-0.35,0); pm.angular_velocity_min=-120; pm.angular_velocity_max=120
 	pm.turbulence_enabled=true; pm.turbulence_noise_strength=0.8; pm.turbulence_noise_scale=2.0
 	pm.scale_min=0.6; pm.scale_max=1.3
 	p.process_material=pm
-	var q:=QuadMesh.new(); q.size=Vector2(0.14,0.09)
+	var q:=QuadMesh.new(); q.size=Vector2(0.09,0.06)
 	var m:=StandardMaterial3D.new(); m.albedo_color=Color(1.0,0.72,0.84); m.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED; m.cull_mode=BaseMaterial3D.CULL_DISABLED
 	m.emission_enabled=true; m.emission=Color(1.0,0.7,0.85); m.emission_energy_multiplier=0.5
 	q.material=m; p.draw_pass_1=q
-	p.position=Vector3(0,5,-12); cam.add_child(p)
+	p.position=Vector3(0,5,-19); cam.add_child(p)
