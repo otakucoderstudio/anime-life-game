@@ -1055,12 +1055,12 @@ func door_check(dt:float):
 			if player.position.distance_to(d.p)<1.0:
 				var kd:String=d.kind; var sd:int=d.side; var dp:Vector3=d.p
 				fade_to(func():
-					enter_room(kd); street_ret=Vector3(sd*6.2,0,dp.z); hud_min+=10.0; door_cd=1.2)
+					print('DOOR_ENTER'); enter_room(kd); street_ret=Vector3(sd*6.2,0,dp.z); hud_min+=10.0; door_cd=1.2)
 				return
 	else:
 		var o:Vector3=room_org[in_room]
 		if player.position.z>o.z+3.35 and absf(player.position.x-o.x)<1.6:
-			fade_to(func(): exit_room(); door_cd=1.2)
+			fade_to(func(): print('DOOR_EXIT'); exit_room(); door_cd=1.2)
 
 func _process(dt):
 	door_check(dt)
@@ -1313,6 +1313,8 @@ func _physics_process(_d):
 		if frames==30 and 'talk' in OS.get_cmdline_user_args(): start_scene('w1','',npcs[5].lines)
 		if frames==20 and 'momo' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(0,0,-6)
 		if frames==20 and 'doortest' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(8.0,0,-14.0)
+		if frames>=70 and frames<75 and 'doorexit' in OS.get_cmdline_user_args(): player.position=room_org['cafe']+Vector3(0,0,3.6); door_cd=0.0
+		if frames==20 and 'doorexit' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(8.0,0,-14.0)
 		if frames==20 and 'bench' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; energy=2; player.position=Vector3(20.0,0,-7.2)
 		if frames==20 and ('night' in OS.get_cmdline_user_args() or 'deep' in OS.get_cmdline_user_args()): scene_layer.visible=false; mode='play'; player.position=Vector3(0,0,-6); hud_min=(2.0 if 'deep' in OS.get_cmdline_user_args() else 22.0)*60.0; env_t=0.0; player.position=Vector3(0,0,-8)
 		if frames==20 and ('rain' in OS.get_cmdline_user_args() or 'mist' in OS.get_cmdline_user_args()): scene_layer.visible=false; mode='play'; player.position=Vector3(0,0,-6); env_t=0.0
@@ -1323,7 +1325,7 @@ func _physics_process(_d):
 		if frames==20 and 'world' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-30)
 		if frames==5 and 'dusk' in OS.get_cmdline_user_args(): hud_min=17.5*60+(14*1440.0 if not "winter" in OS.get_cmdline_user_args() else 22*1440.0); env_t=0.0
 		if frames==59: print('STAT nodes=',get_tree().get_node_count(),' draws=',RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME),' prims=',RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME))
-		if frames==60:
+		if frames==(120 if 'doorexit' in OS.get_cmdline_user_args() else 60):
 			get_viewport().get_texture().get_image().save_png("/tmp/shot1.png"); get_tree().quit()
 
 var energy:=5
@@ -1833,14 +1835,14 @@ func enter_room(kind:String):
 	bnd=Rect2(o.x-4.8,o.z-3.6,9.6,7.6)
 	player.position=o+Vector3(0,0,3.2); cam.position=player.position+Vector3(0,5.6,5.6)
 	petals.visible=false
-	env.ambient_light_color=Color(1,0.86,0.68); env.ambient_light_energy=0.8; env.adjustment_saturation=1.3
+	env.ambient_light_color=Color(1,0.86,0.68); env.ambient_light_energy=0.55; sun.light_energy=0.55; env.adjustment_saturation=1.3
 	for p in room_pts: scene_done.erase(p.key)
 	exit_btn.visible=true
 	if not door_mats.has(kind):
 		door_mats[kind]=true; glow_box(Vector3(1.6,0.04,0.5),Color(0.5,1.0,0.7),o+Vector3(0,0.03,3.8),1.8)
 	sfx('bong'); play_bg('cafe' if kind=='cafe' else 'street')
 func exit_room():
-	in_room=''; bnd=Rect2(-8.5,-120,17,126); player.position=street_ret; exit_btn.visible=false; petals.visible=true; env_t=0.0; env.ambient_light_color=Color(0.86,0.9,1.0); env.ambient_light_energy=0.55; env.adjustment_saturation=1.2
+	in_room=''; bnd=Rect2(-8.5,-120,17,126); player.position=street_ret; exit_btn.visible=false; petals.visible=true; env_t=0.0; env.ambient_light_color=Color(0.86,0.9,1.0); env.ambient_light_energy=0.45; sun.light_energy=1.15; env.adjustment_saturation=1.2
 	cam.position=player.position+Vector3(0,3.6,6.0); sfx('bong'); play_bg('street')
 
 var app_layer:Control
