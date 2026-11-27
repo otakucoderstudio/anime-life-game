@@ -811,6 +811,7 @@ func _notification(what):
 	if what==NOTIFICATION_APPLICATION_PAUSED or what==NOTIFICATION_WM_GO_BACK_REQUEST or what==NOTIFICATION_APPLICATION_FOCUS_OUT:
 		if mode!='select' and not ('shot' in OS.get_cmdline_user_args()): save_game()
 func _process(dt):
+	if fit_pending: fit_pending=false; fit_labels()
 	if mode=='play' and not ('shot' in OS.get_cmdline_user_args()):
 		save_t+=dt
 		if save_t>15.0: save_t=0.0; save_game()
@@ -945,7 +946,10 @@ func _physics_process(_d):
 		if frames==20 and 'newst' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(-68.5,0,-14); player.rotation.y=PI
 		if frames==20 and 'snow' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20); hud_min=21*1440.0+600.0
 		if frames==20 and 'stn' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(2,0,-22); get_tree().root.set_meta('x',true); cam.fov=60; cam.position=Vector3(-2,3.0,-4); cam.look_at(Vector3(18,3.0,-14))
-		if frames==20 and 'bot' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; show_ai(); ai_edit.text='ازيك'; ai_send(); ai_edit.text='احكيلي عن طوكيو'; ai_send(); ai_edit.text='ضحكني'; ai_send(); ai_edit.text='انت بتحب الفيزياء'; ai_send()
+		if frames==20 and ('bot' in OS.get_cmdline_user_args() or 'botf' in OS.get_cmdline_user_args() or 'app' in OS.get_cmdline_user_args()):
+			scene_layer.visible=false; mode='play'; phone_layer.visible=true; app_full='botf' in OS.get_cmdline_user_args(); open_app(10 if 'app' not in OS.get_cmdline_user_args() else 7)
+			if 'app' not in OS.get_cmdline_user_args():
+				for q in ['ازيك','احكيلي عن طوكيو','ضحكني','انت بتحب الفيزياء']: ai_edit.text=q; ai_send()
 		if frames>=20 and frames<60 and 'carc' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(0,0,-5); get_tree().root.set_meta('x',true); cars[0].t=-30.0; var cp:Vector3=cars[0].n.position; cam.fov=45; cam.position=cp+Vector3(-3.6,1.5,-6.0); cam.look_at(cp+Vector3(0,0.8,0))
 		if frames==20 and 'cars' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-22); cars[0].t=-30.0; cars[1].t=-34.0
 		if frames==20 and 'greet' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; peds[0].si=0; peds[0].off=7.5; peds[0].t=-20.0; player.position=Vector3(7.5,0,-16.5)
@@ -1040,7 +1044,11 @@ func build_phone():
 	var cb:=Button.new(); cb.text="إغلاق"; cb.size=Vector2(200,56); cb.position=body.position+Vector2(70,body.size.y-110); cb.add_theme_font_override("font",ar); cb.add_theme_font_size_override("font_size",26)
 	cb.pressed.connect(close_phone); phone_layer.add_child(cb)
 	travel_note=lbl("",24,body.position+Vector2(30,520),Color(0.1,0.1,0.3)); travel_note.size=Vector2(280,200); travel_note.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART; travel_note.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT; phone_layer.add_child(travel_note)
-	app_layer=Control.new(); app_layer.size=vs; app_layer.visible=false; ui.add_child(app_layer)
+	app_cont=SubViewportContainer.new(); app_cont.visible=false; ui.add_child(app_cont)
+	app_svp=SubViewport.new(); app_svp.transparent_bg=false; app_svp.handle_input_locally=true; app_cont.add_child(app_svp)
+	app_layer=Control.new(); app_svp.add_child(app_layer)
+	phone_sc_pos=sc.position; phone_sc_size=sc.size
+	app_apply_mode()
 	# map
 	map_layer=Control.new(); map_layer.size=vs; map_layer.visible=false; ui.add_child(map_layer)
 	var mbg:=ColorRect.new(); mbg.color=Color(0.96,0.93,0.85); mbg.size=vs; map_layer.add_child(mbg)
@@ -1095,6 +1103,28 @@ func new_msgs()->Array:
 func refresh_badge():
 	badge.visible=false
 var phone_time:Label
+var app_cont:SubViewportContainer
+var app_svp:SubViewport
+var app_full:=false
+var cur_app:=-1
+var phone_sc_pos:=Vector2.ZERO
+var phone_sc_size:=Vector2(310,558)
+var ai_hist:="البوت: أهلاً! أنا صاحبك في طوكيو. اسألني أي حاجة."
+func avs()->Vector2:
+	return Vector2(app_svp.size)
+func app_apply_mode():
+	var vs:=get_viewport().get_visible_rect().size
+	if app_full:
+		app_cont.scale=Vector2.ONE; app_cont.position=Vector2.ZERO; app_svp.size=Vector2i(int(vs.x),int(vs.y)); app_cont.size=vs
+	else:
+		var k:=phone_sc_size.x/540.0; var h:=phone_sc_size.y-30.0
+		app_svp.size=Vector2i(540,int(h/k)); app_cont.scale=Vector2(k,k); app_cont.position=phone_sc_pos+Vector2(0,30); app_cont.size=Vector2(540,h/k)
+	app_layer.size=Vector2(app_svp.size)
+func app_enter():
+	app_apply_mode(); app_layer.visible=true; app_cont.visible=true; phone_layer.visible=not app_full; mode='phone'
+func app_toggle():
+	app_full=not app_full; sfx('click')
+	if cur_app>=0: open_app(cur_app)
 func draw_glyph(g:Control,kind:String):
 	var w:=Color(1,1,1); var c:=Vector2(38,38)
 	match kind:
@@ -1133,17 +1163,17 @@ func open_map():
 var ai_log:Label
 var ai_edit:LineEdit
 func show_camera():
-	phone_layer.visible=false; app_layer.visible=true; mode='phone'; app_head("الكاميرا",Color(0.18,0.18,0.25))
-	var vs:=get_viewport().get_visible_rect().size
+	app_enter(); app_head("الكاميرا",Color(0.18,0.18,0.25))
+	var vs:=avs()
 	app_layer.add_child(lbl("الكاميرا هتشتغل قريباً: هتصور أماكن طوكيو وتحفظ الصور.",30,Vector2(vs.x/2-300,vs.y/2-30),Color(1,1,0.9)))
 func show_ai():
-	phone_layer.visible=false; app_layer.visible=true; mode='phone'; app_head("البوت",Color(0.32,0.25,0.62))
-	var vs:=get_viewport().get_visible_rect().size
-	var lg:=Label.new(); lg.add_theme_font_override("font",ar); lg.add_theme_font_size_override("font_size",28); lg.add_theme_color_override("font_color",Color(1,1,1)); lg.position=Vector2(60,90); lg.size=Vector2(vs.x-120,vs.y-230); lg.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART; lg.text_direction=Control.TEXT_DIRECTION_RTL; lg.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT
-	lg.text="البوت: أهلاً! أنا صاحبك في طوكيو. اسألني أي حاجة."
+	app_enter(); app_head("البوت",Color(0.32,0.25,0.62))
+	var vs:=avs()
+	var lg:=Label.new(); lg.add_theme_font_override("font",ar); lg.add_theme_font_size_override("font_size",28); lg.add_theme_color_override("font_color",Color(1,1,1)); lg.position=Vector2(30,110); lg.size=Vector2(vs.x-60,vs.y-250); lg.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART; lg.text_direction=Control.TEXT_DIRECTION_RTL; lg.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT
+	lg.text=ai_hist
 	app_layer.add_child(lg); ai_log=lg
-	var ed:=LineEdit.new(); ed.size=Vector2(vs.x-320,60); ed.position=Vector2(180,vs.y-90); ed.placeholder_text="اكتب رسالتك..."; ed.add_theme_font_override("font",ar); ed.add_theme_font_size_override("font_size",28); ed.text_direction=Control.TEXT_DIRECTION_RTL; app_layer.add_child(ed); ai_edit=ed
-	var sb2:=Button.new(); sb2.text="ارسل"; sb2.size=Vector2(130,60); sb2.position=Vector2(30,vs.y-90); sb2.add_theme_font_override("font",ar); sb2.add_theme_font_size_override("font_size",28)
+	var ed:=LineEdit.new(); ed.size=Vector2(vs.x-190,60); ed.position=Vector2(170,vs.y-90); ed.placeholder_text="اكتب رسالتك..."; ed.add_theme_font_override("font",ar); ed.add_theme_font_size_override("font_size",28); ed.text_direction=Control.TEXT_DIRECTION_RTL; app_layer.add_child(ed); ai_edit=ed
+	var sb2:=Button.new(); sb2.text="ارسل"; sb2.size=Vector2(120,60); sb2.position=Vector2(30,vs.y-90); sb2.add_theme_font_override("font",ar); sb2.add_theme_font_size_override("font_size",28)
 	sb2.pressed.connect(ai_send); ed.text_submitted.connect(func(_t): ai_send()); app_layer.add_child(sb2)
 func ar_norm(t:String)->String:
 	var r:=t.to_lower()
@@ -1194,7 +1224,7 @@ func ai_send():
 	ai_edit.text=""
 	var lines:=ai_log.text.split("\n"); lines.append("أنا: "+t); lines.append("البوت: "+ai_reply(t))
 	while lines.size()>8: lines.remove_at(0)
-	ai_log.text="\n".join(lines); sfx('blip',1.1)
+	ai_log.text="\n".join(lines); ai_hist=ai_log.text; sfx('blip',1.1)
 func open_msgs():
 	phone_layer.visible=false; msg_layer.visible=true; mode='phone'
 	for c in msg_layer.get_children():
@@ -1462,12 +1492,29 @@ var items:={"أونيجيري":[5,1,'الصحة',3],"قهوة":[8,1,'الصحة'
 func clear_app():
 	for c in app_layer.get_children(): c.queue_free()
 func app_head(title:String,col:Color):
-	clear_app(); var vs:=get_viewport().get_visible_rect().size
+	clear_app(); var vs:=avs()
 	var bg:=ColorRect.new(); bg.color=col; bg.size=vs; app_layer.add_child(bg)
-	app_layer.add_child(lbl(title,40,Vector2(vs.x/2-80,10),Color(1,1,1)))
-	var back:=Button.new(); back.text="رجوع"; back.size=Vector2(140,52); back.position=Vector2(30,10); back.add_theme_font_override("font",ar); back.add_theme_font_size_override("font_size",26)
-	back.pressed.connect(func(): app_layer.visible=false; phone_layer.visible=true; mode='phone'); app_layer.add_child(back)
-	var m:=lbl("الفلوس: %d   الطاقة: %d/5"%[stats['الفلوس'],energy],26,Vector2(vs.x-380,16)); app_layer.add_child(m)
+	var narrow:=vs.x<700.0
+	var tl:=lbl(title,28 if narrow else 40,Vector2(vs.x/2-60 if narrow else vs.x/2-80,10 if not narrow else 12),Color(1,1,1)); app_layer.add_child(tl)
+	if narrow: tl.size=Vector2(240,50); tl.position.x=150; tl.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER; tl.clip_text=true
+	fit_pending=narrow
+	var back:=Button.new(); back.text="رجوع"; back.size=Vector2(130,52); back.position=Vector2(14 if narrow else 30,10); back.add_theme_font_override("font",ar); back.add_theme_font_size_override("font_size",26)
+	back.pressed.connect(func(): app_layer.visible=false; app_cont.visible=false; app_full=false; cur_app=-1; phone_layer.visible=true; mode='phone'); app_layer.add_child(back)
+	if cur_app>=0:
+		var ex:=Button.new(); ex.text="تصغير" if app_full else "تكبير"; ex.size=Vector2(130,52); ex.position=Vector2(vs.x-144,10) if narrow else Vector2(vs.x-170,10); ex.add_theme_font_override("font",ar); ex.add_theme_font_size_override("font_size",26)
+		ex.pressed.connect(app_toggle); app_layer.add_child(ex)
+	var m:=lbl("الفلوس: %d   الطاقة: %d/5"%[stats['الفلوس'],energy],22 if narrow else 26,Vector2(vs.x/2-120 if narrow else vs.x-500,64 if narrow else 16)); app_layer.add_child(m)
+var fit_pending:=false
+func fit_labels():
+	var vs:=avs()
+	for c in app_layer.get_children():
+		if c is Label and c.position.y>90.0:
+			var l:Label=c
+			var w:=l.get_combined_minimum_size().x
+			if l.position.x<6.0 or l.position.x+w>vs.x-6.0:
+				var fs:int=l.get_theme_font_size("font_size")
+				if fs>20: l.add_theme_font_size_override("font_size",20)
+				l.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART; l.position.x=12; l.custom_minimum_size=Vector2(vs.x-24,0); l.size=Vector2(vs.x-24,l.size.y); l.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT
 func app_btn(txt:String,pos:Vector2,sz:Vector2,col:Color,cb:Callable):
 	var b:=Button.new(); b.text=txt; b.size=sz; b.position=pos; b.add_theme_font_override("font",ar); b.add_theme_font_size_override("font_size",26)
 	var sbb:=StyleBoxFlat.new(); sbb.bg_color=col; sbb.set_corner_radius_all(14); sbb.set_border_width_all(3); sbb.border_color=Color(0.2,0.15,0.3)
@@ -1475,14 +1522,14 @@ func app_btn(txt:String,pos:Vector2,sz:Vector2,col:Color,cb:Callable):
 	for st in ["font_color","font_hover_color","font_pressed_color"]: b.add_theme_color_override(st,Color(0.1,0.08,0.2))
 	b.pressed.connect(cb); app_layer.add_child(b)
 func open_app(k:int):
-	sfx('click')
+	sfx('click'); cur_app=k
 	if k==0: open_map(); return
 	if k==8: open_msgs(); return
 	if k==9: show_camera(); return
 	if k==10: show_ai(); return
 	if k==3:
 		phone_layer.visible=false; mode='stats'; stats_layer.visible=true; stats_layer.get_meta('pc').queue_redraw(); return
-	phone_layer.visible=false; app_layer.visible=true; mode='phone'
+	app_enter()
 	if k==1: show_inv()
 	if k==2: show_shop()
 	if k==4: show_settings()
@@ -1540,7 +1587,7 @@ func qadd(k:String,who:="")->void:
 func show_quests():
 	var d:=int(hud_min/1440.0)
 	if d!=qday: qday=d; qp={}; qdone={}
-	app_head("مهام النهاردة",Color(0.4,0.65,0.35)); var vs:=get_viewport().get_visible_rect().size; var y:=110.0
+	app_head("مهام النهاردة",Color(0.4,0.65,0.35)); var vs:=avs(); var y:=110.0
 	for k in qdefs.keys():
 		var q:Array=qdefs[k]; var ok:=qdone.has(k)
 		app_layer.add_child(lbl(("✓ " if ok else "• ")+q[0]+"  ("+str(mini(qp.get(k,0),q[1]))+"/"+str(q[1])+")  +"+str(q[2])+" فلوس",30,Vector2(vs.x/2-300,y),Color(0.8,1,0.8) if ok else Color(1,1,1)))
@@ -1548,8 +1595,8 @@ func show_quests():
 	app_layer.add_child(lbl("المهام بتتجدد كل يوم",24,Vector2(vs.x/2-120,y+20),Color(1,1,0.85)))
 var year_shown:=false
 func show_year_end():
-	phone_layer.visible=false; app_layer.visible=true; mode='phone'
-	app_head("السنة الأولى",Color(0.9,0.55,0.45)); var vs:=get_viewport().get_visible_rect().size
+	app_full=true; cur_app=-1; app_enter()
+	app_head("السنة الأولى",Color(0.9,0.55,0.45)); var vs:=avs()
 	var best:String="كايتو"; for k in aff.keys(): if aff[k]>aff[best]: best=k
 	var bs:String="الدراسة"; for k in stats.keys(): if k!='الفلوس' and stats[k]>stats[bs]: bs=k
 	var ttl:String={"الدراسة":"الطالب المثالي","العلاقات":"قلب الفصل","الصحة":"بطل الطاقة","المجتمع":"نجم الحي"}.get(bs,"طالب طوكيو")
@@ -1573,7 +1620,7 @@ func apply_outfit(i:int):
 			if not m.has_meta("own"): m=m.duplicate(); m.set_meta("own",true); mi.material_override=m
 			m.set_shader_parameter("p_top",Vector3(o[1].r,o[1].g,o[1].b)); m.set_shader_parameter("p_bot",Vector3(o[2].r,o[2].g,o[2].b)); m.set_shader_parameter("p_acc",Vector3(o[3].r,o[3].g,o[3].b))
 func show_wardrobe():
-	app_head("الدولاب",Color(0.75,0.6,0.3)); var vs:=get_viewport().get_visible_rect().size
+	app_head("الدولاب",Color(0.75,0.6,0.3)); var vs:=avs()
 	for i in range(outfits.size()):
 		var ii:int=i
 		var has:bool=owned.has(i)
@@ -1586,7 +1633,7 @@ func show_wardrobe():
 			show_wardrobe())
 	app_layer.add_child(lbl("اللبس الرمادي مقفول، اشتريه بالفلوس من المهام",24,Vector2(vs.x/2-130,400),Color(1,1,0.85)))
 func show_rel():
-	app_head("العلاقات",Color(0.85,0.5,0.65)); var vs:=get_viewport().get_visible_rect().size; var y:=100.0
+	app_head("العلاقات",Color(0.85,0.5,0.65)); var vs:=avs(); var y:=100.0
 	for nm in aff.keys():
 		var v:int=aff[nm]
 		var hs:=""
@@ -1596,14 +1643,14 @@ func show_rel():
 		y+=140
 	app_layer.add_child(lbl("اتكلم معاهم كل يوم أو اديهم هدية من المخزون",24,Vector2(vs.x/2-230,y+10),Color(1,1,0.85)))
 func gift_pick(nm:String):
-	app_head("اختار هتهدي مين",Color(0.85,0.5,0.65)); var vs:=get_viewport().get_visible_rect().size; var y:=130.0
+	app_head("اختار هتهدي مين",Color(0.85,0.5,0.65)); var vs:=avs(); var y:=130.0
 	for w in aff.keys():
 		var ww:String=w
 		app_btn(ww,Vector2(vs.x/2-200,y),Vector2(400,70),Color(1,0.9,0.95),func(): give_gift(nm,ww)); y+=90
 func give_gift(nm:String,who:String):
 	inv[nm]-=1; add_aff(who,3); sfx('bong'); show_inv()
 func show_inv():
-	app_head("المخزون",Color(0.45,0.55,0.8)); var vs:=get_viewport().get_visible_rect().size; var y:=90.0
+	app_head("المخزون",Color(0.45,0.55,0.8)); var vs:=avs(); var y:=90.0
 	if inv.is_empty(): app_layer.add_child(lbl("المخزون فاضي. روح المتجر!",32,Vector2(vs.x/2-200,200)))
 	for nm in inv.keys():
 		if inv[nm]<=0: continue
@@ -1612,7 +1659,7 @@ func show_inv():
 func use_item(nm:String):
 	var it:Array=items[nm]; inv[nm]-=1; energy=clampi(energy+it[1],0,5); stats[it[2]]=clampi(stats[it[2]]+it[3],0,100); hearts.queue_redraw(); qadd('eat'); sfx('open'); show_inv()
 func show_shop():
-	app_head("المتجر",Color(0.85,0.5,0.65)); var vs:=get_viewport().get_visible_rect().size; var y:=90.0
+	app_head("المتجر",Color(0.85,0.5,0.65)); var vs:=avs(); var y:=90.0
 	for nm in items.keys():
 		var it:Array=items[nm]; var n:String=nm
 		app_btn("%s  —  %d فلوس"%[nm,it[0]],Vector2(vs.x/2-300,y),Vector2(600,64),Color(1,0.95,0.7) if stats['الفلوس']>=it[0] else Color(0.8,0.8,0.8),func(): buy(n)); y+=76
@@ -1621,7 +1668,7 @@ func buy(nm:String):
 	if stats['الفلوس']<it[0]: sfx('click'); return
 	stats['الفلوس']-=it[0]; inv[nm]=inv.get(nm,0)+1; qadd('buy'); sfx('bong'); show_shop()
 func show_settings():
-	app_head("الإعدادات",Color(0.55,0.5,0.75)); var vs:=get_viewport().get_visible_rect().size
+	app_head("الإعدادات",Color(0.55,0.5,0.75)); var vs:=avs()
 	app_btn("الصوت: "+("شغال" if snd_on else "مقفول"),Vector2(vs.x/2-250,140),Vector2(500,70),Color(1,0.95,0.7),func(): snd_on=not snd_on; AudioServer.set_bus_mute(0,not snd_on); show_settings())
 	app_btn("الجرافيك: "+("عالي" if hq else "عادي (أخف)"),Vector2(vs.x/2-250,240),Vector2(500,70),Color(1,0.95,0.7),func(): hq=not hq; get_viewport().scaling_3d_scale=0.85 if hq else 0.6; show_settings())
 	app_btn("لعبة جديدة (يمسح التقدم)",Vector2(vs.x/2-250,340),Vector2(500,70),Color(1,0.75,0.75),func(): DirAccess.remove_absolute(ProjectSettings.globalize_path('user://save.json')); get_tree().reload_current_scene())
