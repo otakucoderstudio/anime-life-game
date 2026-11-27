@@ -717,7 +717,8 @@ func update_peds(dt:float):
 				p.t=clampf(pt,minf(s3[2],s3[3]),maxf(s3[2],s3[3])); p.off=7.5*(1.0 if randf()<0.5 else -1.0)
 				if d>1e8: pass
 		place_ped(p)
-		n.visible=in_room=='' and player.position.distance_to(n.position)<32.0
+		var deep:bool=fmod(hud_min/60.0,24.0)<4.5
+		n.visible=in_room=='' and not deep and player.position.distance_to(n.position)<32.0
 		if not p.has("bub"):
 			var lb:=Label3D.new(); lb.font=ar; lb.font_size=64; lb.pixel_size=0.007; lb.billboard=BaseMaterial3D.BILLBOARD_ENABLED; lb.no_depth_test=true; lb.modulate=Color(1,1,1); lb.outline_modulate=Color(0.25,0.1,0.2); lb.outline_size=14; lb.position=Vector3(0,2.9,0); lb.visible=false; n.add_child(lb); p["bub"]=lb; p["bt"]=0.0; p["gday"]=-1
 		var bl:Label3D=p.bub
@@ -865,8 +866,8 @@ func _physics_process(_d):
 		if frames>=50 and frames<=59 and 'ptr' in OS.get_cmdline_user_args():
 			var pi:int=int(OS.get_cmdline_user_args()[-1]); var pn:Node3D=npcs[pi].n; pn.rotation.y=0; player.visible=false; get_tree().root.set_meta("x",true)
 			cam.position=pn.position+Vector3(0.1,2.0,2.3); cam.fov=34; cam.look_at(pn.position+Vector3(0,1.9,0))
-		if frames==40 and 'night' in OS.get_cmdline_user_args(): env_t=0.0
-		if frames==100 and 'night' in OS.get_cmdline_user_args(): pass
+		if frames==40 and ('night' in OS.get_cmdline_user_args() or 'deep' in OS.get_cmdline_user_args()): env_t=0.0
+		if frames==100 and ('night' in OS.get_cmdline_user_args() or 'deep' in OS.get_cmdline_user_args()): pass
 		if frames==40 and 'map' in OS.get_cmdline_user_args(): mode='play'; open_map()
 		if frames==40 and 'rel' in OS.get_cmdline_user_args(): mode='play'; add_aff('كايتو',4); add_aff('أياني',7); add_aff('مومو',1); open_phone(); open_app(5)
 		if frames==40 and 'ward' in OS.get_cmdline_user_args(): mode='play'; apply_outfit(1); open_phone(); open_app(6)
@@ -892,7 +893,7 @@ func _physics_process(_d):
 		if frames==30 and 'talk' in OS.get_cmdline_user_args(): start_scene('w1','',npcs[5].lines)
 		if frames==20 and 'momo' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(0,0,-6)
 		if frames==20 and 'bench' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; energy=2; player.position=Vector3(20.0,0,-7.2)
-		if frames==20 and 'night' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; hud_min=22.0*60.0; env_t=0.0; player.position=Vector3(0,0,-14)
+		if frames==20 and ('night' in OS.get_cmdline_user_args() or 'deep' in OS.get_cmdline_user_args()): scene_layer.visible=false; mode='play'; hud_min=(2.0 if 'deep' in OS.get_cmdline_user_args() else 22.0)*60.0; env_t=0.0; player.position=Vector3(0,0,-14)
 		if frames==20 and 'rain' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(0,0,-6); env_t=0.0
 		if frames==20 and 'street' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20)
 		if frames==20 and 'park' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(34.5,0,-4.5)
