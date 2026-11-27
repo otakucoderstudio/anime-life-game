@@ -25,3 +25,7 @@ Design rules so new regions can attach later:
 - Planned order: Tokyo hub, countryside village 1 (rice fields, shrine, small station), seaside town (port, beach, ferry), mountain onsen town (snow), a second big city (Kyoto style). Each opens by story progress or by a ticket bought with in-game money.
 - Train map: one shared line list (name, stations, travel time). Adding a region = add a station plus a region scene, no change to existing regions.
 - Region content budget for the Honor X6c: keep each region small, stream only the current one, and unload the previous one on travel.
+
+## Parked ideas
+- AI "talk freely" mode per character (live LLM chat in Egyptian Arabic, offline fallback to scripted lines). Parked by the owner on 27 Nov 2026. Research notes: Gemini free tier is the best free fit (about 500 requests/day per project, shared by all players); a key inside the APK can be extracted, so use a small free proxy. Do not build until the owner asks.
+- Japanese voice acting (VOICEVOX) is in progress: sample approved pending; needs an on-screen VOICEVOX credit.
