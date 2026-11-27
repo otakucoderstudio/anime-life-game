@@ -749,12 +749,14 @@ func tod()->String:
 var peds:=[]
 var ped_streets:=[[true,0.0,-110.0,4.0],[true,-70.0,-108.0,4.0],[true,70.0,-108.0,4.0],[false,-38.75,-108.0,108.0],[false,-100.0,-108.0,108.0]]
 var cars:=[]
+const KCAR_YAW:=0.0
 func spawn_cars():
 	pglb_load("car")
 	var cc=[Color(0.95,0.35,0.4),Color(0.3,0.6,0.95),Color(0.98,0.8,0.3),Color(0.45,0.8,0.55),Color(0.9,0.9,0.95)]
 	var defs=[[0,-60.0,1.0],[0,-20.0,-1.0],[3,-30.0,1.0],[4,40.0,-1.0],[3,60.0,-1.0]]
 	for i in range(defs.size()):
-		var n:=MeshInstance3D.new(); n.mesh=pmeshes["car"]; n.material_override=pmat(Color(1,1,1),cc[i%5]); add_child(n)
+		var n:=Node3D.new(); add_child(n)
+		var kn:Node3D=(load('res://models/kcar/'+['taxi','sedan','suv','police','delivery'][i%5]+'.glb') as PackedScene).instantiate(); n.add_child(kn); kn.rotation_degrees.y=KCAR_YAW; kn.scale=Vector3(1.15,1.15,1.15)
 		cars.append({"n":n,"si":defs[i][0],"t":defs[i][1],"dir":defs[i][2]})
 func update_cars(dt:float):
 	for c in cars:
@@ -1072,6 +1074,23 @@ func _physics_process(_d):
 			if frames==30: kicks[1].n.position=Vector3(5.6,0.3,-4.2); kicks[0].vel=Vector3(0,0,-4); kicks[0].ang=Vector3(-14,0,0)
 			if frames==36: kicks[0].vel=Vector3(0.5,3.5,-2)
 			cam.fov=45; cam.position=Vector3(3.5,2.0,-0.5); cam.look_at(Vector3(5.8,0.5,-5.0))
+		if frames>=20 and frames<70 and ('kcars' in OS.get_cmdline_user_args() or 'kbld' in OS.get_cmdline_user_args()):
+			scene_layer.visible=false; mode='play'; get_tree().root.set_meta('x',true); player.position=Vector3(0,0,20)
+			if frames==20:
+				var nm=['taxi','police','sedan','suv','delivery','hatchback-sports'] if 'kcars' in OS.get_cmdline_user_args() else ['building-a','building-d','building-h','building-k','building-skyscraper-a','building-skyscraper-c','low-detail-building-wide-a','building-n']
+				var x:=-6.0 if 'kcars' in OS.get_cmdline_user_args() else -30.0
+				for q in nm:
+					var kn:Node3D=(load('res://models/'+('kcar/' if 'kcars' in OS.get_cmdline_user_args() else 'kbld/')+q+'.glb') as PackedScene).instantiate(); add_child(kn)
+					var bb:=AABB(); var first:=true
+					for mi in kn.find_children('*','MeshInstance3D',true,false):
+						var a:AABB=mi.get_aabb(); if first: bb=a; first=false
+						else: bb=bb.merge(a)
+					print('KSZ ',q,' ',bb.size)
+					kn.position=Vector3(x,0,-8.0 if 'kcars' in OS.get_cmdline_user_args() else -14.0); x+=2.6 if 'kcars' in OS.get_cmdline_user_args() else 9.0
+					kn.rotation_degrees.y=200 if 'kcars' in OS.get_cmdline_user_args() else 180
+					if 'kbld' in OS.get_cmdline_user_args(): kn.scale=Vector3(8,8,8)
+			if 'kcars' in OS.get_cmdline_user_args(): cam.fov=50; cam.position=Vector3(-1.5,2.4,-3.0); cam.look_at(Vector3(-1.2,0.6,-8.0))
+			else: cam.fov=60; cam.position=Vector3(-3.0,6.0,10.0); cam.look_at(Vector3(-3.0,6.0,-14.0))
 		if frames==20 and 'stn' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(2,0,-22); get_tree().root.set_meta('x',true); cam.fov=60; cam.position=Vector3(-2,3.0,-4); cam.look_at(Vector3(18,3.0,-14))
 		if frames==20 and ('bot' in OS.get_cmdline_user_args() or 'botf' in OS.get_cmdline_user_args() or 'app' in OS.get_cmdline_user_args()):
 			scene_layer.visible=false; mode='play'; phone_layer.visible=true; app_full='botf' in OS.get_cmdline_user_args(); open_app(10 if 'app' not in OS.get_cmdline_user_args() else 7)
@@ -1799,7 +1818,8 @@ func show_settings():
 	app_btn("الصوت: "+("شغال" if snd_on else "مقفول"),Vector2(vs.x/2-250,140),Vector2(500,70),Color(1,0.95,0.7),func(): snd_on=not snd_on; AudioServer.set_bus_mute(0,not snd_on); show_settings())
 	app_btn("الجرافيك: "+("عالي" if hq else "عادي (أخف)"),Vector2(vs.x/2-250,240),Vector2(500,70),Color(1,0.95,0.7),func(): hq=not hq; get_viewport().scaling_3d_scale=0.85 if hq else 0.6; show_settings())
 	app_btn("لعبة جديدة (يمسح التقدم)",Vector2(vs.x/2-250,340),Vector2(500,70),Color(1,0.75,0.75),func(): DirAccess.remove_absolute(ProjectSettings.globalize_path('user://save.json')); get_tree().reload_current_scene())
-	app_layer.add_child(lbl("الصوت والخرائط: مكتبات Kenney (CC0)",22,Vector2(vs.x/2-200,440)))
+	var cr:=lbl("شكر وتقدير (كله مجاني):\nالشخصيات: VRoid Project / pixiv (CC0)\nالسيارات والمباني والصوت: Kenney (CC0)",20,Vector2(12,430))
+	cr.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART; cr.custom_minimum_size=Vector2(vs.x-24,0); cr.size=Vector2(vs.x-24,100); cr.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT; app_layer.add_child(cr)
 # audio
 var mus:AudioStreamPlayer; var amb:AudioStreamPlayer; var sfxp:Array=[]; var sfx_i:=0; var snd:={}
 var foot_t:=0.0
