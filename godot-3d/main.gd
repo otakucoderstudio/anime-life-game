@@ -382,9 +382,9 @@ func _collect(n:Node,out:Dictionary):
 func hair_t(h:Color)->Color:
 	return Color(minf(h.r*2.2+0.15,2.0),minf(h.g*2.2+0.1,2.0),minf(h.b*2.2+0.1,2.0))
 func make_girl(skin:Color,hair:Color,top:Color,skirtc:Color,ribbon:Color,long_hair:=true,glasses:=false)->Dictionary:
-	return vrm_char('res://models/shino.glb',hair_t(hair),1.05)
+	return vrm_char('res://models/shino.glb',hair_t(hair),1.05,Color(1,1,1).lerp(top,0.55)*1.25,Color(1,1,1).lerp(skin,0.3)*1.08)
 func make_boy(skin:Color,hair:Color,spiky:bool,tie:=Color(0.7,0.1,0.15))->Dictionary:
-	return vrm_char('res://models/fumi.glb',hair_t(hair),0.92)
+	return vrm_char('res://models/fumi.glb',hair_t(hair),0.92,Color(1,1,1).lerp(tie,0.35)*1.1,Color(1,1,1).lerp(skin,0.3)*1.05)
 func make_girl_old2(skin:Color,hair:Color,top:Color,skirtc:Color,ribbon:Color,long_hair:=true,glasses:=false)->Dictionary:
 	var iris:=Color(0.35,0.2,0.65) if hair.v<0.5 else Color(0.2,0.45,0.7)
 	var kn:=("girl_long" if long_hair else "girl_bob")+("_g" if glasses else "")
@@ -463,7 +463,7 @@ func add_glasses(g:Dictionary):
 
 
 var vrms:=[]
-func vrm_char(path:String,hair_tint:Color=Color(1,1,1),sc:float=1.12)->Dictionary:
+func vrm_char(path:String,hair_tint:Color=Color(1,1,1),sc:float=1.12,cloth_t:Color=Color(1,1,1),skin_t:Color=Color(1,1,1))->Dictionary:
 	var d:={}
 	var root:=Node3D.new(); d.root=root
 	var hold:=Node3D.new(); root.add_child(hold); hold.rotation_degrees.y=180; hold.scale=Vector3(sc,sc,sc)
@@ -486,6 +486,10 @@ func vrm_char(path:String,hair_tint:Color=Color(1,1,1),sc:float=1.12)->Dictionar
 				if rn.find('_SKIN')>=0 or rn.find('_CLOTH')>=0: m.transparency=BaseMaterial3D.TRANSPARENCY_DISABLED; m.cull_mode=BaseMaterial3D.CULL_DISABLED
 				if rn.find('_HAIR')>=0 and hair_tint!=Color(1,1,1):
 					var m2:=m.duplicate(); m2.albedo_color=hair_tint; mi.set_surface_override_material(i,m2)
+				elif rn.find('_CLOTH')>=0 and cloth_t!=Color(1,1,1):
+					var m3:=m.duplicate(); m3.albedo_color=cloth_t; mi.set_surface_override_material(i,m3)
+				elif rn.find('_SKIN')>=0 and skin_t!=Color(1,1,1):
+					var m4:=m.duplicate(); m4.albedo_color=skin_t; mi.set_surface_override_material(i,m4)
 	for mi in inst.find_children('*','MeshInstance3D',true,false):
 		(mi as MeshInstance3D).cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	vrms.append({'sk':sk,'info':info,'root':root,'d':d})
