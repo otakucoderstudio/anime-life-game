@@ -125,7 +125,7 @@ func pglb(name:String,pos:Vector3,ry:float,tint:=Color(1,1,1),acc:=Color(1,1,1))
 	if not pmeshes.has(name):
 		var inst:Node=(load("res://props/"+name+".glb") as PackedScene).instantiate()
 		var f:={}; _collect(inst,f); pmeshes[name]=(f.values()[0] as MeshInstance3D).mesh; inst.free()
-	var xf:=Transform3D(Basis(Vector3.UP,deg_to_rad(ry)),pos); var mt:=pmat(tint,acc,1.0 if name.begins_with('bld') else 0.0)
+	var xf:=Transform3D(Basis(Vector3.UP,deg_to_rad(ry)),pos); var mt:=pmat(tint,acc,1.0 if (name.begins_with('bld') or name=='lamp') else 0.0)
 	if batching:
 		bt(mt,pos).append_from(pmeshes[name],0,Transform3D(Basis(),-chunk_o(pos))*xf)
 	else:
@@ -890,7 +890,7 @@ func _physics_process(_d):
 		if frames==30 and 'talk' in OS.get_cmdline_user_args(): start_scene('w1','',npcs[5].lines)
 		if frames==20 and 'momo' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(0,0,-6)
 		if frames==20 and 'bench' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; energy=2; player.position=Vector3(20.0,0,-7.2)
-		if frames==20 and 'night' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; hud_min=22.0*60.0; env_t=0.0; player.position=Vector3(0,0,-6)
+		if frames==20 and 'night' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; hud_min=22.0*60.0; env_t=0.0; player.position=Vector3(26,0,-10.5)
 		if frames==20 and 'rain' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(0,0,-6); env_t=0.0
 		if frames==20 and 'street' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20)
 		if frames==20 and 'park' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(34.5,0,-4.5)
