@@ -179,7 +179,7 @@ func world_row(ns:bool,c:float,t:float,idx:int,sak:bool):
 		var vi:int=clampi(int(round((h-7.0)/2.2)),0,4)
 		var pos:=Vector3(c+side*13.5,0,t) if ns else Vector3(t,0,c+side*13.5)
 		var ry:float=(0.0 if side<0 else 180.0) if ns else (-90.0 if side<0 else 90.0)
-		pglb("bld_"+str(vi),pos,ry,cols[(idx+(1 if side>0 else 0))%6],accs[((idx+(1 if side>0 else 0))%6)%4])
+		pglb("bld_"+str(vi),pos,ry,Color(1,1,1),Color(1,1,1))
 	if sak:
 		var pp:=Vector3(c-5.9,0,t) if ns else Vector3(t,0,c-5.9)
 		sakura(pp,idx)
@@ -334,10 +334,10 @@ func izk_front(side:int,z:float,i:int):
 	var floors:=2+((i*5+(1 if side>0 else 0))%3)
 	for b in range(2):
 		var zz:float=z-2.35+b*4.7
-		var g:=izk(ground[(i+b*2+(1 if side>0 else 0))%ground.size()],Vector3(fx,0,zz),ry); toonify(g,tint,0.008)
+		var g:=izk(ground[(i+b*2+(1 if side>0 else 0))%ground.size()],Vector3(fx,0,zz),ry); toonify(g,Color(1,1,1),0.008)
 		for f in range(floors):
-			var up:=izk("upper_storey_balcony_bay" if (f==0 and (i+b)%2==0) else "upper_storey_bay",Vector3(fx,3.2+f*2.8,zz),ry); toonify(up,tint,0.008)
-		var cap:=izk("alley_roof_cap_bay",Vector3(fx,3.2+floors*2.8,zz),ry); toonify(cap,tint.darkened(0.15),0.008)
+			var up:=izk("upper_storey_balcony_bay" if (f==0 and (i+b)%2==0) else "upper_storey_bay",Vector3(fx,3.2+f*2.8,zz),ry); toonify(up,Color(1,1,1),0.008)
+		var cap:=izk("alley_roof_cap_bay",Vector3(fx,3.2+floors*2.8,zz),ry); toonify(cap,Color(1,1,1),0.008)
 
 func glow_box(size:Vector3,c:Color,pos:Vector3,energy:float=1.6):
 	var m:=MeshInstance3D.new(); var b:=BoxMesh.new(); b.size=size; m.mesh=b
@@ -399,7 +399,7 @@ func kbuild(pos:Vector3,ry:float,k:int):
 	var n:Node3D=(load("res://models/kbld/"+nm+".glb") as PackedScene).instantiate()
 	n.scale=Vector3(9.5,13.5,9.5); n.position=pos+Vector3(sign(pos.x)*1.6,0,0); n.rotation_degrees.y=ry
 	var pal:=[Color(0.98,0.78,0.62),Color(0.66,0.8,0.96),Color(0.96,0.68,0.76),Color(0.7,0.88,0.74),Color(0.97,0.86,0.55),Color(0.76,0.72,0.96)]
-	toonify(n,pal[k%pal.size()],0.012)
+	toonify(n,Color(1,1,1),0.012)
 	add_child(n)
 
 func skyline():
@@ -413,7 +413,7 @@ func skyline():
 			var n:Node3D=(load("res://models/kobo/"+nm+".glb") as PackedScene).instantiate()
 			var sc:=2.9
 			n.scale=Vector3(sc,sc,sc); n.position=Vector3(side*(33.0+float(k%3)*3.0),0,z); n.rotation_degrees.y=90.0 if side<0 else -90.0
-			toonify(n,pal[(k+side+1)%pal.size()],0.02)
+			toonify(n,Color(1,1,1),0.02)
 			add_child(n); sky_nodes.append(n)
 			z-=36.0+float((k*5)%4)*4.0; k+=1
 
