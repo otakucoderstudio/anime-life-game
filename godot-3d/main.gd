@@ -1256,6 +1256,9 @@ func room_extras(kind:String):
 		'library':
 			var hu:=make_girl(Color(0.98,0.84,0.74),Color(0.55,0.3,0.15),Color(0.5,0.7,0.9),Color(0.9,0.9,0.95),Color(1,0.5,0.6),true)
 			spawn_room_npc(kind,hu.root,Vector3(0.0,0,-1.6),"r_huda",[["هدى","أهلاً في مكتبة النور! الهدوء هنا بيخلي المذاكرة أسهل بكتير.","pt_w4",[["أذاكر ساعة","الدراسة",10,-1],["أقرا رواية","الصحة",4,0]]]])
+		'boutique':
+			var mr:=make_girl(Color(1,0.86,0.78),Color(0.2,0.12,0.1),Color(0.95,0.5,0.7),Color(0.9,0.9,0.95),Color(1,0.85,0.3),true)
+			spawn_room_npc(kind,mr.root,Vector3(1.7,0,-1.9),"r_mira",[["ميرا","أهلاً في بوتيك ساكورا! كل فستان هنا اتصمم بإيد حد من الحي.","pt_w2",[["أسألها عن الموضة","المجتمع",4,0],["أقيس فستان","العلاقات",3,0]]]])
 		'home':
 			var cat:=Node3D.new(); mesh(cat,sph(0.22),Color(1,0.95,0.9),Vector3(0,0.22,0)); mesh(cat,sph(0.15),Color(1,0.95,0.9),Vector3(0,0.42,0.2))
 			for sx in [-1,1]: mesh(cat,sph(0.05),Color(1,0.7,0.5),Vector3(sx*0.09,0.58,0.2))
@@ -1322,7 +1325,7 @@ var aff_day:={}
 var rel_seen:={}
 var cur_key:=""
 var rel_queue:=[]
-var npc_of:={"gate":"أياني","class":"أياني","r_class_a":"أياني","front":"كايتو","cafe":"كايتو","r_cafe_k":"كايتو","momo":"مومو","m1":"كايتو","w1":"سعيد","w2":"ميرا","w3":"دودي","w4":"هدى","r_huda":"هدى"}
+var npc_of:={"gate":"أياني","class":"أياني","r_class_a":"أياني","front":"كايتو","cafe":"كايتو","r_cafe_k":"كايتو","momo":"مومو","m1":"كايتو","w1":"سعيد","w2":"ميرا","w3":"دودي","w4":"هدى","r_mira":"ميرا","r_huda":"هدى"}
 func rel_title(v:int)->String:
 	if v>=10: return "قريبين جداً"
 	if v>=6: return "أعز أصحاب"
