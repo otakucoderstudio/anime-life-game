@@ -893,6 +893,7 @@ func _physics_process(_d):
 		if frames==20 and 'momo' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(0,0,-6)
 		if frames==20 and 'bench' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; energy=2; player.position=Vector3(20.0,0,-7.2)
 		if frames==20 and 'night' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; hud_min=22.0*60.0; env_t=0.0; player.position=Vector3(0,0,-6)
+		if frames==20 and 'rain' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(0,0,-6); env_t=0.0
 		if frames==20 and 'street' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20)
 		if frames==20 and 'park' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(34.5,0,-4.5)
 		if frames==20 and 'world' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-30)
@@ -902,6 +903,7 @@ func _physics_process(_d):
 			get_viewport().get_texture().get_image().save_png("/tmp/shot1.png"); get_tree().quit()
 
 var energy:=5
+var rain:CPUParticles3D=null
 var stars:MeshInstance3D=null
 var bench_cd:=0.0
 var bench_t:=0.0
@@ -1469,6 +1471,7 @@ func sfx(n:String,pitch:=1.0):
 	var p:AudioStreamPlayer=sfxp[sfx_i]; sfx_i=(sfx_i+1)%sfxp.size(); p.stream=snd.get(key); p.pitch_scale=pitch; p.play()
 
 func apply_tod(dt:float):
+	if rain!=null and player!=null: rain.position=player.position+Vector3(0,8,0)
 	if in_room!='': return
 	env_t-=dt
 	if env_t>0: return
@@ -1479,6 +1482,15 @@ func apply_tod(dt:float):
 	elif h>=11 and h<16: sc=Color(1,0.98,0.92); se=0.8; am=Color(0.9,0.94,1); ae=0.6; fog=Color(0.86,0.93,1)
 	elif h>=16 and h<19.5: sc=Color(1,0.62,0.38); se=0.75; am=Color(1,0.78,0.72); ae=0.5; fog=Color(1,0.82,0.7)
 	else: sc=Color(0.5,0.55,0.95); se=0.35; am=Color(0.5,0.55,0.85); ae=0.42; fog=Color(0.35,0.4,0.6)
+	var dday:=int(hud_min/1440.0)
+	var rainy:bool=(dday%5==2 and h>=13.0 and h<19.0) or ('rain' in OS.get_cmdline_user_args())
+	if rain==null:
+		rain=CPUParticles3D.new(); rain.amount=260; rain.lifetime=0.8; rain.emission_shape=CPUParticles3D.EMISSION_SHAPE_BOX; rain.emission_box_extents=Vector3(12,0.5,12)
+		rain.direction=Vector3(0.1,-1,0); rain.spread=2.0; rain.initial_velocity_min=16.0; rain.initial_velocity_max=19.0; rain.gravity=Vector3(0,-6,0)
+		var qm:=QuadMesh.new(); qm.size=Vector2(0.02,0.55); var rm:=StandardMaterial3D.new(); rm.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED; rm.albedo_color=Color(0.85,0.92,1.0,0.55); rm.transparency=BaseMaterial3D.TRANSPARENCY_ALPHA; rm.billboard_mode=BaseMaterial3D.BILLBOARD_PARTICLES; rm.disable_fog=true
+		qm.material=rm; rain.mesh=qm; rain.local_coords=false; rain.emitting=false; add_child(rain)
+	rain.emitting=rainy
+	if rainy: sc=sc.darkened(0.25); am=am.darkened(0.15)
 	var day:=int(hud_min/1440.0); var si:=int(day/7)%4
 	var tint:Color=[Color(1,0.97,1),Color(1,1,0.94),Color(1,0.93,0.86),Color(0.92,0.96,1.04)][si]
 	var tw:=create_tween().set_parallel(true)
