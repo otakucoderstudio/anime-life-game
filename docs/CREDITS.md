@@ -8,3 +8,7 @@
 
 ## 3DAssets.dev Izakaya Alley and Ramen Shop
 CC0 1.0. https://3dassets.dev/packs/izakaya-alley-and-ramen-shop . Used for street facades (wall bays, shutters, balcony bays, roof caps). Files converted with gltf-transform dequantize for Godot.
+
+## Kobo Assets - Free Low Poly Japanese Town Buildings
+https://kobo-assets.itch.io/japanese-town-buildings
+Free for personal and commercial projects. Credit "Assets by Kobo Assets". The pack says its models were built with AI-assisted Blender scripts. The raw files are NOT redistributed in this repo (licence forbids it); they are built into the APK only.
