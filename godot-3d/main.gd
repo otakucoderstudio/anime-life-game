@@ -264,6 +264,8 @@ func build_street():
 			var z=-float(i)*9.5+4
 			building(side,z,h,cols[(i+(1 if side>0 else 0))%cols.size()],i)
 			shop(side,z,i+(1 if side>0 else 0))
+			var aw:=box(self,Vector3(1.3,0.08,5.2),[Color(0.9,0.3,0.35),Color(0.3,0.6,0.9),Color(0.35,0.75,0.5),Color(0.97,0.75,0.25)][(i+side+4)%4],Vector3(side*(13.5-3.55)-side*0.7,2.7,z),false)
+			aw.rotation_degrees.z=side*14.0
 			planter(Vector3(side*9.1,0,z+3.2+float((i*3)%3)*0.4),i)
 			planter(Vector3(side*9.1,0,z-3.0),i+2)
 		sakura(Vector3(-5.9,0,-float(i)*9.5-1),i) if i%2==0 else null
