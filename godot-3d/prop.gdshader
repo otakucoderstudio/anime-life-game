@@ -22,6 +22,7 @@ void fragment(){
 		float n = fract(sin(dot(floor(vec2((wp.x+wp.z)/0.55,wp.y/0.37)),vec2(12.9898,78.233)))*43758.5453);
 		c *= 1.0 - line*0.10 - cell*0.05 - n*0.045*(1.0-up*up); }
 	else if(COLOR.a < 0.75){ c *= accent; EMISSION = c*night*0.9*glow; }
+	else if(accent.r>0.9 && accent.g<0.6 && tint.r<0.75){ c *= accent; }
 	float wall = 1.0 - smoothstep(0.3,0.7,abs(up));
 	float broad = vn(vec2(wp.x+wp.z, wp.y)*0.22);
 	float fine = vn(vec2(wp.x+wp.z, wp.y)*1.7);

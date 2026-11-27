@@ -101,7 +101,7 @@ var ar:Font=load("res://fonts/arabic.ttf")
 func _enter_tree(): ThemeDB.fallback_font=ar
 func tag(txt:String,pos:Vector3,rot_y:float,size:float,col:Color,font:Font,outline:=Color(0.15,0.1,0.2)):
 	var l:=Label3D.new(); l.text=txt; l.font=font; l.font_size=96; l.pixel_size=size; l.position=pos; l.rotation_degrees.y=rot_y
-	l.modulate=col; l.outline_modulate=outline; l.outline_size=16; add_child(l)
+	l.modulate=Color(col.r*1.5,col.g*1.5,col.b*1.5,col.a); l.shaded=false; l.outline_modulate=outline; l.outline_size=16; add_child(l)
 func line(a:Vector3,b:Vector3,r:float,c:Color):
 	var m:=CylinderMesh.new(); m.top_radius=r; m.bottom_radius=r; m.height=a.distance_to(b); m.radial_segments=4; m.rings=1
 	var up:=(b-a).normalized(); var ax:=Vector3.UP.cross(up); var bs:=Basis()
@@ -121,7 +121,7 @@ func pmat(tint:Color,acc:Color,glow:=0.0)->Material:
 	if pmats.has(key): return pmats[key]
 	if pshader==null: pshader=load("res://prop.gdshader")
 	var m:=ShaderMaterial.new(); m.shader=pshader
-	m.set_shader_parameter("glow",glow); m.set_shader_parameter("tint",Vector3(tint.r,tint.g,tint.b)); m.set_shader_parameter("accent",Vector3(acc.r,acc.g,acc.b))
+	m.set_shader_parameter("glow",glow); m.set_shader_parameter("tint",Vector3(tint.srgb_to_linear().r,tint.srgb_to_linear().g,tint.srgb_to_linear().b)); m.set_shader_parameter("accent",Vector3(acc.srgb_to_linear().r,acc.srgb_to_linear().g,acc.srgb_to_linear().b))
 	var o:=ShaderMaterial.new(); o.shader=outl; o.set_shader_parameter("thickness",0.035); m.next_pass=o
 	pmats[key]=m; return m
 func pglb(name:String,pos:Vector3,ry:float,tint:=Color(1,1,1),acc:=Color(1,1,1)):
@@ -381,7 +381,7 @@ func lamp(p:Vector3):
 var tree_mat:Material
 func sakura(p:Vector3,i:int):
 	var nm:="sakura_"+str(i%3)
-	if tree_mat==null: tree_mat=pmat(Color(1,1,1),Color(1,0.78,0.88)).duplicate()
+	if tree_mat==null: tree_mat=pmat(Color(1,1,1),Color(1,0.78,0.88)).duplicate(); var lc:=Color(1,0.78,0.88).srgb_to_linear(); (tree_mat as ShaderMaterial).set_shader_parameter("accent",Vector3(lc.r,lc.g,lc.b))
 	if not pmeshes.has(nm): pglb_load(nm)
 	var n:=MeshInstance3D.new(); n.mesh=pmeshes[nm]; n.material_override=tree_mat
 	n.transform=Transform3D(Basis(Vector3.UP,deg_to_rad(float(i*47))),p); n.visibility_range_end=90.0; add_child(n)
@@ -1998,4 +1998,4 @@ func apply_tod(dt:float):
 		var pc:Color=[Color(1,0.78,0.88),Color(0.8,1,0.7),Color(1,0.62,0.25),Color(1,1,1)][si]
 		(petals.mesh.material as StandardMaterial3D).albedo_color=pc
 		var tc:Color=[Color(1,0.78,0.88),Color(0.5,0.85,0.42),Color(1,0.55,0.2),Color(0.96,0.98,1.0)][si]
-		if tree_mat: (tree_mat as ShaderMaterial).set_shader_parameter("accent",Vector3(tc.r,tc.g,tc.b))
+		if tree_mat: (tree_mat as ShaderMaterial).set_shader_parameter("accent",Vector3(tc.srgb_to_linear().r,tc.srgb_to_linear().g,tc.srgb_to_linear().b))
