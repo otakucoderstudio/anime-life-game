@@ -919,10 +919,10 @@ const KCAR_YAW:=0.0
 func spawn_cars():
 	pglb_load("car")
 	var cc=[Color(0.95,0.35,0.4),Color(0.3,0.6,0.95),Color(0.98,0.8,0.3),Color(0.45,0.8,0.55),Color(0.9,0.9,0.95)]
-	var defs=[[0,-60.0,1.0],[0,-20.0,-1.0],[3,-30.0,1.0],[4,40.0,-1.0],[3,60.0,-1.0]]
+	var defs=[[0,-60.0,1.0],[0,-20.0,-1.0],[3,-30.0,1.0],[4,40.0,-1.0],[3,60.0,-1.0],[0,20.0,1.0],[3,0.0,-1.0],[4,-40.0,1.0]]
 	for i in range(defs.size()):
 		var n:=Node3D.new(); add_child(n)
-		var kn:Node3D=(load('res://models/kcar/'+['taxi','sedan','suv','police','delivery'][i%5]+'.glb') as PackedScene).instantiate(); n.add_child(kn); kn.rotation_degrees.y=KCAR_YAW; kn.scale=Vector3(1.15,1.15,1.15); toonify(kn,Color(1,1,1),0.008)
+		var kn:Node3D=(load('res://models/kcar/'+['taxi','sedan','suv','police','delivery','hatchback-sports','sedan','hatchback-sports'][i%8]+'.glb') as PackedScene).instantiate(); n.add_child(kn); kn.rotation_degrees.y=KCAR_YAW; kn.scale=Vector3(1.15,1.15,1.15); toonify(kn,Color(1,1,1),0.008)
 		cars.append({"n":n,"si":defs[i][0],"t":defs[i][1],"dir":defs[i][2]})
 func update_cars(dt:float):
 	for c in cars:
@@ -1243,6 +1243,7 @@ func _physics_process(_d):
 		if frames==40 and 'map' in OS.get_cmdline_user_args(): mode='play'; open_map()
 		if frames==40 and 'rel' in OS.get_cmdline_user_args(): mode='play'; add_aff('كايتو',4); add_aff('أياني',7); add_aff('مومو',1); open_phone(); open_app(5)
 		if frames==40 and 'ward' in OS.get_cmdline_user_args(): mode='play'; apply_outfit(1); open_phone(); open_app(6)
+		if frames==40 and 'mapapp' in OS.get_cmdline_user_args(): mode='play'; open_phone(); open_app(0)
 		if frames==40 and 'sett' in OS.get_cmdline_user_args(): mode='play'; open_phone(); open_app(4)
 		if frames==40 and 'year' in OS.get_cmdline_user_args(): mode='play'; add_aff('أياني',7); stats['الدراسة']=80; hud_min=28*1440.0+600.0
 		if frames==40 and ('lib' in OS.get_cmdline_user_args() or 'libtalk' in OS.get_cmdline_user_args()): mode='play'; scene_layer.visible=false; travel('library')
