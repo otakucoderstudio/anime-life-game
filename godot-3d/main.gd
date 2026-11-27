@@ -77,11 +77,11 @@ func _ready():
 	sky.sky_top_color=Color(0.2,0.5,0.95); sky.sky_horizon_color=Color(0.8,0.9,1.0); sky.ground_horizon_color=Color(0.85,0.9,0.95); sky.ground_bottom_color=Color(0.6,0.65,0.7)
 	var s:=Sky.new(); var psm:=PanoramaSkyMaterial.new(); psm.panorama=load('res://models/sky.hdr'); s.sky_material=psm
 	env.background_mode=Environment.BG_SKY; env.sky=s
-	env.ambient_light_source=Environment.AMBIENT_SOURCE_COLOR; env.ambient_light_color=Color(0.86,0.9,1.0); env.ambient_light_energy=0.45
+	env.ambient_light_source=Environment.AMBIENT_SOURCE_COLOR; env.ambient_light_color=Color(0.86,0.9,1.0); env.ambient_light_energy=0.36
 	env.glow_enabled=true; env.glow_intensity=0.35; env.glow_bloom=0.08; env.glow_hdr_threshold=1.2; env.glow_blend_mode=Environment.GLOW_BLEND_MODE_SOFTLIGHT; env.tonemap_mode=Environment.TONE_MAPPER_FILMIC; env.tonemap_exposure=0.7; env.adjustment_enabled=true; env.adjustment_saturation=1.6; env.adjustment_contrast=1.35; env.adjustment_brightness=1.03
 	env.fog_enabled=true; env.fog_light_color=Color(0.86,0.92,1.0); env.fog_density=0.005
 	var we:=WorldEnvironment.new(); we.environment=env; add_child(we)
-	sun=DirectionalLight3D.new(); sun.rotation_degrees=Vector3(-26,-48,0); sun.light_color=Color(1,0.84,0.6); sun.light_energy=0.7; sun.shadow_enabled=true; sun.directional_shadow_max_distance=38; sun.directional_shadow_mode=DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS; sun.shadow_blur=1.6; sun.light_energy=1.15; sun.shadow_opacity=0.75; add_child(sun)
+	sun=DirectionalLight3D.new(); sun.rotation_degrees=Vector3(-26,-48,0); sun.light_color=Color(1,0.84,0.6); sun.light_energy=0.7; sun.shadow_enabled=true; sun.directional_shadow_max_distance=38; sun.directional_shadow_mode=DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS; sun.shadow_blur=1.6; sun.light_energy=0.85; sun.shadow_opacity=0.75; add_child(sun)
 	if OS.has_feature('mobile'):
 		get_viewport().scaling_3d_scale=0.6; Engine.max_fps=30
 	gfx_load()
@@ -1885,7 +1885,7 @@ func enter_room(kind:String):
 		door_mats[kind]=true; glow_box(Vector3(1.6,0.04,0.5),Color(0.5,1.0,0.7),o+Vector3(0,0.03,3.8),1.8)
 	sfx('bong'); play_bg('cafe' if kind=='cafe' else 'street')
 func exit_room():
-	in_room=''; bnd=Rect2(-8.5,-120,17,126); player.position=street_ret; exit_btn.visible=false; petals.visible=true; env_t=0.0; env.ambient_light_color=Color(0.86,0.9,1.0); env.ambient_light_energy=0.45; sun.light_energy=1.15; sun.light_color=Color(1,0.84,0.6); env.adjustment_saturation=1.2; loc_lbl.text='شيبويا، طوكيو'
+	in_room=''; bnd=Rect2(-8.5,-120,17,126); player.position=street_ret; exit_btn.visible=false; petals.visible=true; env_t=0.0; env.ambient_light_color=Color(0.86,0.9,1.0); env.ambient_light_energy=0.36; sun.light_energy=0.85; sun.light_color=Color(1,0.84,0.6); env.adjustment_saturation=1.2; loc_lbl.text='شيبويا، طوكيو'
 	cam.position=player.position+Vector3(0,3.6,6.0); sfx('bong'); play_bg('street')
 
 var app_layer:Control
@@ -2192,8 +2192,8 @@ func apply_tod(dt:float):
 	env_t=1.0
 	var h:=fmod(hud_min/60.0,24.0)
 	var sc:Color; var se:float; var am:Color; var ae:float; var fog:Color
-	if h>=6 and h<11: sc=Color(1,0.8,0.55); se=1.0; am=Color(0.62,0.74,1.0); ae=0.5; fog=Color(0.82,0.88,1.0)
-	elif h>=11 and h<16: sc=Color(1,0.9,0.7); se=0.95; am=Color(0.7,0.8,1.0); ae=0.5; fog=Color(0.86,0.93,1)
+	if h>=6 and h<11: sc=Color(1,0.8,0.55); se=0.8; am=Color(0.62,0.74,1.0); ae=0.38; fog=Color(0.82,0.88,1.0)
+	elif h>=11 and h<16: sc=Color(1,0.9,0.7); se=0.78; am=Color(0.7,0.8,1.0); ae=0.38; fog=Color(0.86,0.93,1)
 	elif h>=16 and h<19.5: sc=Color(1,0.62,0.38); se=0.75; am=Color(1,0.78,0.72); ae=0.5; fog=Color(1,0.82,0.7)
 	else: sc=Color(0.5,0.55,0.95); se=0.35; am=Color(0.5,0.55,0.85); ae=0.42; fog=Color(0.35,0.4,0.6)
 	var dday:=int(hud_min/1440.0)
