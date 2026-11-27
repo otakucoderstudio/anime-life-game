@@ -1244,7 +1244,8 @@ func _physics_process(_d):
 		if frames==40 and 'rel' in OS.get_cmdline_user_args(): mode='play'; add_aff('كايتو',4); add_aff('أياني',7); add_aff('مومو',1); open_phone(); open_app(5)
 		if frames==40 and 'ward' in OS.get_cmdline_user_args(): mode='play'; apply_outfit(1); open_phone(); open_app(6)
 		if frames==40 and 'mapapp' in OS.get_cmdline_user_args(): mode='play'; open_phone(); open_app(0)
-		if frames==40 and 'worldmap' in OS.get_cmdline_user_args(): mode='play'; open_phone(); open_app(0); world_layer.visible=true
+		if frames==40 and 'districts' in OS.get_cmdline_user_args(): mode='play'; open_phone(); open_app(0); world_refresh(); world_layer.visible=true; district_layer.visible=true; district_select(1)
+		if frames==40 and 'worldmap' in OS.get_cmdline_user_args(): mode='play'; open_phone(); open_app(0); world_refresh(); world_layer.visible=true
 		if frames==40 and 'sett' in OS.get_cmdline_user_args(): mode='play'; open_phone(); open_app(4)
 		if frames==40 and 'year' in OS.get_cmdline_user_args(): mode='play'; add_aff('أياني',7); stats['الدراسة']=80; hud_min=28*1440.0+600.0
 		if frames==40 and ('lib' in OS.get_cmdline_user_args() or 'libtalk' in OS.get_cmdline_user_args()): mode='play'; scene_layer.visible=false; travel('library')
@@ -1442,7 +1443,7 @@ func build_phone():
 	var back:=Button.new(); back.text="رجوع"; back.size=Vector2(140,52); back.position=Vector2(30,10); back.add_theme_font_override("font",ar); back.add_theme_font_size_override("font_size",26)
 	back.pressed.connect(func(): map_layer.visible=false; phone_layer.visible=true; mode='phone'); map_layer.add_child(back)
 	var wb:=Button.new(); wb.text="العالم"; wb.size=Vector2(170,52); wb.position=Vector2(190,10); wb.add_theme_font_override("font",ar); wb.add_theme_font_size_override("font_size",26)
-	wb.pressed.connect(func(): world_layer.visible=true); map_layer.add_child(wb)
+	wb.pressed.connect(func(): world_refresh(); world_layer.visible=true); map_layer.add_child(wb)
 	build_worldmap(vs)
 	# messages
 	msg_layer=Control.new(); msg_layer.size=vs; msg_layer.visible=false; ui.add_child(msg_layer)
@@ -2181,50 +2182,119 @@ func spawn_petals():
 
 var world_layer:Control; var wi_name:Label; var wi_jp:Label; var wi_desc:Label; var wi_stats:Label; var wi_enter:Button; var wi_note:Label; var wi_sel:=0
 const WCITIES=[
-	["طوكيو","東京",Vector2(0.48,0.28),true,"أكبر مدن اليابان. شيبويا والشارع والمدرسة والبيت.","السكان: 37 مليون\nالمناطق: شيبويا (مفتوحة)\nالمواصلات: قطار\nالمستوى الموصى به: 1+"],
-	["كيوتو","京都",Vector2(0.31,0.46),false,"مدينة المعابد والأضرحة. هتتفتح لما نبنيها.","مقفلة: لسه مش مبنية\nالمستوى الموصى به: 10+"],
-	["أوساكا","大阪",Vector2(0.23,0.58),false,"مدينة الأكل والملاهي. هتتفتح لما نبنيها.","مقفلة: لسه مش مبنية\nالمستوى الموصى به: 5+"],
-	["ميناء","港町",Vector2(0.61,0.56),false,"مدينة ميناء على البحر. هتتفتح بعدين.","مقفلة: لسه مش مبنية"],
-	["الجزيرة الجنوبية","南の島",Vector2(0.44,0.84),false,"جزيرة شواطئ. هتتفتح بعدين.","مقفلة: لسه مش مبنية"],
+	["طوكيو","東京",Vector2(0.50,0.36),true,"أكبر مدن اليابان. شيبويا والشارع والمدرسة والبيت.","السكان: 37 مليون\nالمناطق: 9 (شيبويا مفتوحة)",1,["12500","02:45"]],
+	["كيوتو","京都",Vector2(0.39,0.47),false,"مدينة المعابد والأضرحة. هتتفتح لما نبنيها.","مقفلة: لسه مش مبنية",10,["14200","02:15"]],
+	["أوساكا","大阪",Vector2(0.34,0.60),false,"مدينة الأكل والملاهي. هتتفتح لما نبنيها.","مقفلة: لسه مش مبنية",5,["15000","02:30"]],
+	["هيروشيما","広島",Vector2(0.28,0.73),false,"مدينة السلام والجزر. هتتفتح بعدين.","مقفلة: لسه مش مبنية",15,["19500","04:00"]],
+	["سينداي","仙台",Vector2(0.55,0.20),false,"مدينة الشجر في الشمال. هتتفتح بعدين.","مقفلة: لسه مش مبنية",20,["11000","01:30"]],
+	["أوكيناوا","沖縄",Vector2(0.46,0.86),false,"جزر وشواطئ. هتتفتح بعدين.","مقفلة: لسه مش مبنية",25,["18000","03:00"]],
 ]
+const WDIST=[
+	["شينجوكو","新宿",Vector2(0.26,0.25),1,false,"مركز تسوق ومكاتب وحياة ليلية. هتتفتح بعدين."],
+	["شيبويا","渋谷",Vector2(0.38,0.47),1,true,"الحي المفتوح دلوقتي: الشارع والمدرسة والبيت والمحلات."],
+	["أساكوسا","浅草",Vector2(0.59,0.24),5,false,"معابد وأسواق قديمة. هتتفتح بعدين."],
+	["إكيبوكورو","池袋",Vector2(0.23,0.60),5,false,"تسوق وأنمي. هتتفتح بعدين."],
+	["أكيهابارا","秋葉原",Vector2(0.48,0.42),5,false,"إلكترونيات وأنمي وألعاب. هتتفتح بعدين."],
+	["أوداييبا","お台場",Vector2(0.70,0.60),8,false,"ترفيه على الخليج. هتتفتح بعدين."],
+	["ميجورو","目黒",Vector2(0.30,0.78),3,false,"حي هادي بحدائق. هتتفتح بعدين."],
+	["تايتو","台東",Vector2(0.55,0.65),5,false,"متاحف وحدائق. هتتفتح بعدين."],
+	["كوتو","江東",Vector2(0.66,0.42),8,false,"مصانع وبحر. هتتفتح بعدين."],
+]
+const WTRAVEL=[["قطار شينكانسن",1.0,"fast"],["قطار عادي",0.45,"slow"],["طيران داخلي",1.45,"air"],["عبّارة بحرية",0.3,"ferry"]]
+var district_layer:Control; var wd_name:Label; var wd_desc:Label; var wd_go:Button; var wd_sel:=1
+var wi_travel_sel:=0; var wi_card:Label; var wi_money:Label; var wi_energy:Label; var wi_time:Label; var wi_weather:Label
+func wpanel(pos:Vector2,size:Vector2)->Panel:
+	var pn:=Panel.new(); pn.size=size; pn.position=pos
+	var ps:=StyleBoxFlat.new(); ps.bg_color=Color(0.08,0.12,0.25,0.93); ps.set_corner_radius_all(16); ps.border_color=Color(0.4,0.7,0.9); ps.set_border_width_all(3); pn.add_theme_stylebox_override("panel",ps); return pn
+func wbtn(txt:String,size:Vector2,pos:Vector2,fs:int,col:Color)->Button:
+	var b:=Button.new(); b.text=txt; b.size=size; b.position=pos; b.add_theme_font_override("font",ar); b.add_theme_font_size_override("font_size",fs)
+	var sb:=StyleBoxFlat.new(); sb.bg_color=col; sb.set_corner_radius_all(12); sb.border_color=Color(1,1,1); sb.set_border_width_all(2)
+	for st in ["normal","hover","pressed","disabled"]: b.add_theme_stylebox_override(st,sb)
+	return b
+func wl(txt:String,fs:int,pos:Vector2,w:float,col:Color,h:=0.0)->Label:
+	var l:=lbl(txt,fs,pos,col); l.size.x=w; l.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT; l.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	if h>0.0: l.size.y=h
+	l.add_theme_constant_override("outline_size",0); return l
 func build_worldmap(vs:Vector2):
 	world_layer=Control.new(); world_layer.size=vs; world_layer.visible=false; map_layer.add_child(world_layer)
 	var bg:=TextureRect.new(); bg.texture=img_tex("res://art/world.jpg"); bg.expand_mode=TextureRect.EXPAND_IGNORE_SIZE; bg.size=vs; world_layer.add_child(bg)
-	var px:=vs.x*0.70
+	var lw:=vs.x*0.19; var rx:=vs.x*0.72; var rw:=vs.x*0.275
 	var pts:=[]
-	for c in WCITIES: pts.append(c[2]*Vector2(1280,720)*(vs/Vector2(1280,720)))
-	for pr in [[0,1],[1,2],[0,3],[1,3],[2,4],[3,4]]:
-		var ln:=Line2D.new(); ln.width=4.0; ln.default_color=Color(1,1,1,0.85); ln.add_point(pts[pr[0]]); ln.add_point(pts[pr[1]]); world_layer.add_child(ln)
-	var title:=lbl("خريطة العالم",38,Vector2(px/2-110,8),Color(1,0.9,0.5)); world_layer.add_child(title)
+	for c in WCITIES: pts.append(c[2]*vs)
+	for pr in [[0,1],[1,2],[2,3],[0,4],[2,5]]:
+		var ln:=Line2D.new(); ln.width=5.0; ln.default_color=Color(1,1,1,0.9); ln.add_point(pts[pr[0]]); ln.add_point(pts[pr[1]]); world_layer.add_child(ln)
+	world_layer.add_child(lbl("خريطة العالم",34,Vector2(vs.x*0.45-90,6),Color(1,0.9,0.5)))
+	# left: player card
+	var lp:=wpanel(Vector2(10,60),Vector2(lw,vs.y*0.52)); world_layer.add_child(lp)
+	world_layer.add_child(wl("هاروتو",30,Vector2(18,70),lw-16,Color(1,1,1)))
+	wi_money=wl("",22,Vector2(18,120),lw-16,Color(1,0.9,0.5)); world_layer.add_child(wi_money)
+	wi_energy=wl("",22,Vector2(18,160),lw-16,Color(1,0.7,0.8)); world_layer.add_child(wi_energy)
+	wi_time=wl("",26,Vector2(18,215),lw-16,Color(1,1,1)); world_layer.add_child(wi_time)
+	wi_weather=wl("",22,Vector2(18,260),lw-16,Color(0.8,0.9,1)); world_layer.add_child(wi_weather)
+	var lg:=wpanel(Vector2(10,vs.y*0.52+70),Vector2(lw,vs.y*0.38)); world_layer.add_child(lg)
+	world_layer.add_child(wl("دليل الخريطة",22,Vector2(18,vs.y*0.52+78),lw-16,Color(1,0.9,0.5)))
+	world_layer.add_child(wl("مفتوحة: أحمر\nمقفلة: أزرق\nخط أبيض: خط قطار\nالمستوى = الموصى به",18,Vector2(18,vs.y*0.52+110),lw-16,Color(0.9,0.95,1)))
 	for i in range(WCITIES.size()):
 		var c=WCITIES[i]
-		var b:=Button.new(); b.text=c[0]+(" (مفتوحة)" if c[3] else " (مقفلة)"); b.size=Vector2(190,50); b.position=pts[i]-Vector2(95,25)
-		b.add_theme_font_override("font",ar); b.add_theme_font_size_override("font_size",24)
-		var sb:=StyleBoxFlat.new(); sb.bg_color=(Color(0.95,0.35,0.4) if c[3] else Color(0.25,0.3,0.45)); sb.set_corner_radius_all(14); sb.border_color=Color(1,1,1); sb.set_border_width_all(3)
-		b.add_theme_stylebox_override("normal",sb); b.add_theme_stylebox_override("hover",sb); b.add_theme_stylebox_override("pressed",sb)
+		var b:=wbtn(c[0]+"  "+str(c[6])+"+",Vector2(160,42),pts[i]-Vector2(80,21),22,(Color(0.95,0.35,0.4) if c[3] else Color(0.25,0.3,0.45)))
 		b.pressed.connect(func(): world_select(i)); world_layer.add_child(b)
-	var pn:=Panel.new(); pn.size=Vector2(vs.x*0.28,vs.y-30); pn.position=Vector2(vs.x*0.71,15)
-	var ps:=StyleBoxFlat.new(); ps.bg_color=Color(0.08,0.12,0.25,0.93); ps.set_corner_radius_all(18); ps.border_color=Color(0.4,0.7,0.9); ps.set_border_width_all(3); pn.add_theme_stylebox_override("panel",ps); world_layer.add_child(pn)
-	var x0:=pn.position.x+16; var pw:=pn.size.x-32
-	wi_name=lbl("",40,Vector2(x0,28),Color(1,1,1)); wi_name.size.x=pw; wi_name.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT; world_layer.add_child(wi_name)
-	wi_jp=lbl("",30,Vector2(x0,86),Color(1,0.85,0.4)); wi_jp.add_theme_font_override("font",load("res://fonts/jp.ttf")); wi_jp.size.x=pw; wi_jp.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT; world_layer.add_child(wi_jp)
-	wi_desc=lbl("",22,Vector2(x0,140),Color(0.9,0.95,1)); wi_desc.size=Vector2(pw,110); wi_desc.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART; wi_desc.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT; world_layer.add_child(wi_desc)
-	wi_stats=lbl("",22,Vector2(x0,260),Color(0.8,0.9,1)); wi_stats.size=Vector2(pw,130); wi_stats.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART; wi_stats.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT; world_layer.add_child(wi_stats)
-	wi_enter=Button.new(); wi_enter.size=Vector2(pw,56); wi_enter.position=Vector2(x0,vs.y-250); wi_enter.add_theme_font_override("font",ar); wi_enter.add_theme_font_size_override("font_size",26)
-	wi_enter.pressed.connect(world_enter); world_layer.add_child(wi_enter)
-	var opts=["قطار سريع","قطار عادي","طيران","عبّارة"]
+	# right: city info
+	world_layer.add_child(wpanel(Vector2(rx,10),Vector2(rw,vs.y*0.52)))
+	wi_name=wl("",34,Vector2(rx+10,16),rw-20,Color(1,1,1)); world_layer.add_child(wi_name)
+	wi_jp=wl("",26,Vector2(rx+10,62),rw-20,Color(1,0.85,0.4)); wi_jp.add_theme_font_override("font",load("res://fonts/jp.ttf")); world_layer.add_child(wi_jp)
+	wi_desc=wl("",19,Vector2(rx+10,115),rw-20,Color(0.9,0.95,1),70.0); world_layer.add_child(wi_desc)
+	wi_stats=wl("",19,Vector2(rx+10,185),rw-20,Color(0.8,0.9,1),70.0); world_layer.add_child(wi_stats)
+	wi_enter=wbtn("",Vector2(rw-20,46),Vector2(rx+10,vs.y*0.52-44),24,Color(0.2,0.5,0.45)); wi_enter.pressed.connect(world_enter); world_layer.add_child(wi_enter)
+	# right: travel card
+	world_layer.add_child(wpanel(Vector2(rx,vs.y*0.52+20),Vector2(rw,vs.y*0.48-30)))
+	world_layer.add_child(wl("وسائل السفر (من طوكيو)",21,Vector2(rx+10,vs.y*0.52+26),rw-20,Color(1,0.9,0.5)))
 	for k in range(4):
-		var tb:=Button.new(); tb.text=opts[k]; tb.size=Vector2(pw/2-6,48); tb.position=Vector2(x0+(k%2)*(pw/2+6),vs.y-180+int(k/2)*56)
-		tb.add_theme_font_override("font",ar); tb.add_theme_font_size_override("font_size",22)
-		tb.pressed.connect(func(): wi_note.text="السفر بين المدن لسه تحت التطوير. دلوقتي طوكيو بس مفتوحة."); world_layer.add_child(tb)
-	wi_note=lbl("",20,Vector2(x0,vs.y-60),Color(1,0.8,0.5)); wi_note.size=Vector2(pw,50); wi_note.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART; wi_note.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT; world_layer.add_child(wi_note)
-	var wback:=Button.new(); wback.text="رجوع"; wback.size=Vector2(140,52); wback.position=Vector2(30,10); wback.add_theme_font_override("font",ar); wback.add_theme_font_size_override("font_size",26)
-	wback.pressed.connect(func(): world_layer.visible=false); world_layer.add_child(wback)
+		var tb:=wbtn("",Vector2(rw-20,34),Vector2(rx+10,vs.y*0.52+58+k*40),18,Color(0.2,0.28,0.45)); tb.name="tr"+str(k)
+		tb.pressed.connect(func(): wi_travel_sel=k; world_select(wi_sel)); world_layer.add_child(tb)
+	wi_note=wl("",17,Vector2(rx+10,vs.y*0.52+222),rw-20,Color(1,0.8,0.5),50.0); world_layer.add_child(wi_note)
+	var wback:=wbtn("رجوع",Vector2(140,46),Vector2(10,8),24,Color(0.1,0.15,0.3)); wback.pressed.connect(func(): world_layer.visible=false); world_layer.add_child(wback)
+	build_districts(vs)
 	world_select(0)
 func world_select(i:int):
 	wi_sel=i; var c=WCITIES[i]
-	wi_name.text=c[0]; wi_jp.text=c[1]; wi_desc.text=c[4]; wi_stats.text=c[5]; wi_note.text=""
-	wi_enter.text=("الدخول إلى المدينة" if c[3] else "مقفلة"); wi_enter.disabled=not c[3]
+	wi_name.text=c[0]; wi_jp.text=c[1]; wi_desc.text=c[4]; wi_stats.text=c[5]+"\nالمستوى الموصى به: "+str(c[6])+"+"
+	wi_enter.text=("استكشاف المدينة" if c[3] else "مقفلة"); wi_enter.disabled=not c[3]
+	for k in range(4):
+		var t=WTRAVEL[k]; var tb:Button=world_layer.get_node("tr"+str(k))
+		var cost:=int(float(c[7][0])*(t[1] if k!=0 else 1.0)); var mins:=(int(c[7][1].split(":")[0])*60+int(c[7][1].split(":")[1]))
+		if k==1: mins=int(mins*2.0)
+		elif k==2: mins=int(mins*0.5)
+		elif k==3: mins=int(mins*3.0)
+		tb.text="%s  %02d:%02d  ¥%d"%[t[0],mins/60,mins%60,cost]
+	wi_note.text=("السفر الفعلي لسه تحت التطوير. الأسعار والأوقات للعرض بس." if i>0 else "")
+func world_refresh():
+	wi_money.text="الفلوس: "+str(int(stats['الفلوس']))
+	wi_energy.text="الطاقة: "+str(energy)+" / 5"
+	var h:=int(fmod(hud_min,1440.0)/60.0); var m:=int(fmod(hud_min,60.0))
+	wi_time.text="%02d:%02d"%[h,m]
+	wi_weather.text=("الطقس: مطر" if rain_on else "الطقس: صافي")
 func world_enter():
 	if not WCITIES[wi_sel][3]: return
-	world_layer.visible=false; map_layer.visible=false; mode='play'; phone_layer.visible=false; phone_layer.position.y=0
+	district_layer.visible=true; district_select(1)
+func build_districts(vs:Vector2):
+	district_layer=Control.new(); district_layer.size=vs; district_layer.visible=false; world_layer.add_child(district_layer)
+	var bg:=TextureRect.new(); bg.texture=img_tex("res://art/tokyo.jpg"); bg.expand_mode=TextureRect.EXPAND_IGNORE_SIZE; bg.size=vs; district_layer.add_child(bg)
+	var rx:=vs.x*0.72; var rw:=vs.x*0.275
+	district_layer.add_child(lbl("خريطة طوكيو: الأحياء",32,Vector2(vs.x*0.45-150,6),Color(1,0.9,0.5)))
+	for i in range(WDIST.size()):
+		var d=WDIST[i]
+		var b:=wbtn(str(i+1)+"  "+d[0]+"  "+str(d[3])+"+",Vector2(190,40),d[2]*vs-Vector2(95,20),20,(Color(0.95,0.35,0.4) if d[4] else Color(0.2,0.28,0.45)))
+		b.pressed.connect(func(): district_select(i)); district_layer.add_child(b)
+	district_layer.add_child(wpanel(Vector2(rx,10),Vector2(rw,vs.y*0.55)))
+	wd_name=wl("",32,Vector2(rx+10,16),rw-20,Color(1,1,1)); district_layer.add_child(wd_name)
+	wd_desc=wl("",20,Vector2(rx+10,70),rw-20,Color(0.9,0.95,1),120.0); district_layer.add_child(wd_desc)
+	wd_go=wbtn("",Vector2(rw-20,50),Vector2(rx+10,vs.y*0.55-50),24,Color(0.2,0.5,0.45)); wd_go.pressed.connect(district_go); district_layer.add_child(wd_go)
+	wd_desc.text+=""
+	var back:=wbtn("رجوع للعالم",Vector2(190,46),Vector2(10,8),24,Color(0.1,0.15,0.3)); back.pressed.connect(func(): district_layer.visible=false); district_layer.add_child(back)
+func district_select(i:int):
+	wd_sel=i; var d=WDIST[i]
+	wd_name.text=d[0]; wd_desc.text=d[5]+"\nالمستوى الموصى به: "+str(d[3])+"+ (للعرض)"
+	wd_go.text=("انتقال إلى الحي" if d[4] else "مقفل"); wd_go.disabled=not d[4]
+func district_go():
+	if not WDIST[wd_sel][4]: return
+	district_layer.visible=false; world_layer.visible=false; map_layer.visible=false; mode='play'; phone_layer.visible=false; phone_layer.position.y=0
