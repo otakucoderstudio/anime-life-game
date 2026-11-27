@@ -2201,7 +2201,7 @@ const WDIST=[
 	["كوتو","江東",Vector2(0.66,0.42),8,false,"مصانع وبحر. هتتفتح بعدين."],
 ]
 const WTRAVEL=[["قطار شينكانسن",1.0,"fast"],["قطار عادي",0.45,"slow"],["طيران داخلي",1.45,"air"],["عبّارة بحرية",0.3,"ferry"]]
-var district_layer:Control; var wd_name:Label; var wd_desc:Label; var wd_go:Button; var wd_sel:=1
+var district_note:Label; var district_layer:Control; var wd_name:Label; var wd_desc:Label; var wd_go:Button; var wd_sel:=1
 var wi_travel_sel:=0; var wi_card:Label; var wi_money:Label; var wi_energy:Label; var wi_time:Label; var wi_weather:Label
 func wpanel(pos:Vector2,size:Vector2)->Panel:
 	var pn:=Panel.new(); pn.size=size; pn.position=pos
@@ -2218,42 +2218,43 @@ func wl(txt:String,fs:int,pos:Vector2,w:float,col:Color,h:=0.0)->Label:
 func build_worldmap(vs:Vector2):
 	world_layer=Control.new(); world_layer.size=vs; world_layer.visible=false; map_layer.add_child(world_layer)
 	var bg:=TextureRect.new(); bg.texture=img_tex("res://art/world.jpg"); bg.expand_mode=TextureRect.EXPAND_IGNORE_SIZE; bg.size=vs; world_layer.add_child(bg)
-	var lw:=vs.x*0.19; var rx:=vs.x*0.72; var rw:=vs.x*0.275
+	var H:=vs.y-64.0; var lw:=vs.x*0.19; var rx:=vs.x*0.72; var rw:=vs.x*0.275
 	var pts:=[]
 	for c in WCITIES: pts.append(c[2]*vs)
 	for pr in [[0,1],[1,2],[2,3],[0,4],[2,5]]:
 		var ln:=Line2D.new(); ln.width=5.0; ln.default_color=Color(1,1,1,0.9); ln.add_point(pts[pr[0]]); ln.add_point(pts[pr[1]]); world_layer.add_child(ln)
 	world_layer.add_child(lbl("خريطة العالم",34,Vector2(vs.x*0.45-90,6),Color(1,0.9,0.5)))
 	# left: player card
-	var lp:=wpanel(Vector2(10,60),Vector2(lw,vs.y*0.52)); world_layer.add_child(lp)
+	var lp:=wpanel(Vector2(10,60),Vector2(lw,H*0.5)); world_layer.add_child(lp)
 	world_layer.add_child(wl("هاروتو",30,Vector2(18,70),lw-16,Color(1,1,1)))
 	wi_money=wl("",22,Vector2(18,120),lw-16,Color(1,0.9,0.5)); world_layer.add_child(wi_money)
 	wi_energy=wl("",22,Vector2(18,160),lw-16,Color(1,0.7,0.8)); world_layer.add_child(wi_energy)
 	wi_time=wl("",26,Vector2(18,215),lw-16,Color(1,1,1)); world_layer.add_child(wi_time)
 	wi_weather=wl("",22,Vector2(18,260),lw-16,Color(0.8,0.9,1)); world_layer.add_child(wi_weather)
-	var lg:=wpanel(Vector2(10,vs.y*0.52+70),Vector2(lw,vs.y*0.38)); world_layer.add_child(lg)
-	world_layer.add_child(wl("دليل الخريطة",22,Vector2(18,vs.y*0.52+78),lw-16,Color(1,0.9,0.5)))
-	world_layer.add_child(wl("مفتوحة: أحمر\nمقفلة: أزرق\nخط أبيض: خط قطار\nالمستوى = الموصى به",18,Vector2(18,vs.y*0.52+110),lw-16,Color(0.9,0.95,1)))
+	var lg:=wpanel(Vector2(10,H*0.5+70),Vector2(lw,H*0.3)); world_layer.add_child(lg)
+	world_layer.add_child(wl("دليل الخريطة",22,Vector2(18,H*0.5+78),lw-16,Color(1,0.9,0.5)))
+	world_layer.add_child(wl("مفتوحة: أحمر\nمقفلة: أزرق\nخط أبيض: خط قطار\nالمستوى = الموصى به",18,Vector2(18,H*0.5+110),lw-16,Color(0.9,0.95,1)))
 	for i in range(WCITIES.size()):
 		var c=WCITIES[i]
 		var b:=wbtn(c[0]+"  "+str(c[6])+"+",Vector2(160,42),pts[i]-Vector2(80,21),22,(Color(0.95,0.35,0.4) if c[3] else Color(0.25,0.3,0.45)))
 		b.pressed.connect(func(): world_select(i)); world_layer.add_child(b)
 	# right: city info
-	world_layer.add_child(wpanel(Vector2(rx,10),Vector2(rw,vs.y*0.52)))
+	world_layer.add_child(wpanel(Vector2(rx,10),Vector2(rw,H*0.5)))
 	wi_name=wl("",34,Vector2(rx+10,16),rw-20,Color(1,1,1)); world_layer.add_child(wi_name)
 	wi_jp=wl("",26,Vector2(rx+10,62),rw-20,Color(1,0.85,0.4)); wi_jp.add_theme_font_override("font",load("res://fonts/jp.ttf")); world_layer.add_child(wi_jp)
 	wi_desc=wl("",19,Vector2(rx+10,115),rw-20,Color(0.9,0.95,1),70.0); world_layer.add_child(wi_desc)
 	wi_stats=wl("",19,Vector2(rx+10,185),rw-20,Color(0.8,0.9,1),70.0); world_layer.add_child(wi_stats)
-	wi_enter=wbtn("",Vector2(rw-20,46),Vector2(rx+10,vs.y*0.52-44),24,Color(0.2,0.5,0.45)); wi_enter.pressed.connect(world_enter); world_layer.add_child(wi_enter)
+	wi_enter=wbtn("",Vector2(rw-20,46),Vector2(rx+10,H*0.5-44),24,Color(0.2,0.5,0.45)); wi_enter.pressed.connect(world_enter); world_layer.add_child(wi_enter)
 	# right: travel card
-	world_layer.add_child(wpanel(Vector2(rx,vs.y*0.52+20),Vector2(rw,vs.y*0.48-30)))
-	world_layer.add_child(wl("وسائل السفر (من طوكيو)",21,Vector2(rx+10,vs.y*0.52+26),rw-20,Color(1,0.9,0.5)))
+	world_layer.add_child(wpanel(Vector2(rx,H*0.5+20),Vector2(rw,H*0.5-12)))
+	world_layer.add_child(wl("وسائل السفر (من طوكيو)",21,Vector2(rx+10,H*0.5+26),rw-20,Color(1,0.9,0.5)))
 	for k in range(4):
-		var tb:=wbtn("",Vector2(rw-20,34),Vector2(rx+10,vs.y*0.52+58+k*40),18,Color(0.2,0.28,0.45)); tb.name="tr"+str(k)
+		var tb:=wbtn("",Vector2(rw-20,32),Vector2(rx+10,H*0.5+56+k*38),18,Color(0.2,0.28,0.45)); tb.name="tr"+str(k)
 		tb.pressed.connect(func(): wi_travel_sel=k; world_select(wi_sel)); world_layer.add_child(tb)
-	wi_note=wl("",17,Vector2(rx+10,vs.y*0.52+222),rw-20,Color(1,0.8,0.5),50.0); world_layer.add_child(wi_note)
+	wi_note=wl("",17,Vector2(rx+10,H*0.5+212),rw-20,Color(1,0.8,0.5),50.0); world_layer.add_child(wi_note)
 	var wback:=wbtn("رجوع",Vector2(140,46),Vector2(10,8),24,Color(0.1,0.15,0.3)); wback.pressed.connect(func(): world_layer.visible=false); world_layer.add_child(wback)
 	build_districts(vs)
+	build_nav(world_layer,vs)
 	world_select(0)
 func world_select(i:int):
 	wi_sel=i; var c=WCITIES[i]
@@ -2279,18 +2280,57 @@ func world_enter():
 func build_districts(vs:Vector2):
 	district_layer=Control.new(); district_layer.size=vs; district_layer.visible=false; world_layer.add_child(district_layer)
 	var bg:=TextureRect.new(); bg.texture=img_tex("res://art/tokyo.jpg"); bg.expand_mode=TextureRect.EXPAND_IGNORE_SIZE; bg.size=vs; district_layer.add_child(bg)
-	var rx:=vs.x*0.72; var rw:=vs.x*0.275
-	district_layer.add_child(lbl("خريطة طوكيو: الأحياء",32,Vector2(vs.x*0.45-150,6),Color(1,0.9,0.5)))
+	var H:=vs.y-64.0; var rx:=vs.x*0.72; var rw:=vs.x*0.275
+	district_layer.add_child(lbl("خريطة طوكيو: الأحياء",32,Vector2(vs.x*0.35-150,6),Color(1,0.9,0.5)))
 	for i in range(WDIST.size()):
 		var d=WDIST[i]
-		var b:=wbtn(str(i+1)+"  "+d[0]+"  "+str(d[3])+"+",Vector2(190,40),d[2]*vs-Vector2(95,20),20,(Color(0.95,0.35,0.4) if d[4] else Color(0.2,0.28,0.45)))
+		var b:=wbtn(str(i+1)+"  "+d[0]+"  "+str(d[3])+"+",Vector2(190,38),d[2]*vs-Vector2(95,19),19,(Color(0.95,0.35,0.4) if d[4] else Color(0.2,0.28,0.45)))
 		b.pressed.connect(func(): district_select(i)); district_layer.add_child(b)
-	district_layer.add_child(wpanel(Vector2(rx,10),Vector2(rw,vs.y*0.55)))
-	wd_name=wl("",32,Vector2(rx+10,16),rw-20,Color(1,1,1)); district_layer.add_child(wd_name)
-	wd_desc=wl("",20,Vector2(rx+10,70),rw-20,Color(0.9,0.95,1),120.0); district_layer.add_child(wd_desc)
-	wd_go=wbtn("",Vector2(rw-20,50),Vector2(rx+10,vs.y*0.55-50),24,Color(0.2,0.5,0.45)); wd_go.pressed.connect(district_go); district_layer.add_child(wd_go)
-	wd_desc.text+=""
-	var back:=wbtn("رجوع للعالم",Vector2(190,46),Vector2(10,8),24,Color(0.1,0.15,0.3)); back.pressed.connect(func(): district_layer.visible=false); district_layer.add_child(back)
+	district_layer.add_child(wpanel(Vector2(rx,6),Vector2(rw,H*0.33)))
+	wd_name=wl("",30,Vector2(rx+10,10),rw-20,Color(1,1,1)); district_layer.add_child(wd_name)
+	wd_desc=wl("",17,Vector2(rx+10,52),rw-20,Color(0.9,0.95,1),H*0.18); district_layer.add_child(wd_desc)
+	wd_go=wbtn("",Vector2(rw-20,40),Vector2(rx+10,H*0.33-42),22,Color(0.2,0.5,0.45)); wd_go.pressed.connect(district_go); district_layer.add_child(wd_go)
+	# landmarks
+	var y1:=H*0.33+12
+	district_layer.add_child(wpanel(Vector2(rx,y1),Vector2(rw,H*0.2)))
+	district_layer.add_child(wl("المعالم (من لقطات اللعبة)",17,Vector2(rx+8,y1+2),rw-16,Color(1,0.9,0.5)))
+	var tw:=(rw-32)/3.0
+	for k in range(3):
+		var t:=TextureRect.new(); t.texture=img_tex("res://art/lm"+str(k+1)+".png"); t.expand_mode=TextureRect.EXPAND_IGNORE_SIZE; t.size=Vector2(tw,H*0.2-48); t.position=Vector2(rx+8+k*(tw+8),y1+28); district_layer.add_child(t)
+		var nm:String=["شارع شيبويا","الكافيه","الشارع والعربيات"][k]
+		district_layer.add_child(wl(nm,13,Vector2(rx+8+k*(tw+8),y1+H*0.2-22),tw,Color(1,1,1)))
+	# activities
+	var y2:=y1+H*0.2+8
+	district_layer.add_child(wpanel(Vector2(rx,y2),Vector2(rw,H*0.2)))
+	district_layer.add_child(wl("الأنشطة المتاحة",17,Vector2(rx+8,y2+2),rw-16,Color(1,0.9,0.5)))
+	var acts=["تصوير","تسوق","شغل","دراسة","مهرجانات","كاراوكي","رياضة","المزيد"]
+	var aw:=(rw-16-18)/4.0
+	for k in range(8):
+		var ab:=wbtn(acts[k],Vector2(aw,(H*0.2-36)/2.0-4),Vector2(rx+8+(k%4)*(aw+6),y2+28+int(k/4)*((H*0.2-36)/2.0)),14,Color(0.2,0.28,0.45))
+		ab.pressed.connect(func(): district_note.text="النشاط ده جاي بعدين (للعرض بس)."); district_layer.add_child(ab)
+	# news
+	var y3:=y2+H*0.2+8
+	district_layer.add_child(wpanel(Vector2(rx,y3),Vector2(rw,H-y3+6)))
+	district_layer.add_child(wl("أخبار المدينة (للعرض)",17,Vector2(rx+8,y3+2),rw-16,Color(1,0.9,0.5)))
+	district_layer.add_child(wl("مهرجان الأضواء قريباً في أساكوسا",14,Vector2(rx+8,y3+26),rw-16,Color(0.9,0.95,1),H-y3-30))
+	district_note=wl("",14,Vector2(rx+8,y3+H-y3-26),rw-16,Color(1,0.8,0.5),30.0); district_layer.add_child(district_note)
+	var back:=wbtn("رجوع للعالم",Vector2(190,44),Vector2(10,8),22,Color(0.1,0.15,0.3)); back.pressed.connect(func(): district_layer.visible=false); district_layer.add_child(back)
+	build_nav(district_layer,vs)
+func build_nav(par:Control,vs:Vector2):
+	var nb:=wpanel(Vector2(0,vs.y-58),Vector2(vs.x,58)); par.add_child(nb)
+	var items=[["الرئيسية",-1],["خريطة العالم",-2],["المهام",7],["الهاتف",-3],["الحقيبة",1],["العلاقات",5],["العقارات",-4],["المتجر",2],["الإعدادات",4]]
+	var bw:=(vs.x-20)/9.0
+	for k in range(9):
+		var it=items[k]
+		var b:=wbtn(it[0],Vector2(bw-6,44),Vector2(10+k*bw,vs.y-51),17,(Color(0.2,0.5,0.6) if it[1]==-2 else Color(0.12,0.18,0.35)))
+		b.pressed.connect(func(): nav_go(it[1])); par.add_child(b)
+func nav_go(k:int):
+	if k==-2: district_layer.visible=false; return
+	if k==-4: wi_note.text="العقارات جاية بعدين."; district_note.text="العقارات جاية بعدين."; return
+	district_layer.visible=false; world_layer.visible=false; map_layer.visible=false; mode='play'; phone_layer.visible=false; phone_layer.position.y=0
+	if k==-1: return
+	open_phone()
+	if k>=0: open_app(k)
 func district_select(i:int):
 	wd_sel=i; var d=WDIST[i]
 	wd_name.text=d[0]; wd_desc.text=d[5]+"\nالمستوى الموصى به: "+str(d[3])+"+ (للعرض)"
