@@ -447,6 +447,7 @@ func build_street():
 			vending2(Vector3(-6.2,0.0,-float(i)*9.5-1),90,Color(0.2,0.5,0.9),1); bike(Vector3(6.3,0.2,-float(i)*9.5-2),90,Color(0.3,0.7,0.5))
 		if i%2==0:
 			pole(Vector3(-5.1,0,-float(i)*9.5)); pole(Vector3(5.1,0,-float(i)*9.5))
+	street_details()
 	build_world()
 	# wires: along street and across
 	for side in [-1,1]:
@@ -2346,3 +2347,51 @@ func district_select(i:int):
 func district_go():
 	if not WDIST[wd_sel][4]: return
 	district_layer.visible=false; world_layer.visible=false; map_layer.visible=false; mode='play'; phone_layer.visible=false; phone_layer.position.y=0
+
+
+func street_details():
+	var asph:=Color(0.2,0.2,0.23); var wh:=Color(0.95,0.95,0.92); var yl:=Color(0.95,0.78,0.15)
+	box(self,Vector3(8.6,0.012,118),asph,Vector3(0,0.012,-53),false)
+	# edge lines and dashed center line
+	for sx in [-4.0,4.0]: box(self,Vector3(0.14,0.014,118),wh,Vector3(sx,0.03,-53),false)
+	var z:=3.0
+	while z>-110.0:
+		var near:=false
+		for c in range(4):
+			if absf(z-(-c*36.0-9.5))<5.0: near=true
+		if not near: box(self,Vector3(0.18,0.014,2.0),yl,Vector3(0,0.03,z),false)
+		z-=4.0
+	# curbs and sidewalk tile grid
+	for sx in [-1,1]:
+		box(self,Vector3(0.35,0.2,118),Color(0.72,0.72,0.74),Vector3(sx*4.6,0.1,-53),false)
+		box(self,Vector3(4.2,0.04,118),Color(0.62,0.6,0.62),Vector3(sx*6.9,0.2,-53),false)
+		var k:=0.0
+		while k>-112.0:
+			box(self,Vector3(4.2,0.05,0.06),Color(0.46,0.45,0.48),Vector3(sx*6.9,0.22,k),false)
+			k-=1.6
+		for xx in [-1.0,1.0]:
+			box(self,Vector3(0.05,0.05,118),Color(0.46,0.45,0.48),Vector3(sx*6.9+xx*1.0,0.22,-53),false)
+		# tactile yellow guide strip along curb
+		box(self,Vector3(0.5,0.05,118),yl,Vector3(sx*5.0,0.23,-53),false)
+	# crosswalks wider and tactile pads
+	for c in range(4):
+		var zc:=-c*36.0-6
+		for sx in [-1,1]: box(self,Vector3(1.0,0.05,6.2),yl,Vector3(sx*5.4,0.23,zc-3.5),false)
+	# manholes, drains, patches
+	for i in range(9):
+		var zz:=-float(i)*13.0-4.0
+		box(self,Vector3(0.9,0.015,0.9),Color(0.12,0.12,0.14),Vector3(-1.5+float(i%3)*1.5,0.04,zz),false)
+		box(self,Vector3(0.7,0.016,0.7),Color(0.3,0.3,0.33),Vector3(-1.5+float(i%3)*1.5,0.045,zz),false)
+		box(self,Vector3(0.6,0.03,0.12),Color(0.1,0.1,0.12),Vector3(3.9,0.04,zz-5),false)
+		box(self,Vector3(2.4,0.012,1.6),Color(0.15,0.15,0.18),Vector3(-2.2+float((i*5)%4),0.03,zz-8.0),false)
+	# bollards and signs
+	for i in range(0,10):
+		var zz:=-float(i)*11.0+2
+		for sx in [-1,1]:
+			var b:=MeshInstance3D.new(); var cm:=CylinderMesh.new(); cm.top_radius=0.1; cm.bottom_radius=0.1; cm.height=0.75; b.mesh=cm
+			var bm:=StandardMaterial3D.new(); bm.albedo_color=Color(0.85,0.85,0.88); b.material_override=bm; b.position=Vector3(sx*4.75,0.55,zz); add_child(b)
+	for i in range(1,8,2):
+		var zz:=-float(i)*14.0
+		box(self,Vector3(0.1,2.4,0.1),Color(0.6,0.6,0.64),Vector3(8.4,1.4,zz),false)
+		box(self,Vector3(0.75,0.75,0.06),Color(0.15,0.4,0.85),Vector3(8.4,2.8,zz),false)
+		box(self,Vector3(0.45,0.1,0.07),Color(1,1,1),Vector3(8.4,2.8,zz),false)
