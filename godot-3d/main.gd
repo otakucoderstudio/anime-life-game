@@ -163,6 +163,7 @@ func overlaps(a0:float,a1:float,gaps:Array)->bool:
 	return false
 func world_row(ns:bool,c:float,t:float,idx:int,sak:bool):
 	tokyo_tower(Vector3(4,0,-235))
+	station(Vector3(18.5,0,-14))
 	var cols=[Color(0.9,0.84,0.72),Color(0.7,0.78,0.85),Color(0.86,0.7,0.62),Color(0.78,0.82,0.7),Color(0.92,0.9,0.86),Color(0.68,0.66,0.74)]
 	var accs=[Color(0.95,0.3,0.3),Color(0.25,0.55,0.95),Color(0.35,0.75,0.5),Color(0.95,0.7,0.2)]
 	for side in [-1,1]:
@@ -254,6 +255,15 @@ func tokyo_tower(p:Vector3):
 	box(self,Vector3(0.8,22.0,0.8),Color(0.95,0.3,0.2),p+Vector3(0,92.0,0),false)
 	box(self,Vector3(4.5,2,3.6),Color(1,0.95,0.9),p+Vector3(0,40.0,0),false)
 	batching=was
+
+func station(p:Vector3):
+	box(self,Vector3(10,7,14),Color(0.82,0.84,0.88),p+Vector3(0,3.5,0),false)
+	box(self,Vector3(10.4,0.5,14.4),Color(0.3,0.35,0.5),p+Vector3(0,7.2,0),false)
+	box(self,Vector3(1.2,3.2,6.0),Color(0.15,0.15,0.2),p+Vector3(-4.8,1.6,0),false)
+	box(self,Vector3(0.3,1.6,7.0),Color(0.1,0.55,0.35),p+Vector3(-5.2,5.2,0),false)
+	box(self,Vector3(1.6,0.2,6.4),Color(0.3,0.35,0.5),p+Vector3(-5.2,3.4,0),false)
+	tag("渋谷駅",p+Vector3(-5.45,5.75,0),-90.0,0.012,Color(1,1,1),load("res://fonts/jp.ttf"))
+	tag("محطة شيبويا",p+Vector3(-5.4,4.3,0),-90.0,0.012,Color(1,0.95,0.7),ar)
 
 func building(side:int,z:float,h:float,c:Color,i:int):
 	var cols=[Color(0.95,0.3,0.3),Color(0.25,0.55,0.95),Color(0.35,0.75,0.5),Color(0.95,0.7,0.2)]
@@ -585,8 +595,20 @@ func start_scene(key:String,bg:String,lines:Array):
 	if scene_done.has(key): return
 	cur_key=key; scene_done[key]=true; mode='scene'; phone_btn.visible=false; badge.visible=false; joy_vec=Vector2.ZERO; joy_id=-1; knob.position=base.position
 	sc_bg.texture=(img_tex("res://art/%s.jpg"%bg) if bg!="" else null); scene_lines=lines; scene_i=0; scene_layer.visible=true; show_line()
+var voice_map:Dictionary={}
+var voice_pl:AudioStreamPlayer
+func play_voice(ar:String):
+	if voice_pl==null:
+		voice_pl=AudioStreamPlayer.new(); add_child(voice_pl)
+		var f:=FileAccess.open("res://voice/map.json",FileAccess.READ)
+		if f: voice_map=JSON.parse_string(f.get_as_text())
+	voice_pl.stop()
+	if voice_map.has(ar):
+		var st=load("res://voice/%s.ogg"%voice_map[ar])
+		if st: voice_pl.stream=st; voice_pl.play()
 func show_line():
 	sfx('blip',randf_range(0.9,1.15))
+	play_voice(scene_lines[scene_i][1])
 	var l=scene_lines[scene_i]; sc_name.text=l[0]; sc_txt.text=l[1]; sc_face.texture=img_tex("res://art/%s.png"%l[2])
 	var ch:Array=l[3] if l.size()>3 else []
 	choices_on=ch.size()>0
@@ -918,6 +940,7 @@ func _physics_process(_d):
 		if frames==20 and 'outw' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20); apply_outfit(3)
 		if frames==20 and 'newst' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(-68.5,0,-14); player.rotation.y=PI
 		if frames==20 and 'snow' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20); hud_min=21*1440.0+600.0
+		if frames==20 and 'stn' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(2,0,-22); get_tree().root.set_meta('x',true); cam.fov=60; cam.position=Vector3(-2,3.0,-4); cam.look_at(Vector3(18,3.0,-14))
 		if frames==20 and 'cars' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-22); cars[0].t=-30.0; cars[1].t=-34.0
 		if frames==20 and 'greet' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; peds[0].si=0; peds[0].off=7.5; peds[0].t=-20.0; player.position=Vector3(7.5,0,-16.5)
 		if frames==20 and 'talk' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(-68.5,0,-17.5)
