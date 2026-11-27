@@ -37,3 +37,11 @@ All in main.gd: street (build_street, street_details), phone, world map (build_w
 
 ## Known gaps
 Only one informal real-device report (loads slowly, then runs; save not confirmed); map places are display only; other districts and cities locked/generic; animations are still the VRoid defaults; pinch zoom untested on a phone.
+
+## Backlog (owner wishlist 15:43, not started)
+1 trucks, 2 motorcycles (both in vehicles step), 3 build a house with workers, 4 house food/water/lights, 5 sewage/drainage, 6 speed bumps. Order stays as approved; 3-5 come after rooms.
+
+## Backlog 2 (owner wishlist 15:43, not started)
+animals, villas, residential, libraries, restaurants/hospitals/centers, farms, "reduce housing" (unclear), day/night visibility check, better graphics, ride cars, better walk animation.
+## Fix 1.25
+Wall collision: reg_walls() registers footprints of instanced building models per zone, push_walls() keeps the player out. Shibuya main street uses walk_rects.

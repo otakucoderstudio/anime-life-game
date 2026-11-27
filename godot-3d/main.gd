@@ -1232,9 +1232,40 @@ func phys_step(dt:float):
 			var nrm:=q.normalized() if q.length()>0.001 else Vector2(1,0)
 			player.position.x=so[0].x+nrm.x*(so[1]+0.3); player.position.z=so[0].y+nrm.y*(so[1]+0.3)
 
+var room_walls:={}
+func reg_walls(kind:String,before:int):
+	var arr:=[]; var ch:=get_children()
+	for ci in range(before,ch.size()):
+		var top:Node=ch[ci]
+		var cands:=[top]; cands.append_array(top.find_children('*','Node3D',true,false))
+		for c in cands:
+			var fp:String=c.scene_file_path
+			if fp=='' or not (c is Node3D): continue
+			var low:=fp.to_lower()
+			if low.contains('torii') or low.contains('bridge') or low.contains('lamp') or low.contains('lantern') or low.contains('tree'): continue
+			var bb:=node_aabb(c)
+			if bb.size.y<2.5 or bb.size.x>40 or bb.size.z>40 or bb.size.x<1.0 or bb.size.z<1.0: continue
+			arr.append(Rect2(bb.position.x+0.25,bb.position.z+0.25,bb.size.x-0.5,bb.size.z-0.5))
+	room_walls[kind]=arr
+
+
+func push_walls(p:Vector3)->Vector3:
+	if not room_walls.has(in_room): return p
+	var org:Vector3=room_org[in_room]
+	for r in room_walls[in_room]:
+		var rr:Rect2=r.grow(0.3)
+		if rr.has_point(Vector2(p.x,p.z)):
+			var dl:=p.x-rr.position.x; var dr:=rr.end.x-p.x; var dt:=p.z-rr.position.y; var db:=rr.end.y-p.z
+			var m:=minf(minf(dl,dr),minf(dt,db))
+			if m==dl: p.x=rr.position.x
+			elif m==dr: p.x=rr.end.x
+			elif m==dt: p.z=rr.position.y
+			else: p.z=rr.end.y
+	return p
+
 func clamp_walk(p:Vector3)->Vector3:
 	if in_room!='':
-		return Vector3(clamp(p.x,bnd.position.x,bnd.end.x),p.y,clamp(p.z,bnd.position.y,bnd.end.y))
+		return push_walls(Vector3(clamp(p.x,bnd.position.x,bnd.end.x),p.y,clamp(p.z,bnd.position.y,bnd.end.y)))
 	var best:=Vector3.ZERO; var bd:=1e9
 	for r in walk_rects:
 		var q:=Vector3(clamp(p.x,r.position.x,r.end.x),p.y,clamp(p.z,r.position.y,r.end.y))
@@ -1895,7 +1926,10 @@ func room_extras(kind:String):
 	no_outline=false
 func enter_room(kind:String):
 	if in_room=='' : street_ret=player.position
-	if not room_org.has(kind): build_room(kind)
+	if not room_org.has(kind):
+		var before:=get_children().size()
+		build_room(kind)
+		reg_walls(kind,before)
 	# clear old points
 	for p in room_pts: p.n.queue_free()
 	room_pts.clear()
