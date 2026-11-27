@@ -236,6 +236,10 @@ func vending(p:Vector3,ry:float,c:Color):
 func shop(side:int,z:float,kind:int):
 	var fx=side*(13.5-3.55)
 	var ry=90.0 if side<0 else -90.0
+	if kind%4==0:
+		for q in range(3):
+			box(self,Vector3(0.25,0.28,5.4),[Color(0.1,0.65,0.35),Color(1,1,1),Color(0.15,0.4,0.85)][q],Vector3(fx-side*0.72,2.55+float(q)*0.28,z),false)
+		box(self,Vector3(0.1,1.7,2.2),Color(0.75,0.92,1.0),Vector3(fx-side*0.72,1.0,z),false)
 	if kind%2==0:
 		tag(["コンビニ 24","ラーメン","本屋","カフェ"][kind%4],Vector3(fx-side*0.85,3.05,z),ry,0.011,Color(1,1,1),jp)
 		tag(["كونبيني ٢٤ ساعة","مطعم رامن","مكتبة","كافيه"][kind%4],Vector3(fx-side*0.85,2.5,z),ry,0.008,Color(1,0.95,0.7),ar)
