@@ -1245,7 +1245,7 @@ func _physics_process(_d):
 		if frames==40 and 'rel' in OS.get_cmdline_user_args(): mode='play'; add_aff('كايتو',4); add_aff('أياني',7); add_aff('مومو',1); open_phone(); open_app(5)
 		if frames==40 and 'ward' in OS.get_cmdline_user_args(): mode='play'; apply_outfit(1); open_phone(); open_app(6)
 		if frames==40 and 'mapapp' in OS.get_cmdline_user_args(): mode='play'; open_phone(); open_app(0)
-		if frames==44 and 'mapicons' in OS.get_cmdline_user_args(): mv_filter=0; mv_locate(); mv_zoom=3.8; mv_pan=-(WDIST[1][2]*mv_size*3.8-mv_size*0.5); mv_clamp()
+		if frames==44 and 'mapicons' in OS.get_cmdline_user_args(): mv_filter=0; mv_locate(); mv_zoom=2.9; mv_pan=-(WDIST[1][2]*mv_size*2.9-mv_size*0.5)+Vector2(0,40); mv_clamp()
 		if frames==44 and 'districtz' in OS.get_cmdline_user_args(): mv_zoom=3.4; mv_pan=-(WDIST[1][2]*mv_size*3.4-mv_size*0.5); mv_clamp(); mv.queue_redraw()
 		if frames==40 and ('districts' in OS.get_cmdline_user_args() or 'mapicons' in OS.get_cmdline_user_args() or 'districtz' in OS.get_cmdline_user_args()): mode='play'; open_phone(); open_app(0); world_refresh(); world_layer.visible=true; district_layer.visible=true; district_select(1)
 		if frames==40 and 'worldmap' in OS.get_cmdline_user_args(): mode='play'; open_phone(); open_app(0); world_refresh(); world_layer.visible=true
@@ -2463,6 +2463,7 @@ func mv_draw():
 				mv.draw_line(c+Vector2(k,-r),c+Vector2(k,r),Color(0.8,0.82,0.9,0.9),maxf(2.0,3.0*z*0.5))
 				mv.draw_line(c+Vector2(-r,k),c+Vector2(r,k),Color(0.8,0.82,0.9,0.9),maxf(2.0,3.0*z*0.5))
 		if z>=2.5: mv_icons(i,c,r,z,20.0*z,int(R*2/20.0),open)
+		if i==1 and z>=1.7: mv_shibuya(c,r,z)
 		var sel:=(i==wd_sel)
 		var txt:String=str(i+1)+"  "+d[0]+"  "+str(d[3])+"+"
 		var fs:=16 if z<2.0 else 20
@@ -2521,3 +2522,37 @@ func mv_glyph(nm:String,p:Vector2,r:float):
 			mv.draw_rect(Rect2(p+Vector2(-u*0.8,-u),Vector2(u*1.6,u*1.6)),w); mv.draw_circle(p+Vector2(-u*0.4,u*0.9),u*0.25,w); mv.draw_circle(p+Vector2(u*0.4,u*0.9),u*0.25,w)
 		_:
 			mv.draw_rect(Rect2(p+Vector2(-u*0.7,-u),Vector2(u*0.4,u*2)),w); mv.draw_circle(p+Vector2(u*0.2,-u*0.3),u*0.6,w)
+
+func mv_shibuya(c:Vector2,r:float,z:float):
+	var sp:=20.0*z; var o:=c-Vector2(r,r)
+	# rail line along the south side with sleepers
+	var ry:=o.y+sp*5.0; var rl:=Vector2(o.x-sp,ry); var rr:=Vector2(o.x+r*2+sp,ry)
+	mv.draw_line(rl,rr,Color(0.1,0.1,0.12),maxf(10.0,3.6*z)); mv.draw_line(rl,rr,Color(0.9,0.9,0.95),maxf(3.0,1.2*z))
+	if z>=2.5:
+		var k:=0.0
+		while k<r*2+2*sp:
+			mv.draw_line(Vector2(o.x-sp+k,ry-3.0*z*0.6),Vector2(o.x-sp+k,ry+3.0*z*0.6),Color(0.35,0.3,0.25),2.0); k+=sp*0.18
+	# park block (cells 1-2 x 1-2) with trees and pond
+	var pr:=Rect2(o+Vector2(sp*1.0,sp*1.0),Vector2(sp*2.0,sp*2.0))
+	if z>=2.5:
+		mv.draw_rect(pr,Color(0.3,0.62,0.32)); mv.draw_circle(pr.position+pr.size*0.62,sp*0.38,Color(0.35,0.65,0.9)); mv.draw_arc(pr.position+pr.size*0.62,sp*0.38,0,TAU,24,Color(1,1,1,0.7),2.0)
+		for t in range(7):
+			var tp:=pr.position+Vector2(fposmod(t*0.37+0.15,1.0)*pr.size.x,fposmod(t*0.53+0.1,1.0)*pr.size.y*0.6)
+			mv.draw_circle(tp,sp*0.12,Color(0.16,0.45,0.22)); mv.draw_circle(tp+Vector2(-1,-1),sp*0.07,Color(0.3,0.7,0.35))
+	# scramble crossing at the middle intersection: zebra on 4 sides plus diagonals
+	var X:=o+Vector2(sp*5.0,sp*2.0)
+	if z>=1.7:
+		var w:=maxf(1.5,0.5*z)
+		mv.draw_rect(Rect2(X-Vector2(sp*1.15,sp*1.15),Vector2(sp*2.3,sp*2.3)),Color(0.08,0.08,0.1,0.92))
+		for side in range(4):
+			for q in range(-3,4):
+				var d:=Vector2(1,0).rotated(side*PI*0.5); var nrm:=Vector2(-d.y,d.x)
+				var base:=X+d*sp*0.7+nrm*q*sp*0.2
+				mv.draw_line(base,base+d*sp*0.75,Color(1,1,1,0.95),w*1.6)
+		mv.draw_line(X+Vector2(-sp*0.6,-sp*0.6),X+Vector2(sp*0.6,sp*0.6),Color(1,1,1,0.6),w*0.8)
+		mv.draw_line(X+Vector2(-sp*0.6,sp*0.6),X+Vector2(sp*0.6,-sp*0.6),Color(1,1,1,0.6),w*0.8)
+	if z>=2.5:
+		var F:=mf(); var tx:="تقاطع شيبويا"; var tsz:=F.get_string_size(tx,HORIZONTAL_ALIGNMENT_LEFT,-1,15)
+		mv.draw_rect(Rect2(X+Vector2(-tsz.x*0.5-4,-sp*1.5),tsz+Vector2(8,2)),Color(0,0,0,0.7)); mv.draw_string(F,X+Vector2(-tsz.x*0.5,-sp*1.5+tsz.y-3),tx,HORIZONTAL_ALIGNMENT_LEFT,-1,15,Color(1,1,1))
+		tx="الحديقة"; tsz=F.get_string_size(tx,HORIZONTAL_ALIGNMENT_LEFT,-1,15)
+		mv.draw_rect(Rect2(pr.position+Vector2(pr.size.x*0.5-tsz.x*0.5-4,pr.size.y*0.1),tsz+Vector2(8,2)),Color(0,0,0,0.6)); mv.draw_string(F,pr.position+Vector2(pr.size.x*0.5-tsz.x*0.5,pr.size.y*0.1+tsz.y-3),tx,HORIZONTAL_ALIGNMENT_LEFT,-1,15,Color(1,1,1))
