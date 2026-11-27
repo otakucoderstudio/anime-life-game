@@ -78,10 +78,10 @@ func _ready():
 	var s:=Sky.new(); var psm:=PanoramaSkyMaterial.new(); psm.panorama=load('res://art/sky.jpg'); s.sky_material=psm
 	env.background_mode=Environment.BG_SKY; env.sky=s
 	env.ambient_light_source=Environment.AMBIENT_SOURCE_COLOR; env.ambient_light_color=Color(0.86,0.9,1.0); env.ambient_light_energy=0.55
-	env.glow_enabled=false; env.glow_intensity=0.35; env.glow_bloom=0.0; env.glow_hdr_threshold=1.4; env.tonemap_mode=Environment.TONE_MAPPER_FILMIC; env.tonemap_exposure=0.8; env.adjustment_enabled=true; env.adjustment_saturation=1.4; env.adjustment_contrast=1.1; env.adjustment_brightness=1.03
+	env.glow_enabled=true; env.glow_intensity=0.35; env.glow_bloom=0.08; env.glow_hdr_threshold=1.2; env.glow_blend_mode=Environment.GLOW_BLEND_MODE_SOFTLIGHT; env.tonemap_mode=Environment.TONE_MAPPER_FILMIC; env.tonemap_exposure=0.62; env.adjustment_enabled=true; env.adjustment_saturation=1.3; env.adjustment_contrast=1.18; env.adjustment_brightness=1.03
 	env.fog_enabled=true; env.fog_light_color=Color(0.86,0.92,1.0); env.fog_density=0.012
 	var we:=WorldEnvironment.new(); we.environment=env; add_child(we)
-	sun=DirectionalLight3D.new(); sun.rotation_degrees=Vector3(-42,-55,0); sun.light_color=Color(1,0.9,0.72); sun.light_energy=0.7; sun.shadow_enabled=false; sun.directional_shadow_max_distance=60; sun.shadow_blur=2.0; add_child(sun)
+	sun=DirectionalLight3D.new(); sun.rotation_degrees=Vector3(-42,-55,0); sun.light_color=Color(1,0.9,0.72); sun.light_energy=0.7; sun.shadow_enabled=true; sun.directional_shadow_max_distance=38; sun.directional_shadow_mode=DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS; sun.shadow_blur=1.6; sun.light_energy=0.85; sun.shadow_opacity=0.75; add_child(sun)
 	if OS.has_feature('mobile'):
 		get_viewport().scaling_3d_scale=0.6; Engine.max_fps=30
 	build_street()
@@ -313,7 +313,7 @@ func cmat(skin:Color,hair:Color,top:Color,bot:Color,acc:Color,iris:Color)->Mater
 	m.set_shader_parameter("p_skin",Vector3(skin.r,skin.g,skin.b)); m.set_shader_parameter("p_hair",Vector3(hair.r,hair.g,hair.b))
 	m.set_shader_parameter("p_top",Vector3(top.r,top.g,top.b)); m.set_shader_parameter("p_bot",Vector3(bot.r,bot.g,bot.b))
 	m.set_shader_parameter("p_acc",Vector3(acc.r,acc.g,acc.b)); m.set_shader_parameter("p_iris",Vector3(iris.r,iris.g,iris.b))
-	var o:=ShaderMaterial.new(); o.shader=outl; o.set_shader_parameter("thickness",0.02); m.next_pass=o
+	var o:=ShaderMaterial.new(); o.shader=outl; o.set_shader_parameter("thickness",0.008); m.next_pass=o
 	cmats[key]=m; return m
 func load_char(kind:String,mt:Material)->Dictionary:
 	var ps:PackedScene=load("res://chars/"+kind+".glb")
@@ -1514,8 +1514,8 @@ func apply_tod(dt:float):
 	env_t=1.0
 	var h:=fmod(hud_min/60.0,24.0)
 	var sc:Color; var se:float; var am:Color; var ae:float; var fog:Color
-	if h>=6 and h<11: sc=Color(1,0.9,0.72); se=0.7; am=Color(0.86,0.9,1); ae=0.55; fog=Color(0.88,0.93,1)
-	elif h>=11 and h<16: sc=Color(1,0.98,0.92); se=0.8; am=Color(0.9,0.94,1); ae=0.6; fog=Color(0.86,0.93,1)
+	if h>=6 and h<11: sc=Color(1,0.9,0.72); se=0.7; am=Color(0.86,0.9,1); ae=0.42; fog=Color(0.88,0.93,1)
+	elif h>=11 and h<16: sc=Color(1,0.98,0.92); se=0.8; am=Color(0.9,0.94,1); ae=0.45; fog=Color(0.86,0.93,1)
 	elif h>=16 and h<19.5: sc=Color(1,0.62,0.38); se=0.75; am=Color(1,0.78,0.72); ae=0.5; fog=Color(1,0.82,0.7)
 	else: sc=Color(0.5,0.55,0.95); se=0.35; am=Color(0.5,0.55,0.85); ae=0.42; fog=Color(0.35,0.4,0.6)
 	var dday:=int(hud_min/1440.0)
