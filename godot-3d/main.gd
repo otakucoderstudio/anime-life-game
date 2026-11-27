@@ -895,7 +895,7 @@ func _physics_process(_d):
 		if frames==20 and 'momo' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(0,0,-6)
 		if frames==20 and 'bench' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; energy=2; player.position=Vector3(20.0,0,-7.2)
 		if frames==20 and ('night' in OS.get_cmdline_user_args() or 'deep' in OS.get_cmdline_user_args()): scene_layer.visible=false; mode='play'; player.position=Vector3(0,0,-6); hud_min=(2.0 if 'deep' in OS.get_cmdline_user_args() else 22.0)*60.0; env_t=0.0; player.position=Vector3(0,0,-8)
-		if frames==20 and 'rain' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(0,0,-6); env_t=0.0
+		if frames==20 and ('rain' in OS.get_cmdline_user_args() or 'mist' in OS.get_cmdline_user_args()): scene_layer.visible=false; mode='play'; player.position=Vector3(0,0,-6); env_t=0.0
 		if frames==20 and 'street' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20)
 		if frames==20 and 'park' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(34.5,0,-4.5)
 		if frames==20 and 'world' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-30)
@@ -1511,6 +1511,8 @@ func apply_tod(dt:float):
 	var tint:Color=[Color(1,0.97,1),Color(1,1,0.94),Color(1,0.93,0.86),Color(0.92,0.96,1.04)][si]
 	var tw:=create_tween().set_parallel(true)
 	tw.tween_property(sun,"light_color",sc*tint,1.0); tw.tween_property(sun,"light_energy",se,1.0)
+	var misty:bool=(dday%4==1 and h>=6.0 and h<10.0) or ('mist' in OS.get_cmdline_user_args())
+	tw.tween_property(env,"fog_density",0.04 if misty else (0.02 if rainy else 0.012),1.5)
 	var bgm:float=0.95 if (h>=6 and h<16) else (0.7 if (h>=16 and h<19.5) else 0.16)
 	tw.tween_property(env,"background_energy_multiplier",bgm,1.0)
 	RenderingServer.global_shader_parameter_set('night',1.0 if bgm<0.3 else (0.5 if bgm<0.8 else 0.0))
