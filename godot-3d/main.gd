@@ -799,9 +799,7 @@ func _process(dt):
 			bench_cd=40.0; hud_min+=20.0; hud_clock.queue_redraw()
 			if energy<5: energy+=1; hearts.queue_redraw()
 			stats['الصحة']=clampi(stats['الصحة']+1,0,100)
-			if bench_lb==null:
-				bench_lb=Label3D.new(); bench_lb.font=ar; bench_lb.font_size=64; bench_lb.pixel_size=0.007; bench_lb.billboard=BaseMaterial3D.BILLBOARD_ENABLED; bench_lb.no_depth_test=true; bench_lb.outline_modulate=Color(0.25,0.1,0.2); bench_lb.outline_size=14; bench_lb.position=Vector3(0,2.9,0); player.add_child(bench_lb)
-			bench_lb.text="قعدت ارتاحت شوية على الكنبة"; bench_lb.visible=true; bench_t=3.0
+			player_say("قعدت ارتاحت شوية على الكنبة")
 	if bench_t>0.0:
 		bench_t-=dt
 		if bench_t<=0.0 and bench_lb!=null: bench_lb.visible=false
@@ -1475,6 +1473,11 @@ func sfx(n:String,pitch:=1.0):
 	var key={"click":"click1","blip":"click2","foot":"foot","bong":"bong","open":"open"}.get(n,n)
 	var p:AudioStreamPlayer=sfxp[sfx_i]; sfx_i=(sfx_i+1)%sfxp.size(); p.stream=snd.get(key); p.pitch_scale=pitch; p.play()
 
+func player_say(t:String):
+	if bench_lb==null:
+		bench_lb=Label3D.new(); bench_lb.font=ar; bench_lb.font_size=64; bench_lb.pixel_size=0.007; bench_lb.billboard=BaseMaterial3D.BILLBOARD_ENABLED; bench_lb.no_depth_test=true; bench_lb.outline_modulate=Color(0.25,0.1,0.2); bench_lb.outline_size=14; bench_lb.position=Vector3(0,2.9,0); player.add_child(bench_lb)
+	bench_lb.text=t; bench_lb.visible=true; bench_t=3.5
+
 func apply_tod(dt:float):
 	if rain_p!=null: rain_p.stream_paused=(in_room!='' or not rain_on)
 	if rain!=null and player!=null: rain.position=player.position+Vector3(0,8,0)
@@ -1495,6 +1498,7 @@ func apply_tod(dt:float):
 		rain.direction=Vector3(0.1,-1,0); rain.spread=2.0; rain.initial_velocity_min=16.0; rain.initial_velocity_max=19.0; rain.gravity=Vector3(0,-6,0)
 		var qm:=QuadMesh.new(); qm.size=Vector2(0.02,0.55); var rm:=StandardMaterial3D.new(); rm.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED; rm.albedo_color=Color(0.85,0.92,1.0,0.55); rm.transparency=BaseMaterial3D.TRANSPARENCY_ALPHA; rm.billboard_mode=BaseMaterial3D.BILLBOARD_PARTICLES; rm.disable_fog=true
 		qm.material=rm; rain.mesh=qm; rain.local_coords=false; rain.emitting=false; add_child(rain)
+	if rainy and not rain_on and mode=='play' and in_room=='': player_say('بدأت تمطر... الجو حلو النهاردة')
 	rain.emitting=rainy; rain_on=rainy
 	if rainy: sc=sc.darkened(0.25); am=am.darkened(0.15)
 	var day:=int(hud_min/1440.0); var si:=int(day/7)%4
