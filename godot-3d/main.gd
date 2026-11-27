@@ -1336,6 +1336,8 @@ func _physics_process(_d):
 		if frames==40 and 'rel' in OS.get_cmdline_user_args(): mode='play'; add_aff('كايتو',4); add_aff('أياني',7); add_aff('مومو',1); open_phone(); open_app(5)
 		if frames==40 and 'ward' in OS.get_cmdline_user_args(): mode='play'; apply_outfit(1); open_phone(); open_app(6)
 		if frames==40 and 'mapapp' in OS.get_cmdline_user_args(): mode='play'; open_phone(); open_app(0)
+		if frames==32 and 'znight' in OS.get_cmdline_user_args(): hud_min=22.0*60.0; env_t=0.0
+		if frames==32 and 'zday' in OS.get_cmdline_user_args(): hud_min=12.0*60.0; env_t=0.0
 		if frames==30 and 'kyoto' in OS.get_cmdline_user_args(): mode='play'; scene_layer.visible=false; enter_room('kyoto')
 		if frames==40 and 'kyoto2' in OS.get_cmdline_user_args(): player.position=room_org['kyoto']+Vector3(0,0,-17); cam.position=player.position+Vector3(0,3.6,6.0)
 		if frames==30 and 'shinjuku' in OS.get_cmdline_user_args(): mode='play'; scene_layer.visible=false; enter_room('shinjuku')
@@ -1986,6 +1988,7 @@ func enter_room(kind:String):
 	if kind=='osaka': env.ambient_light_color=Color(0.85,0.7,0.8); env.ambient_light_energy=0.34; sun.light_energy=0.36; sun.light_color=Color(1,0.7,0.6); petals.visible=false; env.adjustment_saturation=1.3; loc_lbl.text='أوساكا (نسخة أولى)'
 	if kind=='shinjuku': env.ambient_light_color=Color(0.78,0.76,0.95); env.ambient_light_energy=0.32; sun.light_energy=0.42; sun.light_color=Color(1,0.88,0.75); petals.visible=false; env.adjustment_saturation=1.3; loc_lbl.text='شينجوكو (اختبار مباني)'
 	if kind=='kyoto': env.ambient_light_color=Color(1,0.88,0.75); env.ambient_light_energy=0.42; sun.light_energy=0.62; sun.light_color=Color(1,0.78,0.55); petals.visible=true; env.adjustment_saturation=1.15; loc_lbl.text='كيوتو (نسخة أولى)'
+	if kind in ZONE_KINDS: zone_base[kind]={'am':env.ambient_light_color,'ae':env.ambient_light_energy,'sc':sun.light_color,'se':sun.light_energy}; env_t=0.0
 	for p in room_pts: scene_done.erase(p.key)
 	exit_btn.visible=true
 	if not door_mats.has(kind):
@@ -2290,14 +2293,37 @@ var sub_t:=0.0
 func player_say(t:String):
 	subtitle(t,3.5)
 
+var zone_base:={}
+const ZONE_KINDS:=['nagasaki','okinawa','hiroshima','sendai','osaka','shinjuku','kyoto']
+func zone_night_factor(h:float)->float:
+	# 0 = full day, 1 = full night, smooth dusk 17-20 and dawn 5-7
+	if h>=7.0 and h<17.0: return 0.0
+	if h>=17.0 and h<20.0: return (h-17.0)/3.0
+	if h>=20.0 or h<5.0: return 1.0
+	return 1.0-(h-5.0)/2.0
+func apply_zone_tod(h:float):
+	# City zones keep their own base look (set in enter_room); time of day is blended on top.
+	var b:Dictionary=zone_base[in_room]
+	var nf:=zone_night_factor(h)
+	var night_am:=Color(0.5,0.55,0.85); var night_sc:=Color(0.5,0.55,0.95)
+	var tw:=create_tween().set_parallel(true)
+	tw.tween_property(sun,"light_color",(b.sc as Color).lerp(night_sc,nf),1.0)
+	tw.tween_property(sun,"light_energy",lerpf(b.se,0.3,nf),1.0)
+	tw.tween_property(env,"ambient_light_color",(b.am as Color).lerp(night_am,nf),1.0)
+	tw.tween_property(env,"ambient_light_energy",lerpf(b.ae,0.42,nf),1.0)
+	tw.tween_property(env,"background_energy_multiplier",lerpf(0.95,0.16,nf),1.0)
+	RenderingServer.global_shader_parameter_set('night',1.0 if nf>0.7 else (0.5 if nf>0.3 else 0.0))
+
 func apply_tod(dt:float):
 	if rain_p!=null: rain_p.stream_paused=(in_room!='' or not rain_on)
 	if rain!=null and player!=null: rain.position=player.position+Vector3(0,8,0)
-	if in_room!='': return
+	if in_room!='' and not zone_base.has(in_room): return
 	env_t-=dt
 	if env_t>0: return
 	env_t=1.0
 	var h:=fmod(hud_min/60.0,24.0)
+	if in_room!='':
+		apply_zone_tod(h); return
 	var sc:Color; var se:float; var am:Color; var ae:float; var fog:Color
 	if h>=6 and h<11: sc=Color(1,0.8,0.55); se=0.8; am=Color(0.62,0.74,1.0); ae=0.38; fog=Color(0.82,0.88,1.0)
 	elif h>=11 and h<16: sc=Color(1,0.9,0.7); se=0.78; am=Color(0.7,0.8,1.0); ae=0.38; fog=Color(0.86,0.93,1)
