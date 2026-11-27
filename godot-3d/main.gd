@@ -96,6 +96,7 @@ func _ready():
 
 var jp:Font=load("res://fonts/jp_s.ttf")
 var ar:Font=load("res://fonts/arabic.ttf")
+func _enter_tree(): ThemeDB.fallback_font=ar
 func tag(txt:String,pos:Vector3,rot_y:float,size:float,col:Color,font:Font,outline:=Color(0.15,0.1,0.2)):
 	var l:=Label3D.new(); l.text=txt; l.font=font; l.font_size=96; l.pixel_size=size; l.position=pos; l.rotation_degrees.y=rot_y
 	l.modulate=col; l.outline_modulate=outline; l.outline_size=16; add_child(l)
