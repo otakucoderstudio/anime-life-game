@@ -899,6 +899,8 @@ func _physics_process(_d):
 		if frames==20 and 'bench' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; energy=2; player.position=Vector3(20.0,0,-7.2)
 		if frames==20 and ('night' in OS.get_cmdline_user_args() or 'deep' in OS.get_cmdline_user_args()): scene_layer.visible=false; mode='play'; player.position=Vector3(0,0,-6); hud_min=(2.0 if 'deep' in OS.get_cmdline_user_args() else 22.0)*60.0; env_t=0.0; player.position=Vector3(0,0,-8)
 		if frames==20 and ('rain' in OS.get_cmdline_user_args() or 'mist' in OS.get_cmdline_user_args()): scene_layer.visible=false; mode='play'; player.position=Vector3(0,0,-6); env_t=0.0
+		if frames==20 and 'newday' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(0,0,-6); env_t=0.0
+		if frames==40 and 'newday' in OS.get_cmdline_user_args(): hud_min=1440.0*2+480.0; env_t=0.0
 		if frames==20 and 'street' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20)
 		if frames==20 and 'park' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(34.5,0,-4.5)
 		if frames==20 and 'world' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-30)
@@ -908,6 +910,7 @@ func _physics_process(_d):
 			get_viewport().get_texture().get_image().save_png("/tmp/shot1.png"); get_tree().quit()
 
 var energy:=5
+var last_dday:=-1
 var rain_p:AudioStreamPlayer=null
 var rain_on:=false
 var rain:CPUParticles3D=null
@@ -1504,6 +1507,9 @@ func apply_tod(dt:float):
 	elif h>=16 and h<19.5: sc=Color(1,0.62,0.38); se=0.75; am=Color(1,0.78,0.72); ae=0.5; fog=Color(1,0.82,0.7)
 	else: sc=Color(0.5,0.55,0.95); se=0.35; am=Color(0.5,0.55,0.85); ae=0.42; fog=Color(0.35,0.4,0.6)
 	var dday:=int(hud_min/1440.0)
+	if dday!=last_dday:
+		if last_dday>=0 and mode=='play' and in_room=='': player_say("يوم جديد: يوم %d"%(dday+1))
+		last_dday=dday
 	var rainy:bool=(dday%5==2 and h>=13.0 and h<19.0 and int(dday/7)%4!=3) or ('rain' in OS.get_cmdline_user_args())
 	if rain==null:
 		rain=CPUParticles3D.new(); rain.amount=260; rain.lifetime=0.8; rain.emission_shape=CPUParticles3D.EMISSION_SHAPE_BOX; rain.emission_box_extents=Vector3(12,0.5,12)
