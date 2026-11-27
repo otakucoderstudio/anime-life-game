@@ -258,6 +258,8 @@ func build_street():
 			building(side,z,h,cols[(i+(1 if side>0 else 0))%cols.size()],i)
 			shop(side,z,i+(1 if side>0 else 0))
 		sakura(Vector3(-5.9,0,-float(i)*9.5-1),i) if i%2==0 else null
+		if i%2==0: pglb("lamp",Vector3(5.7,0.1,-float(i)*9.5-8.6),0.0)
+		else: pglb("lamp",Vector3(-5.7,0.1,-float(i)*9.5-3.0),180.0)
 		sakura(Vector3(5.9,0,-float(i)*9.5-6),i+3) if i%2==1 else null
 		if i%3==0:
 			bike(Vector3(-6.3,0.2,-float(i)*9.5-4),90,Color(0.3,0.5,0.8)); bike(Vector3(-6.3,0.2,-float(i)*9.5-5.0),90,Color(0.85,0.4,0.4))
@@ -890,7 +892,7 @@ func _physics_process(_d):
 		if frames==30 and 'talk' in OS.get_cmdline_user_args(): start_scene('w1','',npcs[5].lines)
 		if frames==20 and 'momo' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(0,0,-6)
 		if frames==20 and 'bench' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; energy=2; player.position=Vector3(20.0,0,-7.2)
-		if frames==20 and 'night' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; hud_min=22.0*60.0; env_t=0.0; player.position=Vector3(26,0,-10.5)
+		if frames==20 and 'night' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; hud_min=22.0*60.0; env_t=0.0; player.position=Vector3(0,0,-14)
 		if frames==20 and 'rain' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(0,0,-6); env_t=0.0
 		if frames==20 and 'street' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20)
 		if frames==20 and 'park' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(34.5,0,-4.5)
