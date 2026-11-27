@@ -275,7 +275,14 @@ func building(side:int,z:float,h:float,c:Color,i:int):
 	var cols=[Color(0.95,0.3,0.3),Color(0.25,0.55,0.95),Color(0.35,0.75,0.5),Color(0.95,0.7,0.2)]
 	var kind:=i+(1 if side>0 else 0)
 	var vi:int=clampi(int(round((h-7.0)/2.2)),0,4)
-	pglb("bld_"+str(vi),Vector3(side*13.5,0,z),0.0 if side<0 else 180.0,c,cols[(kind%6)%4])
+	kbuild(Vector3(side*13.9,0,z),-90.0 if side<0 else 90.0,i+(1 if side>0 else 0))
+
+const KB:=["building-a","building-d","building-h","building-k","building-n","building-skyscraper-a","building-skyscraper-c"]
+func kbuild(pos:Vector3,ry:float,k:int):
+	var nm:String=KB[(k*3+1)%KB.size()]
+	var n:Node3D=(load("res://models/kbld/"+nm+".glb") as PackedScene).instantiate()
+	n.scale=Vector3(7.5,7.5,7.5); n.position=pos; n.rotation_degrees.y=ry
+	add_child(n)
 
 func build_street():
 	batching=true
