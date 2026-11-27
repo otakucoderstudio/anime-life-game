@@ -946,6 +946,7 @@ func _physics_process(_d):
 		if frames==20 and 'snow' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20); hud_min=21*1440.0+600.0
 		if frames==20 and 'stn' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(2,0,-22); get_tree().root.set_meta('x',true); cam.fov=60; cam.position=Vector3(-2,3.0,-4); cam.look_at(Vector3(18,3.0,-14))
 		if frames==20 and 'bot' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; show_ai(); ai_edit.text='ازيك'; ai_send(); ai_edit.text='احكيلي عن طوكيو'; ai_send(); ai_edit.text='ضحكني'; ai_send(); ai_edit.text='انت بتحب الفيزياء'; ai_send()
+		if frames>=20 and frames<60 and 'carc' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(0,0,-5); get_tree().root.set_meta('x',true); cars[0].t=-30.0; var cp:Vector3=cars[0].n.position; cam.fov=45; cam.position=cp+Vector3(-3.6,1.5,-6.0); cam.look_at(cp+Vector3(0,0.8,0))
 		if frames==20 and 'cars' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-22); cars[0].t=-30.0; cars[1].t=-34.0
 		if frames==20 and 'greet' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; peds[0].si=0; peds[0].off=7.5; peds[0].t=-20.0; player.position=Vector3(7.5,0,-16.5)
 		if frames==20 and 'talk' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(-68.5,0,-17.5)
