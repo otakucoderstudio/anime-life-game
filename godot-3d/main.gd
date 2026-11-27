@@ -2050,7 +2050,7 @@ func show_settings():
 		var sl:=HSlider.new(); sl.min_value=0.0; sl.max_value=1.0; sl.step=0.05; sl.value=vols[k]; sl.position=Vector2(vs.x/2-250,yy+4); sl.size=Vector2(350,36)
 		sl.value_changed.connect(func(v): vols[kk]=v; apply_vol(kk); save_vols()); app_layer.add_child(sl)
 		yy+=56
-	var cr:=lbl("شكر وتقدير (كله مجاني):\nالشخصيات: VRoid Project / pixiv (CC0)\nالسيارات والمباني والصوت: Kenney (CC0)\nواجهات الشوارع اليابانية: 3DAssets.dev Izakaya Alley (CC0)\nمباني الأفق: Assets by Kobo Assets\nالسما: Poly Haven – Belfast Sunset (CC0)",20,Vector2(12,610))
+	var cr:=lbl("شكر وتقدير (كله مجاني):\nالشخصيات: VRoid Project / pixiv (CC0)\nالسيارات والمباني والصوت: Kenney (CC0)\nواجهات الشوارع اليابانية: 3DAssets.dev Izakaya Alley (CC0)\nمباني الأفق: Assets by Kobo Assets\nموسيقى المطر: WAFU Sound Works Vol.31 (ذكاء اصطناعي + تعديل بشري)\nالسما: Poly Haven – Belfast Sunset (CC0)",20,Vector2(12,610))
 	cr.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART; cr.custom_minimum_size=Vector2(vs.x-24,0); cr.size=Vector2(vs.x-24,100); cr.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT; app_layer.add_child(cr)
 # audio
 var mus:AudioStreamPlayer; var amb:AudioStreamPlayer; var sfxp:Array=[]; var sfx_i:=0; var snd:={}
@@ -2073,7 +2073,7 @@ func save_vols():
 	cf.save("user://audio.cfg")
 func build_audio():
 	setup_buses()
-	for n in ["music_street","music_cafe","amb_cafe","amb_street","foot","bong","click1","click2","open","horn"]:
+	for n in ["music_street","music_cafe","music_rain","amb_cafe","amb_street","foot","bong","click1","click2","open","horn"]:
 		var st=load("res://audio/%s.ogg"%n)
 		if st==null: continue
 		if n.begins_with("music") or n.begins_with("amb"): st.loop=true
@@ -2090,7 +2090,7 @@ func build_audio():
 	play_bg('street')
 func play_bg(kind:String):
 	if snd.is_empty(): return
-	var mk="music_cafe" if kind=='cafe' else "music_street"; var ak="amb_cafe" if kind=='cafe' else "amb_street"
+	var mk="music_cafe" if kind=='cafe' else ("music_rain" if (rain_on and snd.has("music_rain")) else "music_street"); var ak="amb_cafe" if kind=='cafe' else "amb_street"
 	if mus.stream!=snd.get(mk): mus.stream=snd.get(mk); mus.play()
 	if amb.stream!=snd.get(ak): amb.stream=snd.get(ak); amb.play()
 func sfx(n:String,pitch:=1.0):
@@ -2138,7 +2138,8 @@ func apply_tod(dt:float):
 		var qm:=QuadMesh.new(); qm.size=Vector2(0.02,0.55); var rm:=StandardMaterial3D.new(); rm.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED; rm.albedo_color=Color(0.85,0.92,1.0,0.55); rm.transparency=BaseMaterial3D.TRANSPARENCY_ALPHA; rm.billboard_mode=BaseMaterial3D.BILLBOARD_PARTICLES; rm.disable_fog=true
 		qm.material=rm; rain.mesh=qm; rain.local_coords=false; rain.emitting=false; add_child(rain)
 	if rainy and not rain_on and mode=='play' and in_room=='': player_say('بدأت تمطر... الجو حلو النهاردة')
-	rain.emitting=rainy; rain_on=rainy
+	rain.emitting=rainy; var was_rain:=rain_on; rain_on=rainy
+	if was_rain!=rainy and in_room=='': play_bg('street')
 	if rainy: sc=sc.darkened(0.25); am=am.darkened(0.15)
 	var day:=int(hud_min/1440.0); var si:=int(day/7)%4
 	var tint:Color=[Color(1,0.97,1),Color(1,1,0.94),Color(1,0.93,0.86),Color(0.92,0.96,1.04)][si]
