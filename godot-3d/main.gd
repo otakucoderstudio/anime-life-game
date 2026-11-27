@@ -1430,13 +1430,17 @@ func build_phone():
 	var body:=Panel.new(); body.size=Vector2(340,vs.y-30); body.position=Vector2(vs.x/2-170,15); body.name="body"
 	var sb:=StyleBoxFlat.new(); sb.bg_color=Color(0.14,0.15,0.3); sb.set_corner_radius_all(36); sb.set_border_width_all(6); sb.border_color=Color(0.05,0.05,0.1); body.add_theme_stylebox_override("panel",sb); phone_layer.add_child(body)
 	var sc:=ColorRect.new(); sc.color=Color(0.75,0.88,1); sc.size=body.size-Vector2(30,60); sc.position=body.position+Vector2(15,30); phone_layer.add_child(sc)
-	phone_layer.add_child(lbl("الهاتف",34,body.position+Vector2(110,40),Color(0.1,0.1,0.3)))
 	# wallpaper and status bar
 	sc.color=Color(0.98,0.72,0.8)
-	var wp2:=ColorRect.new(); wp2.color=Color(0.55,0.62,0.95); wp2.size=Vector2(sc.size.x,sc.size.y*0.55); wp2.position=sc.position; phone_layer.add_child(wp2)
-	var wp3:=ColorRect.new(); wp3.color=Color(1,0.85,0.7,0.6); wp3.size=Vector2(sc.size.x,sc.size.y*0.2); wp3.position=sc.position+Vector2(0,sc.size.y*0.4); phone_layer.add_child(wp3)
+	var gr:=Gradient.new(); gr.colors=PackedColorArray([Color(0.42,0.5,0.9),Color(0.78,0.6,0.92),Color(1,0.72,0.8),Color(1,0.86,0.72)]); gr.offsets=PackedFloat32Array([0.0,0.38,0.72,1.0])
+	var gt:=GradientTexture2D.new(); gt.gradient=gr; gt.fill_from=Vector2(0.5,0.0); gt.fill_to=Vector2(0.5,1.0); gt.width=64; gt.height=256
+	var wpt:=TextureRect.new(); wpt.texture=gt; wpt.expand_mode=TextureRect.EXPAND_IGNORE_SIZE; wpt.stretch_mode=TextureRect.STRETCH_SCALE; wpt.size=sc.size; wpt.position=sc.position; phone_layer.add_child(wpt)
+	for pi in range(9):
+		var pet:=ColorRect.new(); pet.color=Color(1,0.85,0.92,0.55); pet.size=Vector2(9,6); pet.position=sc.position+Vector2(20+pi*34.0,40+((pi*53)%90)); pet.rotation=0.5+pi*0.4; phone_layer.add_child(pet)
 	var sbar:=ColorRect.new(); sbar.color=Color(0,0,0,0.25); sbar.size=Vector2(sc.size.x,30); sbar.position=sc.position; phone_layer.add_child(sbar)
 	phone_time=lbl("٨:٠٠",20,sc.position+Vector2(14,0),Color(1,1,1)); phone_layer.add_child(phone_time)
+	phone_big=lbl("08:00",46,sc.position+Vector2(sc.size.x*0.5-62,30),Color(1,1,1)); phone_layer.add_child(phone_big)
+	phone_layer.add_child(lbl("طوكيو · ربيع",18,sc.position+Vector2(sc.size.x*0.5-62,80),Color(1,1,1,0.9)))
 	var bat:=ColorRect.new(); bat.color=Color(1,1,1); bat.size=Vector2(28,13); bat.position=sc.position+Vector2(sc.size.x-44,9); phone_layer.add_child(bat)
 	var sig:=ColorRect.new(); sig.color=Color(1,1,1); sig.size=Vector2(16,13); sig.position=sc.position+Vector2(sc.size.x-70,9); phone_layer.add_child(sig)
 	var apps=[["الرسائل",Color(0.35,0.8,0.55),8,"msg"],["الخريطة",Color(1,0.75,0.35),0,"map"],["الكاميرا",Color(0.4,0.4,0.5),9,"cam"],["الذكاء",Color(0.6,0.45,0.95),10,"ai"],
@@ -1444,7 +1448,7 @@ func build_phone():
 		["الدولاب",Color(0.9,0.7,0.35),6,"shirt"],["المهام",Color(0.55,0.8,0.35),7,"check"],["الإعدادات",Color(0.6,0.6,0.75),4,"gear"]]
 	var ai:=0
 	for a in apps:
-		var cx:=body.position.x+28+(ai%3)*100.0; var cy:=body.position.y+78+int(ai/3)*104.0; ai+=1
+		var cx:=body.position.x+28+(ai%3)*100.0; var cy:=body.position.y+134+int(ai/3)*92.0; ai+=1
 		var ic:=Button.new(); ic.size=Vector2(76,76); ic.position=Vector2(cx,cy)
 		var sbb:=StyleBoxFlat.new(); sbb.bg_color=a[1]; sbb.set_corner_radius_all(20); sbb.set_border_width_all(0); sbb.shadow_size=4; sbb.shadow_color=Color(0,0,0,0.25)
 		for st in ["normal","hover","pressed"]: ic.add_theme_stylebox_override(st,sbb)
@@ -1518,6 +1522,7 @@ func new_msgs()->Array:
 func refresh_badge():
 	badge.visible=false
 var phone_time:Label
+var phone_big:Label
 var app_cont:SubViewportContainer
 var app_svp:SubViewport
 var app_full:=false
@@ -1569,6 +1574,7 @@ func draw_glyph(g:Control,kind:String):
 func open_phone():
 	mode='phone'; phone_layer.visible=true; refresh_badge()
 	if phone_time: var hm:=int(hud_min)%1440; phone_time.text='%02d:%02d'%[hm/60,hm%60]
+	if phone_big: phone_big.text=phone_time.text
 	var body:Control=phone_layer.get_node("body"); var y0:=body.position.y
 	phone_layer.position.y=700; var tw:=create_tween(); tw.tween_property(phone_layer,"position:y",0.0,0.25)
 func close_phone():
