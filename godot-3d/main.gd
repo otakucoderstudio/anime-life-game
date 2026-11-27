@@ -1245,7 +1245,8 @@ func _physics_process(_d):
 		if frames==40 and 'rel' in OS.get_cmdline_user_args(): mode='play'; add_aff('كايتو',4); add_aff('أياني',7); add_aff('مومو',1); open_phone(); open_app(5)
 		if frames==40 and 'ward' in OS.get_cmdline_user_args(): mode='play'; apply_outfit(1); open_phone(); open_app(6)
 		if frames==40 and 'mapapp' in OS.get_cmdline_user_args(): mode='play'; open_phone(); open_app(0)
-		if frames==40 and 'districts' in OS.get_cmdline_user_args(): mode='play'; open_phone(); open_app(0); world_refresh(); world_layer.visible=true; district_layer.visible=true; district_select(1)
+		if frames==44 and 'districtz' in OS.get_cmdline_user_args(): mv_zoom=3.4; mv_pan=-(WDIST[1][2]*mv_size*3.4-mv_size*0.5); mv_clamp(); mv.queue_redraw()
+		if frames==40 and ('districts' in OS.get_cmdline_user_args() or 'districtz' in OS.get_cmdline_user_args()): mode='play'; open_phone(); open_app(0); world_refresh(); world_layer.visible=true; district_layer.visible=true; district_select(1)
 		if frames==40 and 'worldmap' in OS.get_cmdline_user_args(): mode='play'; open_phone(); open_app(0); world_refresh(); world_layer.visible=true
 		if frames==40 and 'sett' in OS.get_cmdline_user_args(): mode='play'; open_phone(); open_app(4)
 		if frames==40 and 'year' in OS.get_cmdline_user_args(): mode='play'; add_aff('أياني',7); stats['الدراسة']=80; hud_min=28*1440.0+600.0
@@ -2202,7 +2203,7 @@ const WDIST=[
 	["كوتو","江東",Vector2(0.66,0.42),8,false,"مصانع وبحر. هتتفتح بعدين."],
 ]
 const WTRAVEL=[["قطار شينكانسن",1.0,"fast"],["قطار عادي",0.45,"slow"],["طيران داخلي",1.45,"air"],["عبّارة بحرية",0.3,"ferry"]]
-var district_note:Label; var district_layer:Control; var wd_name:Label; var wd_desc:Label; var wd_go:Button; var wd_sel:=1
+var mv:Control; var mv_size:Vector2; var mv_zoom:=1.0; var mv_pan:=Vector2.ZERO; var mv_bg:Texture2D; var mv_lbl:Label; var mv_drag:=false; var mv_moved:=0.0; var district_note:Label; var district_layer:Control; var wd_name:Label; var wd_desc:Label; var wd_go:Button; var wd_sel:=1
 var wi_travel_sel:=0; var wi_card:Label; var wi_money:Label; var wi_energy:Label; var wi_time:Label; var wi_weather:Label
 var mf_cache:Font=null
 func mf()->Font:
@@ -2288,10 +2289,14 @@ func build_districts(vs:Vector2):
 	var bg:=TextureRect.new(); bg.texture=img_tex("res://art/tokyo.jpg"); bg.expand_mode=TextureRect.EXPAND_IGNORE_SIZE; bg.size=vs; district_layer.add_child(bg)
 	var H:=vs.y-64.0; var rx:=vs.x*0.72; var rw:=vs.x*0.275
 	district_layer.add_child(lbl("خريطة طوكيو: الأحياء",32,Vector2(vs.x*0.35-150,6),Color(1,0.9,0.5)))
-	for i in range(WDIST.size()):
-		var d=WDIST[i]
-		var b:=wbtn(str(i+1)+"  "+d[0]+"  "+str(d[3])+"+",Vector2(190,38),d[2]*vs-Vector2(95,19),19,(Color(0.95,0.35,0.4) if d[4] else Color(0.2,0.28,0.45)))
-		b.pressed.connect(func(): district_select(i)); district_layer.add_child(b)
+	mv_size=Vector2(rx-20,H-54); mv_zoom=1.0; mv_pan=Vector2.ZERO; mv_bg=img_tex("res://art/tokyo.jpg")
+	mv=Control.new(); mv.position=Vector2(10,48); mv.size=mv_size; mv.clip_contents=true; mv.mouse_filter=Control.MOUSE_FILTER_STOP
+	mv.draw.connect(mv_draw); mv.gui_input.connect(mv_input); district_layer.add_child(mv)
+	var zb=[["+",1.35],["-",1/1.35],["الكل",0.0]]
+	for k in range(3):
+		var zbt:=wbtn(zb[k][0],Vector2(54,44),Vector2(rx-84,60+k*50),24,Color(0.12,0.18,0.35)); var f=zb[k][1]
+		zbt.pressed.connect(func(): mv_zoom_to(f)); district_layer.add_child(zbt)
+	mv_lbl=wl("",16,Vector2(20,H-8),300,Color(1,1,0.8)); district_layer.add_child(mv_lbl)
 	district_layer.add_child(wpanel(Vector2(rx,6),Vector2(rw,H*0.33)))
 	wd_name=wl("",30,Vector2(rx+10,10),rw-20,Color(1,1,1)); district_layer.add_child(wd_name)
 	wd_desc=wl("",17,Vector2(rx+10,52),rw-20,Color(0.9,0.95,1),H*0.18); district_layer.add_child(wd_desc)
@@ -2395,3 +2400,67 @@ func street_details():
 		box(self,Vector3(0.1,2.4,0.1),Color(0.6,0.6,0.64),Vector3(8.4,1.4,zz),false)
 		box(self,Vector3(0.75,0.75,0.06),Color(0.15,0.4,0.85),Vector3(8.4,2.8,zz),false)
 		box(self,Vector3(0.45,0.1,0.07),Color(1,1,1),Vector3(8.4,2.8,zz),false)
+
+
+func mv_clamp():
+	mv_zoom=clampf(mv_zoom,1.0,4.0)
+	mv_pan.x=clampf(mv_pan.x,mv_size.x-mv_size.x*mv_zoom,0.0); mv_pan.y=clampf(mv_pan.y,mv_size.y-mv_size.y*mv_zoom,0.0)
+func mv_zoom_to(f:float):
+	var c:=mv_size*0.5; var base:=(c-mv_pan)/mv_zoom
+	if f==0.0: mv_zoom=1.0
+	else: mv_zoom=mv_zoom*f
+	mv_zoom=clampf(mv_zoom,1.0,4.0); mv_pan=c-base*mv_zoom; mv_clamp(); mv.queue_redraw()
+func mv_input(e:InputEvent):
+	if e is InputEventMouseButton:
+		if e.button_index==MOUSE_BUTTON_WHEEL_UP and e.pressed: mv_zoom_to(1.2)
+		elif e.button_index==MOUSE_BUTTON_WHEEL_DOWN and e.pressed: mv_zoom_to(1/1.2)
+		elif e.button_index==MOUSE_BUTTON_LEFT:
+			if e.pressed: mv_drag=true; mv_moved=0.0
+			else:
+				mv_drag=false
+				if mv_moved<10.0:
+					var best:=-1; var bd:=60.0
+					for i in range(WDIST.size()):
+						var p:Vector2=WDIST[i][2]*mv_size*mv_zoom+mv_pan
+						var dd:=p.distance_to(e.position)
+						if dd<bd: bd=dd; best=i
+					if best>=0: district_select(best)
+	elif e is InputEventMouseMotion and mv_drag:
+		mv_pan+=e.relative; mv_moved+=e.relative.length(); mv_clamp(); mv.queue_redraw()
+	elif e is InputEventMagnifyGesture: mv_zoom_to(e.factor)
+func mv_draw():
+	var z:=mv_zoom; var F:=mf()
+	mv.draw_texture_rect(mv_bg,Rect2(mv_pan,mv_size*z),false)
+	mv.draw_rect(Rect2(mv_pan,mv_size*z),Color(0.03,0.05,0.12,clampf((z-1.5)*0.18,0.0,0.45)))
+	var lod:="الحي" if z<1.7 else ("الشوارع" if z<2.5 else "المباني")
+	if mv_lbl: mv_lbl.text="التكبير: x"+str(snappedf(z,0.1))+"  ("+lod+")"
+	var R:=70.0
+	for i in range(WDIST.size()):
+		var d=WDIST[i]; var c:Vector2=d[2]*mv_size*z+mv_pan; var r:=R*z
+		if c.x<-r-80 or c.x>mv_size.x+r+80 or c.y<-r-80 or c.y>mv_size.y+r+80: continue
+		var open:bool=d[4]
+		if z>=1.7:
+			var sp:=20.0*z; var n:=int(R*2/20.0)
+			mv.draw_rect(Rect2(c-Vector2(r,r),Vector2(r,r)*2),Color(0.15,0.17,0.24,0.8 if open else 0.45))
+			if z>=2.5:
+				for gx in range(n):
+					for gy in range(n):
+						var rg:=RandomNumberGenerator.new(); rg.seed=i*7919+gx*131+gy
+						var o:=Vector2(gx,gy)*sp+c-Vector2(r,r)+Vector2(4,4)*z
+						var bw:=sp-8.0*z; var h:=rg.randf()
+						var col:=Color.from_hsv(rg.randf_range(0.0,0.12)+(0.55 if h>0.6 else 0.0),0.25,rg.randf_range(0.75,0.95),0.95 if open else 0.55)
+						if h<0.12: col=Color(0.35,0.6,0.35,0.9)
+						mv.draw_rect(Rect2(o,Vector2(bw,bw)),col)
+						if z>=3.2 and h>0.12: mv.draw_rect(Rect2(o+Vector2(bw*0.15,bw*0.15),Vector2(bw*0.7,bw*0.22)),Color(1,1,1,0.45))
+			for g in range(n+1):
+				var k:=-r+g*sp
+				mv.draw_line(c+Vector2(k,-r),c+Vector2(k,r),Color(0.8,0.82,0.9,0.9),maxf(2.0,3.0*z*0.5))
+				mv.draw_line(c+Vector2(-r,k),c+Vector2(r,k),Color(0.8,0.82,0.9,0.9),maxf(2.0,3.0*z*0.5))
+		var sel:=(i==wd_sel)
+		var txt:String=str(i+1)+"  "+d[0]+"  "+str(d[3])+"+"
+		var fs:=16 if z<2.0 else 20
+		var sz:=F.get_string_size(txt,HORIZONTAL_ALIGNMENT_LEFT,-1,fs)
+		var pill:=Rect2(c-Vector2(sz.x*0.5+10,sz.y*0.5+4),sz+Vector2(20,8))
+		mv.draw_rect(pill,(Color(0.95,0.35,0.4) if open else Color(0.2,0.28,0.45)),true)
+		mv.draw_rect(pill,(Color(1,1,0.6) if sel else Color(1,1,1,0.85)),false,2.0 if not sel else 4.0)
+		mv.draw_string(F,Vector2(pill.position.x+10,pill.position.y+sz.y-2),txt,HORIZONTAL_ALIGNMENT_LEFT,-1,fs,Color(1,1,1))
