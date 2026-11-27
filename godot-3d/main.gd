@@ -1245,8 +1245,9 @@ func _physics_process(_d):
 		if frames==40 and 'rel' in OS.get_cmdline_user_args(): mode='play'; add_aff('كايتو',4); add_aff('أياني',7); add_aff('مومو',1); open_phone(); open_app(5)
 		if frames==40 and 'ward' in OS.get_cmdline_user_args(): mode='play'; apply_outfit(1); open_phone(); open_app(6)
 		if frames==40 and 'mapapp' in OS.get_cmdline_user_args(): mode='play'; open_phone(); open_app(0)
+		if frames==44 and 'mapicons' in OS.get_cmdline_user_args(): mv_filter=0; mv_locate(); mv_zoom=3.8; mv_pan=-(WDIST[1][2]*mv_size*3.8-mv_size*0.5); mv_clamp()
 		if frames==44 and 'districtz' in OS.get_cmdline_user_args(): mv_zoom=3.4; mv_pan=-(WDIST[1][2]*mv_size*3.4-mv_size*0.5); mv_clamp(); mv.queue_redraw()
-		if frames==40 and ('districts' in OS.get_cmdline_user_args() or 'districtz' in OS.get_cmdline_user_args()): mode='play'; open_phone(); open_app(0); world_refresh(); world_layer.visible=true; district_layer.visible=true; district_select(1)
+		if frames==40 and ('districts' in OS.get_cmdline_user_args() or 'mapicons' in OS.get_cmdline_user_args() or 'districtz' in OS.get_cmdline_user_args()): mode='play'; open_phone(); open_app(0); world_refresh(); world_layer.visible=true; district_layer.visible=true; district_select(1)
 		if frames==40 and 'worldmap' in OS.get_cmdline_user_args(): mode='play'; open_phone(); open_app(0); world_refresh(); world_layer.visible=true
 		if frames==40 and 'sett' in OS.get_cmdline_user_args(): mode='play'; open_phone(); open_app(4)
 		if frames==40 and 'year' in OS.get_cmdline_user_args(): mode='play'; add_aff('أياني',7); stats['الدراسة']=80; hud_min=28*1440.0+600.0
@@ -2203,7 +2204,7 @@ const WDIST=[
 	["كوتو","江東",Vector2(0.66,0.42),8,false,"مصانع وبحر. هتتفتح بعدين."],
 ]
 const WTRAVEL=[["قطار شينكانسن",1.0,"fast"],["قطار عادي",0.45,"slow"],["طيران داخلي",1.45,"air"],["عبّارة بحرية",0.3,"ferry"]]
-var mv:Control; var mv_size:Vector2; var mv_zoom:=1.0; var mv_pan:=Vector2.ZERO; var mv_bg:Texture2D; var mv_lbl:Label; var mv_drag:=false; var mv_moved:=0.0; var district_note:Label; var district_layer:Control; var wd_name:Label; var wd_desc:Label; var wd_go:Button; var wd_sel:=1
+var mv_filter:=0; var mv_you:=false; var mv:Control; var mv_size:Vector2; var mv_zoom:=1.0; var mv_pan:=Vector2.ZERO; var mv_bg:Texture2D; var mv_lbl:Label; var mv_drag:=false; var mv_moved:=0.0; var district_note:Label; var district_layer:Control; var wd_name:Label; var wd_desc:Label; var wd_go:Button; var wd_sel:=1
 var wi_travel_sel:=0; var wi_card:Label; var wi_money:Label; var wi_energy:Label; var wi_time:Label; var wi_weather:Label
 var mf_cache:Font=null
 func mf()->Font:
@@ -2296,6 +2297,11 @@ func build_districts(vs:Vector2):
 	for k in range(3):
 		var zbt:=wbtn(zb[k][0],Vector2(54,44),Vector2(rx-84,60+k*50),24,Color(0.12,0.18,0.35)); var f=zb[k][1]
 		zbt.pressed.connect(func(): mv_zoom_to(f)); district_layer.add_child(zbt)
+	var fl=[["الكل",0],["أكل",1],["تسوق",2],["دراسة",3],["مواصلات",4]]
+	for k in range(5):
+		var fb:=wbtn(fl[k][0],Vector2(84,34),Vector2(20+k*90,54),17,Color(0.12,0.18,0.35)); var fv=fl[k][1]
+		fb.pressed.connect(func(): mv_filter=fv; mv.queue_redraw()); district_layer.add_child(fb)
+	var lb:=wbtn("موقعي",Vector2(84,34),Vector2(20,94),17,Color(0.2,0.5,0.45)); lb.pressed.connect(mv_locate); district_layer.add_child(lb)
 	mv_lbl=wl("",16,Vector2(20,H-8),300,Color(1,1,0.8)); district_layer.add_child(mv_lbl)
 	district_layer.add_child(wpanel(Vector2(rx,6),Vector2(rw,H*0.33)))
 	wd_name=wl("",30,Vector2(rx+10,10),rw-20,Color(1,1,1)); district_layer.add_child(wd_name)
@@ -2456,6 +2462,7 @@ func mv_draw():
 				var k:=-r+g*sp
 				mv.draw_line(c+Vector2(k,-r),c+Vector2(k,r),Color(0.8,0.82,0.9,0.9),maxf(2.0,3.0*z*0.5))
 				mv.draw_line(c+Vector2(-r,k),c+Vector2(r,k),Color(0.8,0.82,0.9,0.9),maxf(2.0,3.0*z*0.5))
+		if z>=2.5: mv_icons(i,c,r,z,20.0*z,int(R*2/20.0),open)
 		var sel:=(i==wd_sel)
 		var txt:String=str(i+1)+"  "+d[0]+"  "+str(d[3])+"+"
 		var fs:=16 if z<2.0 else 20
@@ -2464,3 +2471,53 @@ func mv_draw():
 		mv.draw_rect(pill,(Color(0.95,0.35,0.4) if open else Color(0.2,0.28,0.45)),true)
 		mv.draw_rect(pill,(Color(1,1,0.6) if sel else Color(1,1,1,0.85)),false,2.0 if not sel else 4.0)
 		mv.draw_string(F,Vector2(pill.position.x+10,pill.position.y+sz.y-2),txt,HORIZONTAL_ALIGNMENT_LEFT,-1,fs,Color(1,1,1))
+		if i==1 and mv_you:
+			var yp:=c+Vector2(0,-pill.size.y-14)
+			mv.draw_circle(yp,13,Color(1,1,1)); mv.draw_circle(yp,9,Color(0.2,0.55,1.0))
+			var yt:="أنت هنا"; var ys:=F.get_string_size(yt,HORIZONTAL_ALIGNMENT_LEFT,-1,16)
+			mv.draw_rect(Rect2(yp+Vector2(-ys.x*0.5-5,-ys.y-24),ys+Vector2(10,4)),Color(0.2,0.55,1.0)); mv.draw_string(F,yp+Vector2(-ys.x*0.5,-24),yt,HORIZONTAL_ALIGNMENT_LEFT,-1,16,Color(1,1,1))
+
+const MV_CATS=[["كافيه",1,Color(0.75,0.5,0.3)],["مطعم",1,Color(0.95,0.5,0.2)],["متجر",2,Color(0.3,0.6,0.95)],["كونبيني",2,Color(0.3,0.8,0.6)],["مدرسة",3,Color(0.95,0.85,0.25)],["مكتبة",3,Color(0.65,0.5,0.9)],["محطة",4,Color(0.95,0.3,0.35)],["موقف",4,Color(0.6,0.65,0.75)]]
+func mv_locate():
+	mv_you=true; mv_zoom=3.0; var c:Vector2=WDIST[1][2]*mv_size*3.0; mv_pan=mv_size*0.5-c; mv_clamp(); mv_district_sel(1); mv.queue_redraw()
+func mv_district_sel(i:int): district_select(i)
+func mv_icons(i:int,c:Vector2,r:float,z:float,sp:float,n:int,open:bool):
+	var F:=mf()
+	for gx in range(n):
+		for gy in range(n):
+			var rg:=RandomNumberGenerator.new(); rg.seed=i*7919+gx*131+gy
+			var h:=rg.randf()
+			if h<0.12 or h>0.55: continue
+			var cat=MV_CATS[rg.randi()%MV_CATS.size()]
+			if mv_filter!=0 and cat[1]!=mv_filter: continue
+			var p:=c-Vector2(r,r)+Vector2(gx+0.5,gy+0.5)*sp
+			var rad:=7.0+z*1.6
+			mv.draw_circle(p,rad+2,Color(1,1,1,0.95)); mv.draw_circle(p,rad,cat[2] if open else cat[2].darkened(0.4))
+			mv_glyph(cat[0],p,rad)
+			if z>=3.4:
+				var sz:=F.get_string_size(cat[0],HORIZONTAL_ALIGNMENT_LEFT,-1,14)
+				mv.draw_rect(Rect2(p+Vector2(-sz.x*0.5-3,rad+3),sz+Vector2(6,2)),Color(0,0,0,0.65))
+				mv.draw_string(F,p+Vector2(-sz.x*0.5,rad+3+sz.y-3),cat[0],HORIZONTAL_ALIGNMENT_LEFT,-1,14,Color(1,1,1))
+
+func mv_you_draw():
+	pass
+
+func mv_glyph(nm:String,p:Vector2,r:float):
+	var w:=Color(1,1,1); var u:=r*0.45
+	match nm:
+		"كافيه":
+			mv.draw_rect(Rect2(p+Vector2(-u,-u*0.6),Vector2(u*1.6,u*1.4)),w); mv.draw_arc(p+Vector2(u*0.75,u*0.1),u*0.5,-1.5,1.5,8,w,1.6)
+		"مطعم":
+			mv.draw_line(p+Vector2(-u*0.5,-u),p+Vector2(-u*0.5,u),w,2.0); mv.draw_line(p+Vector2(u*0.5,-u),p+Vector2(u*0.5,u),w,2.0); mv.draw_line(p+Vector2(-u*0.9,-u),p+Vector2(-u*0.1,-u),w,2.0)
+		"متجر":
+			mv.draw_colored_polygon(PackedVector2Array([p+Vector2(-u,-u*0.3),p+Vector2(u,-u*0.3),p+Vector2(u*0.8,u),p+Vector2(-u*0.8,u)]),w); mv.draw_arc(p+Vector2(0,-u*0.3),u*0.5,PI,TAU,8,w,1.6)
+		"كونبيني":
+			mv.draw_rect(Rect2(p+Vector2(-u,-u*0.7),Vector2(u*2,u*1.6)),w); mv.draw_rect(Rect2(p+Vector2(-u,-u*0.7),Vector2(u*2,u*0.5)),Color(0.9,0.2,0.3))
+		"مدرسة":
+			mv.draw_colored_polygon(PackedVector2Array([p+Vector2(-u*1.1,-u*0.1),p+Vector2(0,-u*1.1),p+Vector2(u*1.1,-u*0.1)]),w); mv.draw_rect(Rect2(p+Vector2(-u*0.8,-u*0.1),Vector2(u*1.6,u*1.1)),w)
+		"مكتبة":
+			mv.draw_rect(Rect2(p+Vector2(-u,-u*0.8),Vector2(u*0.9,u*1.6)),w); mv.draw_rect(Rect2(p+Vector2(u*0.1,-u*0.8),Vector2(u*0.9,u*1.6)),w.darkened(0.15))
+		"محطة":
+			mv.draw_rect(Rect2(p+Vector2(-u*0.8,-u),Vector2(u*1.6,u*1.6)),w); mv.draw_circle(p+Vector2(-u*0.4,u*0.9),u*0.25,w); mv.draw_circle(p+Vector2(u*0.4,u*0.9),u*0.25,w)
+		_:
+			mv.draw_rect(Rect2(p+Vector2(-u*0.7,-u),Vector2(u*0.4,u*2)),w); mv.draw_circle(p+Vector2(u*0.2,-u*0.3),u*0.6,w)
