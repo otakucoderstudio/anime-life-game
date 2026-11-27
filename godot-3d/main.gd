@@ -86,6 +86,7 @@ func _ready():
 		get_viewport().scaling_3d_scale=0.6; Engine.max_fps=30
 	build_street()
 	build_player()
+	spawn_kickables()
 	no_outline=false
 	cam=Camera3D.new(); cam.fov=55; cam.far=300.0; add_child(cam)
 	build_ui()
@@ -231,6 +232,7 @@ func bike(p:Vector3,ry:float,c:Color):
 	pglb("bike",p-Vector3(0,0.2,0),ry,Color(1,1,1),c)
 
 func vending(p:Vector3,ry:float,c:Color):
+	solids.append([Vector2(p.x,p.z),0.45])
 	pglb("vending",p-Vector3(0,0.2,0),ry,Color(1,1,1),c)
 
 func shop(side:int,z:float,kind:int):
@@ -861,6 +863,7 @@ func _notification(what):
 		if mode!='select' and not ('shot' in OS.get_cmdline_user_args()): save_game()
 func _process(dt):
 	vrm_pose()
+	phys_step(minf(dt,0.05))
 	if fit_pending: fit_pending=false; fit_labels()
 	if mode=='play' and not ('shot' in OS.get_cmdline_user_args()):
 		save_t+=dt
@@ -937,6 +940,68 @@ func _process(dt):
 var frames:=0
 
 var walk_rects:=[Rect2(-8.5,-120,17,126),Rect2(8,-19.5,53,18),Rect2(-78.5,-114,17,120),Rect2(61.5,-114,17,120),Rect2(-112,-47.25,224,17),Rect2(-112,-108.5,224,17)]
+
+# ---- light physics: solid props + kickable props (custom sim, cheap on weak phones)
+var solids:=[]   # [Vector2 pos, radius]
+var kicks:=[]    # {n,vel,ang,r,kind}
+func phys_ground(x:float)->float:
+	return 0.2 if absf(x)>5.6 else 0.0
+func spawn_kickables():
+	var rng:=RandomNumberGenerator.new(); rng.seed=7
+	for i in range(16):
+		var side:=-1.0 if i%2==0 else 1.0
+		var z:=-4.0-float(i)*7.3
+		var x:=side*rng.randf_range(5.9,6.8)
+		var kind:=i%3  # 0 can, 1 cone, 2 ball
+		var n:=Node3D.new(); add_child(n)
+		var r:=0.12
+		if kind==0:
+			var c:=CylinderMesh.new(); c.top_radius=0.06; c.bottom_radius=0.06; c.height=0.14; mesh(n,c,Color(0.85,0.12,0.15),Vector3.ZERO,false); r=0.07
+		elif kind==1:
+			var c:=CylinderMesh.new(); c.top_radius=0.02; c.bottom_radius=0.16; c.height=0.4; mesh(n,c,Color(1,0.45,0.1),Vector3.ZERO,false); r=0.16
+		else:
+			mesh(n,sph(0.16),Color(0.95,0.95,1.0),Vector3.ZERO,false); r=0.16
+		n.position=Vector3(x,phys_ground(x)+r,z)
+		kicks.append({'n':n,'vel':Vector3.ZERO,'ang':Vector3.ZERO,'r':r,'kind':kind})
+func phys_step(dt:float):
+	if in_room!='': return
+	var pp:=Vector2(player.position.x,player.position.z)
+	for k in kicks:
+		var n:Node3D=k.n; var vel:Vector3=k.vel; var r:float=k.r
+		var d:=Vector2(n.position.x-pp.x,n.position.z-pp.y)
+		if d.length()<0.55+r and vel.length()<5.0:
+			var dd:=d.normalized() if d.length()>0.01 else Vector2(0,-1)
+			var sp:=maxf(joy_vec.length()*5.5,3.0) if (joy_vec.length()>0.1 or Input.get_vector("ui_left","ui_right","ui_up","ui_down").length()>0.1) else 1.2
+			vel=Vector3(dd.x*sp,2.2,dd.y*sp)
+			k.ang=Vector3(randf_range(-8,8),randf_range(-4,4),randf_range(-8,8)) if k.kind!=2 else Vector3(dd.y*sp/r,0,-dd.x*sp/r)
+			sfx('foot',1.6)
+		vel.y-=14.0*dt
+		var np:Vector3=n.position+vel*dt
+		var gy:float=phys_ground(np.x)+r
+		if np.y<gy:
+			np.y=gy
+			if vel.y<-0.6: vel.y=-vel.y*0.45
+			else: vel.y=0.0
+			var fr:float=exp(-3.0*dt)
+			vel.x*=fr; vel.z*=fr; k.ang*=fr
+		# curb: step up on the sidewalk if low
+		for so in solids:
+			var q:Vector2=Vector2(np.x,np.z)-so[0]
+			if q.length()<so[1]+r:
+				var nrm:=q.normalized() if q.length()>0.001 else Vector2(1,0)
+				np.x=so[0].x+nrm.x*(so[1]+r); np.z=so[0].y+nrm.y*(so[1]+r)
+				var vn:=vel.x*nrm.x+vel.z*nrm.y
+				if vn<0: vel.x-=1.6*vn*nrm.x; vel.z-=1.6*vn*nrm.y
+		np.x=clampf(np.x,-8.5,8.5)
+		n.position=np; k.vel=vel
+		n.rotate_x(k.ang.x*dt); n.rotate_y(k.ang.y*dt); n.rotate_z(k.ang.z*dt)
+	# player is pushed out of solid props
+	for so in solids:
+		var q:Vector2=pp-so[0]
+		if q.length()<so[1]+0.3:
+			var nrm:=q.normalized() if q.length()>0.001 else Vector2(1,0)
+			player.position.x=so[0].x+nrm.x*(so[1]+0.3); player.position.z=so[0].y+nrm.y*(so[1]+0.3)
+
 func clamp_walk(p:Vector3)->Vector3:
 	if in_room!='':
 		return Vector3(clamp(p.x,bnd.position.x,bnd.end.x),p.y,clamp(p.z,bnd.position.y,bnd.end.y))
@@ -1001,6 +1066,12 @@ func _physics_process(_d):
 			var og=vrm_char('res://models/fumi_src.glb'); add_child(og.root); og.root.position=Vector3(-0.6,0,-6); og.root.rotation_degrees.y=180; player.visible=false
 			vr.queue_free(); var vs=vrm_char('res://models/fumi.glb'); add_child(vs.root); vs.root.position=Vector3(0.9,0,-6); vs.root.rotation_degrees.y=180
 		if frames>=20 and frames<60 and 'cmp' in OS.get_cmdline_user_args(): cam.fov=40; cam.position=Vector3(0.15,1.2,-9.0); cam.look_at(Vector3(0.15,0.95,-6))
+		if frames>=20 and frames<70 and 'phys' in OS.get_cmdline_user_args():
+			scene_layer.visible=false; mode='play'; get_tree().root.set_meta('x',true)
+			if frames==20: player.position=Vector3(5.6,0,-3.0); kicks[0].n.position=Vector3(6.0,0.3,-4.0)
+			if frames==30: kicks[1].n.position=Vector3(5.6,0.3,-4.2); kicks[0].vel=Vector3(0,0,-4); kicks[0].ang=Vector3(-14,0,0)
+			if frames==36: kicks[0].vel=Vector3(0.5,3.5,-2)
+			cam.fov=45; cam.position=Vector3(3.5,2.0,-0.5); cam.look_at(Vector3(5.8,0.5,-5.0))
 		if frames==20 and 'stn' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(2,0,-22); get_tree().root.set_meta('x',true); cam.fov=60; cam.position=Vector3(-2,3.0,-4); cam.look_at(Vector3(18,3.0,-14))
 		if frames==20 and ('bot' in OS.get_cmdline_user_args() or 'botf' in OS.get_cmdline_user_args() or 'app' in OS.get_cmdline_user_args()):
 			scene_layer.visible=false; mode='play'; phone_layer.visible=true; app_full='botf' in OS.get_cmdline_user_args(); open_app(10 if 'app' not in OS.get_cmdline_user_args() else 7)
