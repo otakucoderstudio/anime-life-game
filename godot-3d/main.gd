@@ -1483,7 +1483,7 @@ func apply_tod(dt:float):
 	elif h>=16 and h<19.5: sc=Color(1,0.62,0.38); se=0.75; am=Color(1,0.78,0.72); ae=0.5; fog=Color(1,0.82,0.7)
 	else: sc=Color(0.5,0.55,0.95); se=0.35; am=Color(0.5,0.55,0.85); ae=0.42; fog=Color(0.35,0.4,0.6)
 	var dday:=int(hud_min/1440.0)
-	var rainy:bool=(dday%5==2 and h>=13.0 and h<19.0) or ('rain' in OS.get_cmdline_user_args())
+	var rainy:bool=(dday%5==2 and h>=13.0 and h<19.0 and int(dday/7)%4!=3) or ('rain' in OS.get_cmdline_user_args())
 	if rain==null:
 		rain=CPUParticles3D.new(); rain.amount=260; rain.lifetime=0.8; rain.emission_shape=CPUParticles3D.EMISSION_SHAPE_BOX; rain.emission_box_extents=Vector3(12,0.5,12)
 		rain.direction=Vector3(0.1,-1,0); rain.spread=2.0; rain.initial_velocity_min=16.0; rain.initial_velocity_max=19.0; rain.gravity=Vector3(0,-6,0)
