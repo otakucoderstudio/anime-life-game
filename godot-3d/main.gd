@@ -391,7 +391,7 @@ const KB:=["building-a","building-d","building-h","building-k","building-n","bui
 func kbuild(pos:Vector3,ry:float,k:int):
 	var nm:String=KB[(k*3+1)%KB.size()]
 	var n:Node3D=(load("res://models/kbld/"+nm+".glb") as PackedScene).instantiate()
-	n.scale=Vector3(7.5,7.5,7.5); n.position=pos; n.rotation_degrees.y=ry
+	n.scale=Vector3(9.5,13.5,9.5); n.position=pos+Vector3(sign(pos.x)*1.6,0,0); n.rotation_degrees.y=ry
 	var pal:=[Color(0.98,0.78,0.62),Color(0.66,0.8,0.96),Color(0.96,0.68,0.76),Color(0.7,0.88,0.74),Color(0.97,0.86,0.55),Color(0.76,0.72,0.96)]
 	toonify(n,pal[k%pal.size()],0.012)
 	add_child(n)
@@ -405,11 +405,11 @@ func skyline():
 		while z>-112.0:
 			var nm:String=names[(k*7+(1 if side>0 else 0)*3)%names.size()]
 			var n:Node3D=(load("res://models/kobo/"+nm+".glb") as PackedScene).instantiate()
-			var sc:=1.7
-			n.scale=Vector3(sc,sc,sc); n.position=Vector3(side*(26.0+float(k%3)*2.0),0,z); n.rotation_degrees.y=90.0 if side<0 else -90.0
+			var sc:=2.9
+			n.scale=Vector3(sc,sc,sc); n.position=Vector3(side*(33.0+float(k%3)*3.0),0,z); n.rotation_degrees.y=90.0 if side<0 else -90.0
 			toonify(n,pal[(k+side+1)%pal.size()],0.02)
 			add_child(n)
-			z-=22.0+float((k*5)%4)*3.0; k+=1
+			z-=36.0+float((k*5)%4)*4.0; k+=1
 
 func build_street():
 	batching=true
