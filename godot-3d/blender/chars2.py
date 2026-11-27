@@ -34,51 +34,80 @@ def strand(region,p0,p1,w,seg=8):
     # tapered flat card from p0 (root) to p1 (tip)
     import mathutils
     a=mathutils.Vector(p0); b=mathutils.Vector(p1); d=b-a; L=d.length
-    o=cone(region,tuple((a+b)/2),w,L,seg=seg,r2=0.0)
+    o=cone(region,(0,0,0),w,L,seg=seg,r2=0.0)
     # cone axis is z, apex up; rotate so apex at root(a): axis from tip->root
     bpy.ops.object.select_all(action="DESELECT"); o.select_set(True)
     up=mathutils.Vector((0,0,1)); axis=(b-a).normalized()
     q=up.rotation_difference(axis); o.rotation_euler=q.to_euler()
     bpy.context.view_layer.objects.active=o; o.select_set(True)
     bpy.ops.object.transform_apply(location=False,rotation=True,scale=False)
-    for v in o.data.vertices: v.co.y*=0.45 if False else 1
+    mid=(a+b)/2
+    for v in o.data.vertices: v.co+=mid
     return o
 def build2(kind):
     clear(); objs.clear()
+    boy=kind.startswith('boy'); longh=(kind=='girl_ayani'); glasses=(kind=='girl_ayani')
     H=2.05; S=0.72; Hn=2.27
     # ---- head (unscaled frame) ----
     h=ell(SK,(0,0,H),(0.33,0.31,0.35),seg=24,rings=14); taper_chin(h,H-0.02,0.34)
-    face(H,girl=True)
-    # hair: back/side shell (bob) + cap + bangs + side locks
-    loft(HA,[(H-0.46,0.33,0.31,0,0.05),(H-0.36,0.395,0.37,0,0.06),(H-0.15,0.42,0.39,0,0.06),(H+0.06,0.41,0.385,0,0.06),(H+0.22,0.36,0.34,0,0.05),(H+0.34,0.27,0.25,0,0.04),(H+0.40,0.12,0.11,0,0.03)],seg=24,arc=(-40,220),cap_top=False)
-    ell(HA,(0,0.02,H+0.2),(0.375,0.35,0.25),seg=22,rings=12)
-    bx=[-0.32,-0.24,-0.16,-0.08,0.0,0.08,0.16,0.24,0.32]
-    for x in bx:
-        L=0.36-abs(x)*0.35
-        strand(HA,(x*0.7,-0.26,H+0.44),(x*1.0,-0.375+abs(x)*0.18,H+0.44-L-0.12),0.075)
-    for sx in(-1,1):
-        strand(HA,(sx*0.30,-0.13,H+0.28),(sx*0.335,-0.27,H-0.30),0.085)
-        strand(HA,(sx*0.31,-0.02,H+0.2),(sx*0.37,-0.12,H-0.40),0.075)
-    ell(ACC,(0.27,-0.2,H+0.3),(0.05,0.03,0.04),(0,0,25),8,5)  # hair clip
-    ell(ACC,(0.31,-0.2,H+0.3),(0.05,0.03,0.04),(0,0,-25),8,5)
+    face(H,girl=not boy)
+    if glasses:
+        for sx in(-1,1):
+            bpy.ops.mesh.primitive_torus_add(major_radius=0.115,minor_radius=0.009,major_segments=24,minor_segments=6,location=(sx*0.14,-0.335,H-0.03),rotation=(math.radians(90),0,0))
+            o=bpy.context.object; bpy.ops.object.transform_apply(location=True,rotation=True,scale=True); bpy.ops.object.shade_smooth(); paint(o,DK); objs.append(o)
+        ell(DK,(0,-0.34,H-0.01),(0.035,0.01,0.01),seg=6,rings=4)
+    if boy:
+        ell(HA,(0,0.02,H+0.16),(0.375,0.35,0.27),seg=22,rings=12)
+        ell(HA,(0,0.1,H-0.05),(0.37,0.33,0.3),seg=18,rings=10)
+        for x in [-0.3,-0.2,-0.1,0.0,0.1,0.2,0.3]:
+            strand(HA,(x*0.7,-0.22,H+0.4),(x*1.05,-0.36+abs(x)*0.15,H+0.2+abs(x)*0.1),0.085)
+        for k in range(9):
+            a_=-1.3+k*(2.6/8)
+            strand(HA,(math.sin(a_)*0.2,-0.02-math.cos(a_)*0.06,H+0.3),(math.sin(a_)*0.32,-0.12*math.cos(a_)+0.02,H+0.52+0.05*math.cos(a_*2)),0.095)
+        for sx in(-1,1):
+            strand(HA,(sx*0.33,-0.1,H+0.15),(sx*0.36,-0.15,H-0.2),0.06)
+    else:
+        loft(HA,[(H-0.46,0.33,0.31,0,0.05),(H-0.36,0.395,0.37,0,0.06),(H-0.15,0.42,0.39,0,0.06),(H+0.06,0.41,0.385,0,0.06),(H+0.22,0.36,0.34,0,0.05),(H+0.34,0.27,0.25,0,0.04),(H+0.40,0.12,0.11,0,0.03)],seg=24,arc=(-40,220),cap_top=False)
+        ell(HA,(0,0.02,H+0.2),(0.375,0.35,0.25),seg=22,rings=12)
+        bx=[-0.32,-0.24,-0.16,-0.08,0.0,0.08,0.16,0.24,0.32]
+        for x in bx:
+            L=0.36-abs(x)*0.35
+            strand(HA,(x*0.7,-0.26,H+0.44),(x*1.0,-0.375+abs(x)*0.18,H+0.2+abs(x)*0.12),0.075)
+        for sx in(-1,1):
+            strand(HA,(sx*0.30,-0.13,H+0.28),(sx*0.335,-0.27,H-0.30),0.085)
+            strand(HA,(sx*0.31,-0.02,H+0.2),(sx*0.37,-0.12,H-0.40),0.075)
+        ell(ACC,(0.27,-0.2,H+0.3),(0.05,0.03,0.04),(0,0,25),8,5)  # hair clip
+        ell(ACC,(0.31,-0.2,H+0.3),(0.05,0.03,0.04),(0,0,-25),8,5)
+
+    if longh:
+        loft(HA,[(H-1.15,0.2,0.16,0,0.14),(H-0.95,0.28,0.2,0,0.14),(H-0.7,0.34,0.24,0,0.12),(H-0.46,0.36,0.3,0,0.08)],seg=24,arc=(-10,190))
     for o in objs:
         for v in o.data.vertices:
             v.co.x*=S; v.co.y*=S; v.co.z=(v.co.z-H)*S+Hn
     head_n=len(objs)
     # ---- neck + torso ----
     loft(SK,[(2.0,0.075,0.075,0,0.0),(2.12,0.07,0.07,0,0.0)],seg=14)
-    # shirt+blazer torso, lofted slim waist
-    loft(TOP,[(1.12,0.185,0.125,0,0),(1.3,0.155,0.105,0,0),(1.5,0.185,0.125,0,0),(1.68,0.23,0.14,0,0),(1.83,0.235,0.135,0,0),(1.93,0.14,0.1,0,0.0),(1.99,0.085,0.085,0,0)],seg=22,cap_bot=True)
-    # shirt V and collar
-    ell(WH,(0,-0.1,1.86),(0.085,0.05,0.12),(0,0,0),10,6)
-    for sx in(-1,1): ell(WH,(sx*0.06,-0.1,1.97),(0.06,0.035,0.035),(0,sx*0,sx*-30),8,5)
-    ell(ACC,(0,-0.135,1.82),(0.05,0.03,0.04),(0,0,0),8,5)
-    ell(ACC,(-0.06,-0.135,1.79),(0.055,0.028,0.034),(0,0,28),8,5); ell(ACC,(0.06,-0.135,1.79),(0.055,0.028,0.034),(0,0,-28),8,5)
-    ell(ACC,(-0.025,-0.138,1.7),(0.025,0.02,0.07),(0,0,8),6,4); ell(ACC,(0.025,-0.138,1.7),(0.025,0.02,0.07),(0,0,-8),6,4)
-    # skirt: pleated flare
-    loft(BOT,[(0.72,0.34,0.26,0,0),(0.9,0.31,0.23,0,0),(1.05,0.225,0.16,0,0),(1.15,0.19,0.13,0,0)],seg=32,pleat=0.07,npl=12,cap_top=True)
+    if boy:
+        loft(TOP,[(1.08,0.2,0.135,0,0),(1.3,0.19,0.125,0,0),(1.5,0.215,0.135,0,0),(1.7,0.27,0.15,0,0),(1.84,0.29,0.145,0,0),(1.93,0.16,0.11,0,0),(1.99,0.09,0.09,0,0)],seg=22,cap_bot=True)
+        ell(WH,(0,-0.12,1.88),(0.075,0.05,0.1),(0,0,0),10,6)
+        for sx in(-1,1): ell(WH,(sx*0.07,-0.115,1.97),(0.06,0.035,0.035),(0,0,sx*-30),8,5)
+        ell(ACC,(0,-0.14,1.8),(0.032,0.025,0.1),(0,0,0),8,5)
+        ell(ACC,(0,-0.14,1.9),(0.04,0.028,0.035),(0,0,0),8,5)
+        loft(BOT,[(0.95,0.215,0.15,0,0),(1.12,0.2,0.14,0,0)],seg=20)
+    else:
+        # shirt+blazer torso, lofted slim waist
+        loft(TOP,[(1.12,0.185,0.125,0,0),(1.3,0.155,0.105,0,0),(1.5,0.185,0.125,0,0),(1.68,0.23,0.14,0,0),(1.83,0.235,0.135,0,0),(1.93,0.14,0.1,0,0.0),(1.99,0.085,0.085,0,0)],seg=22,cap_bot=True)
+        # shirt V and collar
+        ell(WH,(0,-0.1,1.86),(0.085,0.05,0.12),(0,0,0),10,6)
+        for sx in(-1,1): ell(WH,(sx*0.06,-0.1,1.97),(0.06,0.035,0.035),(0,sx*0,sx*-30),8,5)
+        ell(ACC,(0,-0.135,1.82),(0.05,0.03,0.04),(0,0,0),8,5)
+        ell(ACC,(-0.06,-0.135,1.79),(0.055,0.028,0.034),(0,0,28),8,5); ell(ACC,(0.06,-0.135,1.79),(0.055,0.028,0.034),(0,0,-28),8,5)
+        ell(ACC,(-0.025,-0.138,1.7),(0.025,0.02,0.07),(0,0,8),6,4); ell(ACC,(0.025,-0.138,1.7),(0.025,0.02,0.07),(0,0,-8),6,4)
+        # skirt: pleated flare
+        loft(BOT,[(0.72,0.34,0.26,0,0),(0.9,0.31,0.23,0,0),(1.05,0.225,0.16,0,0),(1.15,0.19,0.13,0,0)],seg=32,pleat=0.07,npl=12,cap_top=True)
     pieces={'body':list(objs)}
-    jt={'legl':(-0.1,0,1.0),'legr':(0.1,0,1.0),'arml':(-0.24,0,1.82),'armr':(0.24,0,1.82),'body':(0,0,0)}
+    ax=0.3 if boy else 0.24
+    jt={'legl':(-0.1,0,1.0),'legr':(0.1,0,1.0),'arml':(-ax,0,1.82),'armr':(ax,0,1.82),'body':(0,0,0)}
     def limb(name):
         s=len(objs); jx,jy,jz=jt[name]
         if name.startswith('arm'):
@@ -86,6 +115,9 @@ def build2(kind):
             loft(TOP,[(jz+0.04,0.062,0.062,jx,jy),(jz-0.16,0.056,0.056,jx+sx*0.01,jy),(jz-0.42,0.048,0.048,jx+sx*0.03,jy)],seg=12,cap_top=True)
             loft(WH,[(jz-0.4,0.047,0.047,jx+sx*0.03,jy),(jz-0.46,0.043,0.043,jx+sx*0.03,jy)],seg=12)
             ell(SK,(jx+sx*0.035,jy,jz-0.53),(0.04,0.03,0.075),(0,0,0),10,6)
+        elif boy:
+            loft(BOT,[(jz,0.1,0.1,jx,jy),(jz-0.45,0.082,0.082,jx,jy),(jz-0.93,0.07,0.07,jx,jy)],seg=14,cap_top=True)
+            ell(SHOE,(jx,jy-0.05,0.06),(0.08,0.15,0.06),seg=12,rings=7)
         else:
             loft(SK,[(jz,0.092,0.092,jx,jy),(jz-0.2,0.08,0.08,jx,jy),(jz-0.4,0.058,0.058,jx,jy)],seg=14)
             loft(WH,[(jz-0.4,0.06,0.06,jx,jy),(jz-0.7,0.055,0.055,jx,jy),(jz-0.93,0.048,0.048,jx,jy)],seg=14,cap_top=True)

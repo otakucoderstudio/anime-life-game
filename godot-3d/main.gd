@@ -336,10 +336,12 @@ func _collect(n:Node,out:Dictionary):
 	for c in n.get_children(): _collect(c,out)
 func make_girl(skin:Color,hair:Color,top:Color,skirtc:Color,ribbon:Color,long_hair:=true,glasses:=false)->Dictionary:
 	var iris:=Color(0.35,0.2,0.65) if hair.v<0.5 else Color(0.2,0.45,0.7)
-	return load_char(("girl_long" if long_hair else "girl_bob")+("_g" if glasses else ""),cmat(skin,hair,top,skirtc,ribbon,iris))
+	var kn:=("girl_long" if long_hair else "girl_bob")+("_g" if glasses else "")
+	if glasses and long_hair: kn="girl_ayani"
+	return load_char(kn,cmat(skin,hair,top,skirtc,ribbon,iris))
 func make_boy(skin:Color,hair:Color,spiky:bool,tie:=Color(0.7,0.1,0.15))->Dictionary:
 	var iris:=Color(0.25,0.35,0.2) if spiky else Color(0.2,0.25,0.55)
-	return load_char("boy_spiky" if spiky else "boy_soft",cmat(skin,hair,Color(0.14,0.22,0.45),Color(0.5,0.52,0.56),tie,iris))
+	return load_char("boy_kaito" if spiky else "boy_soft",cmat(skin,hair,Color(0.14,0.22,0.45),Color(0.5,0.52,0.56),tie,iris))
 
 func make_girl_old(skin:Color,hair:Color,top:Color,skirtc:Color,ribbon:Color,long_hair:=true)->Dictionary:
 	var root:=Node3D.new()
@@ -870,7 +872,7 @@ func _physics_process(_d):
 			var pi0:int=int(OS.get_cmdline_user_args()[-1]); player.position=npcs[pi0].n.position+Vector3(0,0,9); scene_layer.visible=false; mode='play'; ui.visible=false
 		if frames>=50 and frames<=59 and 'ptr' in OS.get_cmdline_user_args():
 			var pi:int=int(OS.get_cmdline_user_args()[-1]); var pn:Node3D=npcs[pi].n; pn.rotation.y=0; player.visible=false; get_tree().root.set_meta("x",true)
-			cam.position=pn.position+Vector3(0.1,2.0,2.3); cam.fov=34; cam.look_at(pn.position+Vector3(0,1.9,0))
+			cam.position=pn.position+Vector3(0.1,2.0,2.3); cam.fov=40; cam.look_at(pn.position+Vector3(0,1.75,0))
 		if frames==40 and ('night' in OS.get_cmdline_user_args() or 'deep' in OS.get_cmdline_user_args()): env_t=0.0
 		if frames==100 and ('night' in OS.get_cmdline_user_args() or 'deep' in OS.get_cmdline_user_args()): pass
 		if frames==40 and 'map' in OS.get_cmdline_user_args(): mode='play'; open_map()
