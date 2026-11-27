@@ -1243,6 +1243,7 @@ func _physics_process(_d):
 		if frames==40 and 'map' in OS.get_cmdline_user_args(): mode='play'; open_map()
 		if frames==40 and 'rel' in OS.get_cmdline_user_args(): mode='play'; add_aff('كايتو',4); add_aff('أياني',7); add_aff('مومو',1); open_phone(); open_app(5)
 		if frames==40 and 'ward' in OS.get_cmdline_user_args(): mode='play'; apply_outfit(1); open_phone(); open_app(6)
+		if frames==40 and 'sett' in OS.get_cmdline_user_args(): mode='play'; open_phone(); open_app(4)
 		if frames==40 and 'year' in OS.get_cmdline_user_args(): mode='play'; add_aff('أياني',7); stats['الدراسة']=80; hud_min=28*1440.0+600.0
 		if frames==40 and ('lib' in OS.get_cmdline_user_args() or 'libtalk' in OS.get_cmdline_user_args()): mode='play'; scene_layer.visible=false; travel('library')
 		if frames==52 and 'libtalk' in OS.get_cmdline_user_args():
@@ -2041,26 +2042,51 @@ func show_settings():
 	app_btn("الصوت: "+("شغال" if snd_on else "مقفول"),Vector2(vs.x/2-250,140),Vector2(500,70),Color(1,0.95,0.7),func(): snd_on=not snd_on; AudioServer.set_bus_mute(0,not snd_on); show_settings())
 	app_btn("الجرافيك: "+("عالي" if hq else "عادي (أخف)"),Vector2(vs.x/2-250,240),Vector2(500,70),Color(1,0.95,0.7),func(): hq=not hq; apply_gfx(); show_settings())
 	app_btn("لعبة جديدة (يمسح التقدم)",Vector2(vs.x/2-250,340),Vector2(500,70),Color(1,0.75,0.75),func(): DirAccess.remove_absolute(ProjectSettings.globalize_path('user://save.json')); get_tree().reload_current_scene())
-	var cr:=lbl("شكر وتقدير (كله مجاني):\nالشخصيات: VRoid Project / pixiv (CC0)\nالسيارات والمباني والصوت: Kenney (CC0)\nواجهات الشوارع اليابانية: 3DAssets.dev Izakaya Alley (CC0)\nمباني الأفق: Assets by Kobo Assets\nالسما: Poly Haven – Belfast Sunset (CC0)",20,Vector2(12,410))
+	var names_ar={"Music":"الموسيقى","Ambience":"الأجواء","SFX":"المؤثرات"}
+	var yy:=430
+	for k in ["Music","Ambience","SFX"]:
+		var kk:String=k
+		var l:=lbl(names_ar[k],24,Vector2(vs.x/2+110,yy),Color(1,1,1)); l.size=Vector2(140,40); app_layer.add_child(l)
+		var sl:=HSlider.new(); sl.min_value=0.0; sl.max_value=1.0; sl.step=0.05; sl.value=vols[k]; sl.position=Vector2(vs.x/2-250,yy+4); sl.size=Vector2(350,36)
+		sl.value_changed.connect(func(v): vols[kk]=v; apply_vol(kk); save_vols()); app_layer.add_child(sl)
+		yy+=56
+	var cr:=lbl("شكر وتقدير (كله مجاني):\nالشخصيات: VRoid Project / pixiv (CC0)\nالسيارات والمباني والصوت: Kenney (CC0)\nواجهات الشوارع اليابانية: 3DAssets.dev Izakaya Alley (CC0)\nمباني الأفق: Assets by Kobo Assets\nالسما: Poly Haven – Belfast Sunset (CC0)",20,Vector2(12,610))
 	cr.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART; cr.custom_minimum_size=Vector2(vs.x-24,0); cr.size=Vector2(vs.x-24,100); cr.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT; app_layer.add_child(cr)
 # audio
 var mus:AudioStreamPlayer; var amb:AudioStreamPlayer; var sfxp:Array=[]; var sfx_i:=0; var snd:={}
 var foot_t:=0.0
+var vols:={"Music":0.8,"Ambience":0.8,"SFX":0.8}
+func setup_buses():
+	var cf:=ConfigFile.new()
+	if cf.load("user://audio.cfg")==OK:
+		for k in vols.keys(): vols[k]=float(cf.get_value("vol",k,vols[k]))
+	for k in vols.keys():
+		if AudioServer.get_bus_index(k)<0:
+			AudioServer.add_bus(); AudioServer.set_bus_name(AudioServer.bus_count-1,k)
+		apply_vol(k)
+func apply_vol(k:String):
+	var i:=AudioServer.get_bus_index(k)
+	AudioServer.set_bus_volume_db(i,linear_to_db(maxf(vols[k],0.0001))); AudioServer.set_bus_mute(i,vols[k]<=0.01)
+func save_vols():
+	var cf:=ConfigFile.new()
+	for k in vols.keys(): cf.set_value("vol",k,vols[k])
+	cf.save("user://audio.cfg")
 func build_audio():
+	setup_buses()
 	for n in ["music_street","music_cafe","amb_cafe","amb_street","foot","bong","click1","click2","open","horn"]:
 		var st=load("res://audio/%s.ogg"%n)
 		if st==null: continue
 		if n.begins_with("music") or n.begins_with("amb"): st.loop=true
 		snd[n]=st
-	mus=AudioStreamPlayer.new(); mus.volume_db=-13; add_child(mus); amb=AudioStreamPlayer.new(); amb.volume_db=-17; add_child(amb)
+	mus=AudioStreamPlayer.new(); mus.volume_db=-13; mus.bus="Music"; add_child(mus); amb=AudioStreamPlayer.new(); amb.volume_db=-17; amb.bus="Ambience"; add_child(amb)
 	for i in range(4):
-		var p:=AudioStreamPlayer.new(); p.volume_db=-6; add_child(p); sfxp.append(p)
+		var p:=AudioStreamPlayer.new(); p.volume_db=-6; p.bus="SFX"; add_child(p); sfxp.append(p)
 	var rst=load("res://audio/rain.ogg")
 	if rst:
-		rst.loop=true; rain_p=AudioStreamPlayer.new(); rain_p.stream=rst; rain_p.volume_db=-16; rain_p.autoplay=true; rain_p.stream_paused=true; add_child(rain_p)
+		rst.loop=true; rain_p=AudioStreamPlayer.new(); rain_p.stream=rst; rain_p.bus="Ambience"; rain_p.volume_db=-16; rain_p.autoplay=true; rain_p.stream_paused=true; add_child(rain_p)
 	var fst=load("res://audio/fountain.ogg")
 	if fst:
-		fst.loop=true; var fp:=AudioStreamPlayer3D.new(); fp.stream=fst; fp.position=Vector3(34.5,1.0,-10.5); fp.unit_size=5.0; fp.max_distance=32.0; fp.volume_db=-4; fp.autoplay=true; add_child(fp)
+		fst.loop=true; var fp:=AudioStreamPlayer3D.new(); fp.stream=fst; fp.position=Vector3(34.5,1.0,-10.5); fp.unit_size=5.0; fp.max_distance=32.0; fp.volume_db=-4; fp.bus="Ambience"; fp.autoplay=true; add_child(fp)
 	play_bg('street')
 func play_bg(kind:String):
 	if snd.is_empty(): return
