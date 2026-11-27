@@ -1134,10 +1134,10 @@ func _process(dt):
 	else:
 		for n in [legl,legr,arml,armr]: n.rotation.x=lerp(n.rotation.x,0.0,10*dt)
 		player.position.y=0
-	var target=player.position+(Vector3(0,5.6,5.6) if (in_room!='' and in_room!='kyoto') else Vector3(0,3.6,6.0))
+	var target=player.position+(Vector3(0,5.6,5.6) if (in_room!='' and in_room!='kyoto' and in_room!='shinjuku') else Vector3(0,3.6,6.0))
 	if get_tree().root.has_meta("x"): return
 	cam.position=cam.position.lerp(target,min(1.0,6*dt))
-	cam.look_at(player.position+(Vector3(0,0.3,-2.0) if (in_room!='' and in_room!='kyoto') else Vector3(0,2.6,-3.0)))
+	cam.look_at(player.position+(Vector3(0,0.3,-2.0) if (in_room!='' and in_room!='kyoto' and in_room!='shinjuku') else Vector3(0,2.6,-3.0)))
 	petals.position=player.position+Vector3(0,5,-4)
 
 var frames:=0
@@ -1247,6 +1247,8 @@ func _physics_process(_d):
 		if frames==40 and 'mapapp' in OS.get_cmdline_user_args(): mode='play'; open_phone(); open_app(0)
 		if frames==30 and 'kyoto' in OS.get_cmdline_user_args(): mode='play'; scene_layer.visible=false; enter_room('kyoto')
 		if frames==60 and 'kyoto2' in OS.get_cmdline_user_args(): player.position=room_org['kyoto']+Vector3(0,0,-14); cam.position=player.position+Vector3(0,3.6,6.0)
+		if frames==30 and 'shinjuku' in OS.get_cmdline_user_args(): mode='play'; scene_layer.visible=false; enter_room('shinjuku')
+		if frames==50: print('PERF tris=',Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME),' calls=',Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME))
 		if frames==44 and 'mapicons' in OS.get_cmdline_user_args(): mv_filter=0; mv_locate(); mv_zoom=2.9; mv_pan=-(WDIST[1][2]*mv_size*2.9-mv_size*0.5)+Vector2(0,40); mv_clamp()
 		if frames==44 and 'districtz' in OS.get_cmdline_user_args(): mv_zoom=3.4; mv_pan=-(WDIST[1][2]*mv_size*3.4-mv_size*0.5); mv_clamp(); mv.queue_redraw()
 		if frames==40 and ('districts' in OS.get_cmdline_user_args() or 'mapicons' in OS.get_cmdline_user_args() or 'districtz' in OS.get_cmdline_user_args()): mode='play'; open_phone(); open_app(0); world_refresh(); world_layer.visible=true; district_layer.visible=true; district_select(1)
@@ -1659,6 +1661,7 @@ func build_room(kind:String):
 	var o:=Vector3(300+idx*40,0,0); room_org[kind]=o
 	batching=true
 	if kind=='kyoto': build_kyoto(o); flush_batches(); batching=false; return
+	if kind=='shinjuku': build_shinjuku(o); flush_batches(); batching=false; return
 	var floor_c:=Color(0.72,0.5,0.32); var wall_c:=Color(1,0.93,0.82)
 	if kind=='konbini' or kind=='store': floor_c=Color(0.92,0.94,0.98); wall_c=Color(0.85,0.95,1)
 	if kind=='boutique': floor_c=Color(0.95,0.85,0.88); wall_c=Color(1,0.9,0.95)
@@ -1847,9 +1850,11 @@ func enter_room(kind:String):
 	in_room=kind; var o:Vector3=room_org[kind]
 	bnd=Rect2(o.x-4.8,o.z-3.6,9.6,7.6)
 	player.position=o+Vector3(0,0,3.2); cam.position=player.position+Vector3(0,5.6,5.6)
+	if kind=='shinjuku': bnd=Rect2(o.x-5.2,o.z-42,10.4,44); player.position=o+Vector3(0,0,0.6); cam.position=player.position+Vector3(0,3.6,6.0)
 	if kind=='kyoto': bnd=Rect2(o.x-10.5,o.z-34,21,36); player.position=o+Vector3(0,0,0.6); cam.position=player.position+Vector3(0,3.6,6.0)
 	petals.visible=false
 	env.ambient_light_color=Color(1,0.86,0.68); env.ambient_light_energy=0.55; sun.light_energy=0.55; env.adjustment_saturation=1.3
+	if kind=='shinjuku': env.ambient_light_color=Color(0.62,0.58,0.9); env.ambient_light_energy=0.55; sun.light_energy=0.4; sun.light_color=Color(0.8,0.65,1.0); petals.visible=false; env.adjustment_saturation=1.3; loc_lbl.text='شينجوكو (اختبار مباني)'
 	if kind=='kyoto': env.ambient_light_color=Color(1,0.88,0.75); env.ambient_light_energy=0.42; sun.light_energy=0.62; sun.light_color=Color(1,0.78,0.55); petals.visible=true; env.adjustment_saturation=1.15; loc_lbl.text='كيوتو (نسخة أولى)'
 	for p in room_pts: scene_done.erase(p.key)
 	exit_btn.visible=true
@@ -2198,7 +2203,7 @@ const WCITIES=[
 	["أوكيناوا","沖縄",Vector2(0.46,0.86),false,"جزر وشواطئ. هتتفتح بعدين.","مقفلة: لسه مش مبنية",25,["18000","03:00"]],
 ]
 const WDIST=[
-	["شينجوكو","新宿",Vector2(0.26,0.25),1,false,"مركز تسوق ومكاتب وحياة ليلية. هتتفتح بعدين."],
+	["شينجوكو","新宿",Vector2(0.26,0.25),1,true,"مركز تسوق ومكاتب وحياة ليلية. اختبار مباني: شارع واحد بالليل."],
 	["شيبويا","渋谷",Vector2(0.38,0.47),1,true,"الحي المفتوح دلوقتي: الشارع والمدرسة والبيت والمحلات."],
 	["أساكوسا","浅草",Vector2(0.59,0.24),5,false,"معابد وأسواق قديمة. هتتفتح بعدين."],
 	["إكيبوكورو","池袋",Vector2(0.23,0.60),5,false,"تسوق وأنمي. هتتفتح بعدين."],
@@ -2365,6 +2370,7 @@ func district_select(i:int):
 func district_go():
 	if not WDIST[wd_sel][4]: return
 	district_layer.visible=false; world_layer.visible=false; map_layer.visible=false; mode='play'; phone_layer.visible=false; phone_layer.position.y=0
+	if wd_sel==0: enter_room('shinjuku')
 
 
 func street_details():
@@ -2628,3 +2634,49 @@ func build_kyoto(o:Vector3):
 	tag("伏見稲荷風 (نسخة أولى)",o+Vector3(0,0.9,1.0),0,0.006,Color(1,1,1),ar)
 	tag("清水",o+Vector3(-8.2+2.3,2.3,-3.0),90,0.008,Color(1,1,1),jp)
 	tag("茶屋",o+Vector3(8.2-2.3,2.3,-10.5),-90,0.008,Color(1,1,1),jp)
+
+
+func build_shinjuku(o:Vector3):
+	var names:=["tb_tenant_building_7f_01","tb_shop_house_3f_01","tb_pencil_building_6f_01","tb_kanban_shop_2f_01","tb_office_building_8f_01","tb_shop_house_3f_01","tb_pencil_building_6f_01","tb_tenant_building_7f_01","tb_kanban_shop_2f_01","tb_shop_house_3f_01"]
+	var widths:=[8.09,7.0,5.09,6.98,16.12,7.0,5.09,8.09,6.98,7.0]
+	var pal:=[Color(0.98,0.78,0.62),Color(0.66,0.8,0.96),Color(0.96,0.68,0.76),Color(0.7,0.88,0.74),Color(0.97,0.86,0.55),Color(0.76,0.72,0.96)]
+	var signs:=["ラーメン","カラオケ","居酒屋","薬","ゲーム","新宿","焼肉","喫茶","弁当","書店"]
+	var scol:=[Color(1,0.3,0.4),Color(0.3,0.9,1),Color(1,0.85,0.2),Color(0.6,1,0.5),Color(1,0.5,0.9)]
+	box(self,Vector3(80,0.2,120),Color(0.2,0.2,0.24),o+Vector3(0,-0.1,-20),false)
+	box(self,Vector3(6.4,0.04,46),Color(0.17,0.17,0.2),o+Vector3(0,0.02,-20),false)
+	var z:=-1.0
+	while z>-40.0:
+		box(self,Vector3(0.16,0.03,1.6),Color(0.95,0.8,0.2),o+Vector3(0,0.05,z),false); z-=3.5
+	for sx in [-1,1]:
+		box(self,Vector3(3.2,0.2,46),Color(0.5,0.48,0.52),o+Vector3(sx*4.8,0.1,-20),false)
+		box(self,Vector3(0.3,0.25,46),Color(0.7,0.7,0.72),o+Vector3(sx*3.2,0.12,-20),false)
+	var k:=0
+	for side in [-1,1]:
+		var cur:=2.0 if side<0 else -40.0
+		var i:=0
+		while true:
+			var idx:=(i*3+(0 if side<0 else 4))%names.size(); var w:float=widths[idx]
+			if side<0:
+				if cur-w<-41.0: break
+			else:
+				if cur+w>1.5: break
+			var n:Node3D=(load("res://models/kobo/"+names[idx]+".glb") as PackedScene).instantiate()
+			var pz:float=(cur-w) if side<0 else cur
+			# side<0: width extends toward -z from the front-left corner, so the corner sits at cur
+			n.position=o+Vector3(side*6.3,0,cur if side<0 else cur)
+			n.rotation_degrees.y=90.0 if side<0 else -90.0
+			toonify(n,pal[(k+i)%pal.size()],0.02); add_child(n)
+			var zc:float=(cur-w*0.5) if side<0 else (cur+w*0.5)
+			var sc:Color=scol[(k+i)%scol.size()]
+			var fy:float=3.2+float((i*5)%3)*0.9
+			tag(signs[(i+k*3)%signs.size()],o+Vector3(side*5.95,fy,zc),90.0*side if side>0 else 90.0,0.014,sc.lightened(0.3),jp,sc.darkened(0.5))
+			box(self,Vector3(0.12,1.8,0.5),sc.darkened(0.2),o+Vector3(side*5.5,fy+0.9,zc+(0.0 if side>0 else 0.0)),false)
+			glow_box(Vector3(0.08,1.5,0.3),sc,o+Vector3(side*5.42,fy+0.9,zc),1.4)
+			if side<0: cur-=w+0.3
+			else: cur+=w+0.3
+			i+=1
+		k+=1
+	for q in range(6):
+		for side in [-1,1]: pglb("lamp",o+Vector3(side*3.5,0.1,-3.0-q*7.0),0.0)
+	glow_box(Vector3(1.6,0.04,0.5),Color(0.5,1.0,0.7),o+Vector3(0,0.1,1.6),1.8)
+	tag("新宿",o+Vector3(0,5.2,-41.5),0,0.03,Color(1,0.9,0.7),jp)

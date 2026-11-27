@@ -1,6 +1,6 @@
 # Handoff (anime-life-game, godot-3d)
 
-Updated 2026-11-27 13:22 (Cairo). Latest verified tag: **v3d-1.08** (APK on GitHub releases only). Only ONE agent publishes a new tag at a time; the successor first reproduces the build, then asks the parent before tagging.
+Updated 2026-11-27 13:30 (Cairo). Latest verified tag: **v3d-1.10** (1.09 Kyoto zone, 1.10 Shinjuku test street) (APK on GitHub releases only). Only ONE agent publishes a new tag at a time; the successor first reproduces the build, then asks the parent before tagging.
 
 ## Current priority (user decisions)
 1. One city zone per release, Kyoto first. Cheap first version: small own-made zone, own palette and one landmark. Never present a city as real if it is a Tokyo copy, say so.
