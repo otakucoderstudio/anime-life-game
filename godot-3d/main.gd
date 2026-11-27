@@ -84,13 +84,19 @@ func _ready():
 	sun=DirectionalLight3D.new(); sun.rotation_degrees=Vector3(-26,-48,0); sun.light_color=Color(1,0.84,0.6); sun.light_energy=0.7; sun.shadow_enabled=true; sun.directional_shadow_max_distance=38; sun.directional_shadow_mode=DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS; sun.shadow_blur=1.6; sun.light_energy=1.15; sun.shadow_opacity=0.75; add_child(sun)
 	if OS.has_feature('mobile'):
 		get_viewport().scaling_3d_scale=0.6; Engine.max_fps=30
-	if 'hq' in OS.get_cmdline_user_args(): hq=true; apply_gfx()
+	gfx_load()
+	if 'hq' in OS.get_cmdline_user_args(): gfx_level=2
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with('gfx'): gfx_level=int(a.substr(3))
 	build_street()
 	build_player()
 	spawn_kickables()
 	no_outline=false
 	cam=Camera3D.new(); cam.fov=55; cam.far=300.0; add_child(cam); spawn_petals()
 	build_ui()
+	fps_lbl=Label.new(); fps_lbl.position=Vector2(get_viewport().get_visible_rect().size.x*0.5-90,4); fps_lbl.add_theme_font_size_override('font_size',22); fps_lbl.add_theme_color_override('font_color',Color(1,1,0.6)); fps_lbl.add_theme_color_override('font_outline_color',Color(0,0,0)); fps_lbl.add_theme_constant_override('outline_size',6); fps_lbl.visible=false; ui.add_child(fps_lbl)
+	var ft:=Timer.new(); ft.wait_time=1.0; ft.autostart=true; ft.timeout.connect(fps_tick); add_child(ft)
+	apply_gfx()
 	var vg:=TextureRect.new(); vg.texture=load('res://art/vignette.png'); vg.expand_mode=TextureRect.EXPAND_IGNORE_SIZE; vg.size=get_viewport().get_visible_rect().size; vg.mouse_filter=Control.MOUSE_FILTER_IGNORE; ui.add_child(vg); ui.move_child(vg,0)
 	petal_fx()
 	build_select(); build_scene_ui(); build_phone(); spawn_npcs(); spawn_peds(); spawn_cars(); build_audio()
@@ -408,7 +414,7 @@ func skyline():
 			var sc:=2.9
 			n.scale=Vector3(sc,sc,sc); n.position=Vector3(side*(33.0+float(k%3)*3.0),0,z); n.rotation_degrees.y=90.0 if side<0 else -90.0
 			toonify(n,pal[(k+side+1)%pal.size()],0.02)
-			add_child(n)
+			add_child(n); sky_nodes.append(n)
 			z-=36.0+float((k*5)%4)*4.0; k+=1
 
 func build_street():
@@ -1249,6 +1255,7 @@ func _physics_process(_d):
 		if frames==60 and 'kyoto2' in OS.get_cmdline_user_args(): player.position=room_org['kyoto']+Vector3(0,0,-14); cam.position=player.position+Vector3(0,3.6,6.0)
 		if frames==30 and 'shinjuku' in OS.get_cmdline_user_args(): mode='play'; scene_layer.visible=false; enter_room('shinjuku')
 		if frames==50: print('PERF tris=',Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME),' calls=',Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME))
+		if frames==40 and 'settingsapp' in OS.get_cmdline_user_args(): mode='play'; open_phone(); open_app(4); fps_on=true; fps_lbl.visible=true
 		if frames==44 and 'mapicons' in OS.get_cmdline_user_args(): mv_filter=0; mv_locate(); mv_zoom=2.9; mv_pan=-(WDIST[1][2]*mv_size*2.9-mv_size*0.5)+Vector2(0,40); mv_clamp()
 		if frames==44 and 'districtz' in OS.get_cmdline_user_args(): mv_zoom=3.4; mv_pan=-(WDIST[1][2]*mv_size*3.4-mv_size*0.5); mv_clamp(); mv.queue_redraw()
 		if frames==40 and ('districts' in OS.get_cmdline_user_args() or 'mapicons' in OS.get_cmdline_user_args() or 'districtz' in OS.get_cmdline_user_args()): mode='play'; open_phone(); open_app(0); world_refresh(); world_layer.visible=true; district_layer.visible=true; district_select(1)
@@ -1854,7 +1861,7 @@ func enter_room(kind:String):
 	if kind=='kyoto': bnd=Rect2(o.x-10.5,o.z-34,21,36); player.position=o+Vector3(0,0,0.6); cam.position=player.position+Vector3(0,3.6,6.0)
 	petals.visible=false
 	env.ambient_light_color=Color(1,0.86,0.68); env.ambient_light_energy=0.55; sun.light_energy=0.55; env.adjustment_saturation=1.3
-	if kind=='shinjuku': env.ambient_light_color=Color(0.62,0.58,0.9); env.ambient_light_energy=0.55; sun.light_energy=0.4; sun.light_color=Color(0.8,0.65,1.0); petals.visible=false; env.adjustment_saturation=1.3; loc_lbl.text='شينجوكو (اختبار مباني)'
+	if kind=='shinjuku': env.ambient_light_color=Color(0.78,0.76,0.95); env.ambient_light_energy=0.32; sun.light_energy=0.42; sun.light_color=Color(1,0.88,0.75); petals.visible=false; env.adjustment_saturation=1.3; loc_lbl.text='شينجوكو (اختبار مباني)'
 	if kind=='kyoto': env.ambient_light_color=Color(1,0.88,0.75); env.ambient_light_energy=0.42; sun.light_energy=0.62; sun.light_color=Color(1,0.78,0.55); petals.visible=true; env.adjustment_saturation=1.15; loc_lbl.text='كيوتو (نسخة أولى)'
 	for p in room_pts: scene_done.erase(p.key)
 	exit_btn.visible=true
@@ -1869,6 +1876,11 @@ var app_layer:Control
 var inv:={}
 var snd_on:=true
 var hq:=false
+var gfx_mode:=0  # 0 auto, 1 high, 2 low
+var fps_on:=false
+var fps_lbl:Label
+var fps_low:=0
+var fps_note:=''
 var items:={"أونيجيري":[5,1,'الصحة',3],"قهوة":[8,1,'الصحة',2],"كيكة":[12,2,'الصحة',4],"دبدوب هدية":[20,0,'العلاقات',8]}
 func clear_app():
 	for c in app_layer.get_children(): c.queue_free()
@@ -2048,21 +2060,43 @@ func buy(nm:String):
 	var it:Array=items[nm]
 	if stats['الفلوس']<it[0]: sfx('click'); return
 	stats['الفلوس']-=it[0]; inv[nm]=inv.get(nm,0)+1; qadd('buy'); sfx('bong'); show_shop()
+const GFX_NAMES=["منخفض","متوسط","عالي","فوق العالي"]
+var gfx_level:=1
+var gfx_auto:=true
+var sky_nodes:=[]
+func gfx_save():
+	var c:=ConfigFile.new(); c.set_value("g","level",gfx_level); c.set_value("g","auto",gfx_auto); c.set_value("g","fps",fps_on); c.save("user://gfx.cfg")
+func gfx_load():
+	var c:=ConfigFile.new()
+	if c.load("user://gfx.cfg")==OK: gfx_level=int(c.get_value("g","level",1)); gfx_auto=bool(c.get_value("g","auto",true)); fps_on=bool(c.get_value("g","fps",false))
 func apply_gfx():
-	var vp:=get_viewport(); vp.scaling_3d_scale=0.85 if hq else 0.6
-	vp.msaa_3d=Viewport.MSAA_2X if hq else Viewport.MSAA_DISABLED
+	var L:=gfx_level; hq=(L>=2)
+	var vp:=get_viewport()
+	vp.scaling_3d_scale=[0.5,0.7,0.85,1.0][L]
+	vp.msaa_3d=[Viewport.MSAA_DISABLED,Viewport.MSAA_DISABLED,Viewport.MSAA_2X,Viewport.MSAA_4X][L]
+	vp.mesh_lod_threshold=[6.0,3.0,1.0,0.0][L]
 	if sun:
-		sun.directional_shadow_mode=DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS if hq else DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS
-		sun.directional_shadow_max_distance=60.0 if hq else 38.0; sun.shadow_blur=2.2 if hq else 1.6
+		sun.shadow_enabled=(L>=1)
+		sun.directional_shadow_mode=[DirectionalLight3D.SHADOW_ORTHOGONAL,DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS,DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS,DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS][L]
+		sun.directional_shadow_max_distance=[20.0,30.0,60.0,90.0][L]; sun.shadow_blur=[1.0,1.6,2.2,2.8][L]
 	if env:
-		env.glow_intensity=0.5 if hq else 0.35; env.glow_bloom=0.14 if hq else 0.08; env.glow_hdr_threshold=1.0 if hq else 1.2
+		env.glow_enabled=(L>=1)
+		env.glow_intensity=[0.2,0.35,0.5,0.65][L]; env.glow_bloom=[0.0,0.08,0.14,0.2][L]; env.glow_hdr_threshold=[1.4,1.2,1.0,0.9][L]
+		env.fog_density=[0.008,0.006,0.005,0.004][L]
+	if cam: cam.far=[130.0,200.0,260.0,330.0][L]
+	if petals: petals.visible=(L>=1) and in_room==''
+	for n in sky_nodes:
+		if is_instance_valid(n):
+			for mi in n.find_children('*','MeshInstance3D',true,false): (mi as MeshInstance3D).visibility_range_end=[70.0,110.0,170.0,0.0][L]
 func show_settings():
 	app_head("الإعدادات",Color(0.55,0.5,0.75)); var vs:=avs()
 	app_btn("الصوت: "+("شغال" if snd_on else "مقفول"),Vector2(vs.x/2-250,140),Vector2(500,70),Color(1,0.95,0.7),func(): snd_on=not snd_on; AudioServer.set_bus_mute(0,not snd_on); show_settings())
-	app_btn("الجرافيك: "+("عالي" if hq else "عادي (أخف)"),Vector2(vs.x/2-250,240),Vector2(500,70),Color(1,0.95,0.7),func(): hq=not hq; apply_gfx(); show_settings())
-	app_btn("لعبة جديدة (يمسح التقدم)",Vector2(vs.x/2-250,340),Vector2(500,70),Color(1,0.75,0.75),func(): DirAccess.remove_absolute(ProjectSettings.globalize_path('user://save.json')); get_tree().reload_current_scene())
+	app_btn("مستوى الجرافيك: "+GFX_NAMES[gfx_level],Vector2(vs.x/2-250,224),Vector2(500,56),Color(1,0.95,0.7),func(): gfx_level=(gfx_level+1)%4; fps_low=0; fps_note=''; apply_gfx(); gfx_save(); show_settings())
+	app_btn("تخفيض تلقائي لو بطيء: "+("شغال" if gfx_auto else "مقفول"),Vector2(vs.x/2-250,288),Vector2(500,48),Color(0.85,1,0.85),func(): gfx_auto=not gfx_auto; gfx_save(); show_settings())
+	app_btn("عداد الإطارات: "+("شغال" if fps_on else "مقفول"),Vector2(vs.x/2-250,344),Vector2(500,48),Color(0.8,0.95,1),func(): fps_on=not fps_on; fps_lbl.visible=fps_on; gfx_save(); show_settings())
+	app_btn("لعبة جديدة (يمسح التقدم)",Vector2(vs.x/2-250,400),Vector2(500,48),Color(1,0.75,0.75),func(): DirAccess.remove_absolute(ProjectSettings.globalize_path('user://save.json')); get_tree().reload_current_scene())
 	var names_ar={"Music":"الموسيقى","Ambience":"الأجواء","SFX":"المؤثرات"}
-	var yy:=430
+	var yy:=464
 	for k in ["Music","Ambience","SFX"]:
 		var kk:String=k
 		var l:=lbl(names_ar[k],24,Vector2(vs.x/2+110,yy),Color(1,1,1)); l.size=Vector2(140,40); app_layer.add_child(l)
@@ -2665,7 +2699,7 @@ func build_shinjuku(o:Vector3):
 			# side<0: width extends toward -z from the front-left corner, so the corner sits at cur
 			n.position=o+Vector3(side*6.3,0,cur if side<0 else cur)
 			n.rotation_degrees.y=90.0 if side<0 else -90.0
-			toonify(n,pal[(k+i)%pal.size()],0.02); add_child(n)
+			add_child(n)  # natural Kobo palette colours, no tint
 			var zc:float=(cur-w*0.5) if side<0 else (cur+w*0.5)
 			var sc:Color=scol[(k+i)%scol.size()]
 			var fy:float=3.2+float((i*5)%3)*0.9
@@ -2680,3 +2714,14 @@ func build_shinjuku(o:Vector3):
 		for side in [-1,1]: pglb("lamp",o+Vector3(side*3.5,0.1,-3.0-q*7.0),0.0)
 	glow_box(Vector3(1.6,0.04,0.5),Color(0.5,1.0,0.7),o+Vector3(0,0.1,1.6),1.8)
 	tag("新宿",o+Vector3(0,5.2,-41.5),0,0.03,Color(1,0.9,0.7),jp)
+
+
+func fps_tick():
+	var f:=Engine.get_frames_per_second()
+	if fps_lbl: fps_lbl.text=("FPS "+str(int(f))+"  ["+GFX_NAMES[gfx_level]+"]"+("  "+fps_note if fps_note!='' else ""))
+	if 'shot' in OS.get_cmdline_user_args(): return
+	if gfx_auto and gfx_level>0 and mode=='play':
+		if f<20.0: fps_low+=1
+		else: fps_low=maxi(0,fps_low-1)
+		if fps_low>=5:
+			gfx_level-=1; apply_gfx(); gfx_save(); fps_low=0; fps_note="(نزل تلقائي)"
