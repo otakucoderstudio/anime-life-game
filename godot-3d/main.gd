@@ -873,7 +873,10 @@ func _physics_process(_d):
 		if frames==40 and 'rel' in OS.get_cmdline_user_args(): mode='play'; add_aff('كايتو',4); add_aff('أياني',7); add_aff('مومو',1); open_phone(); open_app(5)
 		if frames==40 and 'ward' in OS.get_cmdline_user_args(): mode='play'; apply_outfit(1); open_phone(); open_app(6)
 		if frames==40 and 'year' in OS.get_cmdline_user_args(): mode='play'; add_aff('أياني',7); stats['الدراسة']=80; hud_min=28*1440.0+600.0
-		if frames==40 and 'lib' in OS.get_cmdline_user_args(): mode='play'; scene_layer.visible=false; travel('library')
+		if frames==40 and ('lib' in OS.get_cmdline_user_args() or 'libtalk' in OS.get_cmdline_user_args()): mode='play'; scene_layer.visible=false; travel('library')
+		if frames==52 and 'libtalk' in OS.get_cmdline_user_args():
+			for nn in npcs:
+				if nn.key=='r_huda': player.position=nn.n.position+Vector3(0,0,2.5)
 		if frames==40 and 'bout' in OS.get_cmdline_user_args(): mode='play'; scene_layer.visible=false; travel('boutique')
 		if frames==40 and 'quest' in OS.get_cmdline_user_args(): mode='play'; qadd('talk','a'); qadd('park'); qadd('rest'); qadd('greet'); qadd('greet'); open_phone(); open_app(7)
 		if frames==40 and 'phone7' in OS.get_cmdline_user_args(): mode='play'; open_phone()
@@ -1252,7 +1255,7 @@ func room_extras(kind:String):
 			spawn_room_npc(kind,bu.root,Vector3(0.0,0,-1.9),"r_boutique",[["صاحبة البوتيك","أهلاً بيك! ستايلات جديدة كل أسبوع. افتح الدولاب في الهاتف وشوف الجديد.","rana_smile",[["أسألها عن الموضة","المجتمع",5],["أتفرج بس","العلاقات",2]]]])
 		'library':
 			var hu:=make_girl(Color(0.98,0.84,0.74),Color(0.55,0.3,0.15),Color(0.5,0.7,0.9),Color(0.9,0.9,0.95),Color(1,0.5,0.6),true)
-			spawn_room_npc(kind,hu.root,Vector3(0.0,0,-1.6),"r_huda",[["هدى","أهلاً في مكتبة النور! الهدوء هنا بيخلي المذاكرة أسهل بكتير.","rana_calm",[["أذاكر ساعة","الدراسة",10,-1],["أقرا رواية","الصحة",4,0]]]])
+			spawn_room_npc(kind,hu.root,Vector3(0.0,0,-1.6),"r_huda",[["هدى","أهلاً في مكتبة النور! الهدوء هنا بيخلي المذاكرة أسهل بكتير.","pt_w4",[["أذاكر ساعة","الدراسة",10,-1],["أقرا رواية","الصحة",4,0]]]])
 		'home':
 			var cat:=Node3D.new(); mesh(cat,sph(0.22),Color(1,0.95,0.9),Vector3(0,0.22,0)); mesh(cat,sph(0.15),Color(1,0.95,0.9),Vector3(0,0.42,0.2))
 			for sx in [-1,1]: mesh(cat,sph(0.05),Color(1,0.7,0.5),Vector3(sx*0.09,0.58,0.2))
