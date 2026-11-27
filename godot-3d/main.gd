@@ -77,11 +77,11 @@ func _ready():
 	sky.sky_top_color=Color(0.2,0.5,0.95); sky.sky_horizon_color=Color(0.8,0.9,1.0); sky.ground_horizon_color=Color(0.85,0.9,0.95); sky.ground_bottom_color=Color(0.6,0.65,0.7)
 	var s:=Sky.new(); var psm:=PanoramaSkyMaterial.new(); psm.panorama=load('res://models/sky.hdr'); s.sky_material=psm
 	env.background_mode=Environment.BG_SKY; env.sky=s
-	env.ambient_light_source=Environment.AMBIENT_SOURCE_COLOR; env.ambient_light_color=Color(0.86,0.9,1.0); env.ambient_light_energy=0.55
+	env.ambient_light_source=Environment.AMBIENT_SOURCE_COLOR; env.ambient_light_color=Color(0.86,0.9,1.0); env.ambient_light_energy=0.45
 	env.glow_enabled=true; env.glow_intensity=0.35; env.glow_bloom=0.08; env.glow_hdr_threshold=1.2; env.glow_blend_mode=Environment.GLOW_BLEND_MODE_SOFTLIGHT; env.tonemap_mode=Environment.TONE_MAPPER_FILMIC; env.tonemap_exposure=0.7; env.adjustment_enabled=true; env.adjustment_saturation=1.6; env.adjustment_contrast=1.35; env.adjustment_brightness=1.03
 	env.fog_enabled=true; env.fog_light_color=Color(0.86,0.92,1.0); env.fog_density=0.005
 	var we:=WorldEnvironment.new(); we.environment=env; add_child(we)
-	sun=DirectionalLight3D.new(); sun.rotation_degrees=Vector3(-26,-48,0); sun.light_color=Color(1,0.9,0.72); sun.light_energy=0.7; sun.shadow_enabled=true; sun.directional_shadow_max_distance=38; sun.directional_shadow_mode=DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS; sun.shadow_blur=1.6; sun.light_energy=1.15; sun.shadow_opacity=0.75; add_child(sun)
+	sun=DirectionalLight3D.new(); sun.rotation_degrees=Vector3(-26,-48,0); sun.light_color=Color(1,0.84,0.6); sun.light_energy=0.7; sun.shadow_enabled=true; sun.directional_shadow_max_distance=38; sun.directional_shadow_mode=DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS; sun.shadow_blur=1.6; sun.light_energy=1.15; sun.shadow_opacity=0.75; add_child(sun)
 	if OS.has_feature('mobile'):
 		get_viewport().scaling_3d_scale=0.6; Engine.max_fps=30
 	if 'hq' in OS.get_cmdline_user_args(): hq=true; apply_gfx()
@@ -322,7 +322,7 @@ func node_aabb(n:Node)->AABB:
 func izk_front(side:int,z:float,i:int):
 	var ry:float=90.0 if side<0 else -90.0
 	var fx:float=side*8.7
-	var pal:=[Color(1.0,0.93,0.86),Color(0.92,0.96,1.0),Color(1.0,0.88,0.9),Color(0.93,1.0,0.92),Color(1.0,0.97,0.82),Color(0.9,0.9,1.0)]
+	var pal:=[Color(0.98,0.78,0.62),Color(0.66,0.8,0.96),Color(0.96,0.68,0.76),Color(0.7,0.88,0.74),Color(0.97,0.86,0.55),Color(0.76,0.72,0.96)]
 	var tint:Color=pal[(i*2+(1 if side>0 else 0))%pal.size()]
 	var ground:=["shopfront_shutter_bay","ramen_shop_front_bay","izakaya_front_bay","shopfront_shutter_bay_shutter_up"]
 	var floors:=2+((i*5+(1 if side>0 else 0))%3)
@@ -392,13 +392,13 @@ func kbuild(pos:Vector3,ry:float,k:int):
 	var nm:String=KB[(k*3+1)%KB.size()]
 	var n:Node3D=(load("res://models/kbld/"+nm+".glb") as PackedScene).instantiate()
 	n.scale=Vector3(7.5,7.5,7.5); n.position=pos; n.rotation_degrees.y=ry
-	var pal:=[Color(1.0,0.93,0.86),Color(0.92,0.96,1.0),Color(1.0,0.88,0.9),Color(0.93,1.0,0.92),Color(1.0,0.97,0.82),Color(0.9,0.9,1.0)]
+	var pal:=[Color(0.98,0.78,0.62),Color(0.66,0.8,0.96),Color(0.96,0.68,0.76),Color(0.7,0.88,0.74),Color(0.97,0.86,0.55),Color(0.76,0.72,0.96)]
 	toonify(n,pal[k%pal.size()],0.012)
 	add_child(n)
 
 func skyline():
 	var names:=["tb_mansion_10f_01","tb_office_building_8f_01","tb_tower_mansion_24f_01","tb_tenant_building_7f_01","tb_mansion_10f_01_b","tb_pencil_building_6f_01","tb_office_building_8f_01_c","tb_mansion_5f_01","tb_mansion_10f_01_c","tb_office_building_8f_01_b"]
-	var pal:=[Color(1.0,0.93,0.86),Color(0.92,0.96,1.0),Color(1.0,0.88,0.9),Color(0.93,1.0,0.92),Color(1.0,0.97,0.82),Color(0.9,0.9,1.0)]
+	var pal:=[Color(0.98,0.78,0.62),Color(0.66,0.8,0.96),Color(0.96,0.68,0.76),Color(0.7,0.88,0.74),Color(0.97,0.86,0.55),Color(0.76,0.72,0.96)]
 	var k:=0
 	for side in [-1,1]:
 		var z:=-4.0
