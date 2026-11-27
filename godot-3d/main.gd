@@ -2203,16 +2203,21 @@ const WDIST=[
 const WTRAVEL=[["قطار شينكانسن",1.0,"fast"],["قطار عادي",0.45,"slow"],["طيران داخلي",1.45,"air"],["عبّارة بحرية",0.3,"ferry"]]
 var district_note:Label; var district_layer:Control; var wd_name:Label; var wd_desc:Label; var wd_go:Button; var wd_sel:=1
 var wi_travel_sel:=0; var wi_card:Label; var wi_money:Label; var wi_energy:Label; var wi_time:Label; var wi_weather:Label
+var mf_cache:Font=null
+func mf()->Font:
+	if mf_cache==null:
+		var fv:=FontVariation.new(); fv.base_font=load("res://fonts/cairo.ttf"); fv.variation_embolden=0.6; mf_cache=fv
+	return mf_cache
 func wpanel(pos:Vector2,size:Vector2)->Panel:
 	var pn:=Panel.new(); pn.size=size; pn.position=pos
 	var ps:=StyleBoxFlat.new(); ps.bg_color=Color(0.08,0.12,0.25,0.93); ps.set_corner_radius_all(16); ps.border_color=Color(0.4,0.7,0.9); ps.set_border_width_all(3); pn.add_theme_stylebox_override("panel",ps); return pn
 func wbtn(txt:String,size:Vector2,pos:Vector2,fs:int,col:Color)->Button:
-	var b:=Button.new(); b.text=txt; b.size=size; b.position=pos; b.add_theme_font_override("font",ar); b.add_theme_font_size_override("font_size",fs)
+	var b:=Button.new(); b.text=txt; b.size=size; b.position=pos; b.clip_text=true; b.add_theme_font_override("font",mf()); b.add_theme_font_size_override("font_size",fs)
 	var sb:=StyleBoxFlat.new(); sb.bg_color=col; sb.set_corner_radius_all(12); sb.border_color=Color(1,1,1); sb.set_border_width_all(2)
 	for st in ["normal","hover","pressed","disabled"]: b.add_theme_stylebox_override(st,sb)
 	return b
 func wl(txt:String,fs:int,pos:Vector2,w:float,col:Color,h:=0.0)->Label:
-	var l:=lbl(txt,fs,pos,col); l.size.x=w; l.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT; l.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	var l:=lbl(txt,fs,pos,col); l.add_theme_font_override("font",mf()); l.add_theme_constant_override("line_spacing",-12); l.size.x=w; l.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT; l.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	if h>0.0: l.size.y=h
 	l.add_theme_constant_override("outline_size",0); return l
 func build_worldmap(vs:Vector2):
@@ -2242,14 +2247,14 @@ func build_worldmap(vs:Vector2):
 	world_layer.add_child(wpanel(Vector2(rx,10),Vector2(rw,H*0.5)))
 	wi_name=wl("",34,Vector2(rx+10,16),rw-20,Color(1,1,1)); world_layer.add_child(wi_name)
 	wi_jp=wl("",26,Vector2(rx+10,62),rw-20,Color(1,0.85,0.4)); wi_jp.add_theme_font_override("font",load("res://fonts/jp.ttf")); world_layer.add_child(wi_jp)
-	wi_desc=wl("",19,Vector2(rx+10,115),rw-20,Color(0.9,0.95,1),70.0); world_layer.add_child(wi_desc)
-	wi_stats=wl("",19,Vector2(rx+10,185),rw-20,Color(0.8,0.9,1),70.0); world_layer.add_child(wi_stats)
+	wi_desc=wl("",19,Vector2(rx+10,104),rw-20,Color(0.9,0.95,1),70.0); world_layer.add_child(wi_desc)
+	wi_stats=wl("",19,Vector2(rx+10,160),rw-20,Color(0.8,0.9,1),70.0); world_layer.add_child(wi_stats)
 	wi_enter=wbtn("",Vector2(rw-20,46),Vector2(rx+10,H*0.5-44),24,Color(0.2,0.5,0.45)); wi_enter.pressed.connect(world_enter); world_layer.add_child(wi_enter)
 	# right: travel card
 	world_layer.add_child(wpanel(Vector2(rx,H*0.5+20),Vector2(rw,H*0.5-12)))
 	world_layer.add_child(wl("وسائل السفر (من طوكيو)",21,Vector2(rx+10,H*0.5+26),rw-20,Color(1,0.9,0.5)))
 	for k in range(4):
-		var tb:=wbtn("",Vector2(rw-20,32),Vector2(rx+10,H*0.5+56+k*38),18,Color(0.2,0.28,0.45)); tb.name="tr"+str(k)
+		var tb:=wbtn("",Vector2(rw-20,32),Vector2(rx+10,H*0.5+64+k*37),18,Color(0.2,0.28,0.45)); tb.name="tr"+str(k)
 		tb.pressed.connect(func(): wi_travel_sel=k; world_select(wi_sel)); world_layer.add_child(tb)
 	wi_note=wl("",17,Vector2(rx+10,H*0.5+212),rw-20,Color(1,0.8,0.5),50.0); world_layer.add_child(wi_note)
 	var wback:=wbtn("رجوع",Vector2(140,46),Vector2(10,8),24,Color(0.1,0.15,0.3)); wback.pressed.connect(func(): world_layer.visible=false); world_layer.add_child(wback)
@@ -2293,12 +2298,15 @@ func build_districts(vs:Vector2):
 	# landmarks
 	var y1:=H*0.33+12
 	district_layer.add_child(wpanel(Vector2(rx,y1),Vector2(rw,H*0.2)))
-	district_layer.add_child(wl("المعالم (من لقطات اللعبة)",17,Vector2(rx+8,y1+2),rw-16,Color(1,0.9,0.5)))
+	district_layer.add_child(wl("المعالم (لقطات من اللعبة)",16,Vector2(rx+8,y1+2),rw-16,Color(1,0.9,0.5)))
 	var tw:=(rw-32)/3.0
+	var nms:Array=["شارع شيبويا","الكافيه","الشارع"]
 	for k in range(3):
-		var t:=TextureRect.new(); t.texture=img_tex("res://art/lm"+str(k+1)+".png"); t.expand_mode=TextureRect.EXPAND_IGNORE_SIZE; t.size=Vector2(tw,H*0.2-48); t.position=Vector2(rx+8+k*(tw+8),y1+28); district_layer.add_child(t)
-		var nm:String=["شارع شيبويا","الكافيه","الشارع والعربيات"][k]
-		district_layer.add_child(wl(nm,13,Vector2(rx+8+k*(tw+8),y1+H*0.2-22),tw,Color(1,1,1)))
+		var cx:=rx+8+k*(tw+8); var ch:=H*0.2-34
+		var fr:=Panel.new(); fr.position=Vector2(cx,y1+26); fr.size=Vector2(tw,ch)
+		var fs:=StyleBoxFlat.new(); fs.bg_color=Color(0.05,0.08,0.18); fs.set_corner_radius_all(8); fs.border_color=Color(0.55,0.8,0.95); fs.set_border_width_all(2); fr.add_theme_stylebox_override("panel",fs); district_layer.add_child(fr)
+		var t:=TextureRect.new(); t.texture=img_tex("res://art/lm"+str(k+1)+".png"); t.expand_mode=TextureRect.EXPAND_IGNORE_SIZE; t.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_COVERED; t.size=Vector2(tw-6,ch-24); t.position=Vector2(cx+3,y1+29); district_layer.add_child(t)
+		var cl:=wl(nms[k],13,Vector2(cx,y1+26+ch-22),tw,Color(1,1,1)); cl.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER; cl.autowrap_mode=TextServer.AUTOWRAP_OFF; cl.clip_text=true; cl.size.y=20; district_layer.add_child(cl)
 	# activities
 	var y2:=y1+H*0.2+8
 	district_layer.add_child(wpanel(Vector2(rx,y2),Vector2(rw,H*0.2)))
