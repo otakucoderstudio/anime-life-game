@@ -1,6 +1,6 @@
 # Handoff (anime-life-game, godot-3d)
 
-Updated 2026-11-27 13:30 (Cairo). Latest verified tag: **v3d-1.23** (1.09 Kyoto zone, 1.10 Shinjuku test street, 1.11 four graphics levels and untinted Kobo colours) (APK on GitHub releases only). Only ONE agent publishes a new tag at a time; the successor first reproduces the build, then asks the parent before tagging.
+Updated 2026-11-27 15:35 (Cairo). Latest verified tag: **v3d-1.23** (1.12 to 1.21 Osaka, Shibuya Kobo rebuild, Sendai, Kyoto, Hiroshima, Okinawa, Nagasaki, loading screen; 1.22 phone home screen; 1.23 Kyoto trees). APK on GitHub releases only. Only ONE agent publishes a new tag at a time; the successor first reproduces the build, then asks the parent before tagging. Next in approved order: full icon set, seasons, rooms (Quaternius Furniture, CC0), vehicles, station/school.
 
 ## Current priority (user decisions)
 1. One city zone per release, Kyoto first. Cheap first version: small own-made zone, own palette and one landmark. Never present a city as real if it is a Tokyo copy, say so.
