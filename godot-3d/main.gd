@@ -89,7 +89,7 @@ func _ready():
 	build_player()
 	spawn_kickables()
 	no_outline=false
-	cam=Camera3D.new(); cam.fov=55; cam.far=300.0; add_child(cam)
+	cam=Camera3D.new(); cam.fov=55; cam.far=300.0; add_child(cam); spawn_petals()
 	build_ui()
 	var vg:=TextureRect.new(); vg.texture=load('res://art/vignette.png'); vg.expand_mode=TextureRect.EXPAND_IGNORE_SIZE; vg.size=get_viewport().get_visible_rect().size; vg.mouse_filter=Control.MOUSE_FILTER_IGNORE; ui.add_child(vg); ui.move_child(vg,0)
 	petal_fx()
@@ -2074,3 +2074,19 @@ func apply_tod(dt:float):
 		(petals.mesh.material as StandardMaterial3D).albedo_color=pc
 		var tc:Color=[Color(1,0.78,0.88),Color(0.5,0.85,0.42),Color(1,0.55,0.2),Color(0.96,0.98,1.0)][si]
 		if tree_mat: (tree_mat as ShaderMaterial).set_shader_parameter("accent",Vector3(tc.srgb_to_linear().r,tc.srgb_to_linear().g,tc.srgb_to_linear().b))
+
+func spawn_petals():
+	var p:=GPUParticles3D.new(); p.amount=260; p.lifetime=7.0; p.preprocess=7.0
+	p.visibility_aabb=AABB(Vector3(-20,-12,-40),Vector3(40,24,45))
+	var pm:=ParticleProcessMaterial.new()
+	pm.emission_shape=ParticleProcessMaterial.EMISSION_SHAPE_BOX; pm.emission_box_extents=Vector3(11,0.5,20)
+	pm.direction=Vector3(0.3,-1,0); pm.spread=15.0; pm.initial_velocity_min=0.5; pm.initial_velocity_max=1.1
+	pm.gravity=Vector3(0.25,-0.35,0); pm.angular_velocity_min=-120; pm.angular_velocity_max=120
+	pm.turbulence_enabled=true; pm.turbulence_noise_strength=0.8; pm.turbulence_noise_scale=2.0
+	pm.scale_min=0.6; pm.scale_max=1.3
+	p.process_material=pm
+	var q:=QuadMesh.new(); q.size=Vector2(0.14,0.09)
+	var m:=StandardMaterial3D.new(); m.albedo_color=Color(1.0,0.72,0.84); m.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED; m.cull_mode=BaseMaterial3D.CULL_DISABLED
+	m.emission_enabled=true; m.emission=Color(1.0,0.7,0.85); m.emission_energy_multiplier=0.5
+	q.material=m; p.draw_pass_1=q
+	p.position=Vector3(0,5,-12); cam.add_child(p)
