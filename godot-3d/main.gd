@@ -945,6 +945,7 @@ func _physics_process(_d):
 		if frames==20 and 'newst' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(-68.5,0,-14); player.rotation.y=PI
 		if frames==20 and 'snow' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20); hud_min=21*1440.0+600.0
 		if frames==20 and 'stn' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(2,0,-22); get_tree().root.set_meta('x',true); cam.fov=60; cam.position=Vector3(-2,3.0,-4); cam.look_at(Vector3(18,3.0,-14))
+		if frames==20 and 'bot' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; show_ai(); ai_edit.text='ازيك'; ai_send(); ai_edit.text='احكيلي عن طوكيو'; ai_send(); ai_edit.text='ضحكني'; ai_send(); ai_edit.text='انت بتحب الفيزياء'; ai_send()
 		if frames==20 and 'cars' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-22); cars[0].t=-30.0; cars[1].t=-34.0
 		if frames==20 and 'greet' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; peds[0].si=0; peds[0].off=7.5; peds[0].t=-20.0; player.position=Vector3(7.5,0,-16.5)
 		if frames==20 and 'talk' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(-68.5,0,-17.5)
@@ -1013,13 +1014,28 @@ func build_phone():
 	var sb:=StyleBoxFlat.new(); sb.bg_color=Color(0.14,0.15,0.3); sb.set_corner_radius_all(36); sb.set_border_width_all(6); sb.border_color=Color(0.05,0.05,0.1); body.add_theme_stylebox_override("panel",sb); phone_layer.add_child(body)
 	var sc:=ColorRect.new(); sc.color=Color(0.75,0.88,1); sc.size=body.size-Vector2(30,60); sc.position=body.position+Vector2(15,30); phone_layer.add_child(sc)
 	phone_layer.add_child(lbl("الهاتف",34,body.position+Vector2(110,40),Color(0.1,0.1,0.3)))
-	var apps=[["الخريطة",Color(1,0.8,0.5),0],["المخزون",Color(0.7,0.85,1),1],["المتجر",Color(1,0.7,0.8),2],["الإحصائيات",Color(0.7,1,0.8),3],["الإعدادات",Color(0.85,0.8,1),4],["العلاقات",Color(1,0.75,0.85),5],["الدولاب",Color(0.95,0.85,0.6),6],["المهام",Color(0.8,0.95,0.7),7]]
+	# wallpaper and status bar
+	sc.color=Color(0.98,0.72,0.8)
+	var wp2:=ColorRect.new(); wp2.color=Color(0.55,0.62,0.95); wp2.size=Vector2(sc.size.x,sc.size.y*0.55); wp2.position=sc.position; phone_layer.add_child(wp2)
+	var wp3:=ColorRect.new(); wp3.color=Color(1,0.85,0.7,0.6); wp3.size=Vector2(sc.size.x,sc.size.y*0.2); wp3.position=sc.position+Vector2(0,sc.size.y*0.4); phone_layer.add_child(wp3)
+	var sbar:=ColorRect.new(); sbar.color=Color(0,0,0,0.25); sbar.size=Vector2(sc.size.x,30); sbar.position=sc.position; phone_layer.add_child(sbar)
+	phone_time=lbl("٨:٠٠",20,sc.position+Vector2(14,0),Color(1,1,1)); phone_layer.add_child(phone_time)
+	var bat:=ColorRect.new(); bat.color=Color(1,1,1); bat.size=Vector2(28,13); bat.position=sc.position+Vector2(sc.size.x-44,9); phone_layer.add_child(bat)
+	var sig:=ColorRect.new(); sig.color=Color(1,1,1); sig.size=Vector2(16,13); sig.position=sc.position+Vector2(sc.size.x-70,9); phone_layer.add_child(sig)
+	var apps=[["الرسائل",Color(0.35,0.8,0.55),8,"msg"],["الخريطة",Color(1,0.75,0.35),0,"map"],["الكاميرا",Color(0.4,0.4,0.5),9,"cam"],["الذكاء",Color(0.6,0.45,0.95),10,"ai"],
+		["المخزون",Color(0.45,0.7,1),1,"box"],["المتجر",Color(1,0.5,0.65),2,"bag"],["الإحصائيات",Color(0.3,0.8,0.7),3,"bars"],["العلاقات",Color(1,0.45,0.6),5,"heart"],
+		["الدولاب",Color(0.9,0.7,0.35),6,"shirt"],["المهام",Color(0.55,0.8,0.35),7,"check"],["الإعدادات",Color(0.6,0.6,0.75),4,"gear"]]
+	var ai:=0
 	for a in apps:
-		var b:=Button.new(); b.size=Vector2(130,92); b.position=body.position+Vector2(25+(a[2]%2)*155,95+int(a[2]/2)*105)
-		var sbb:=StyleBoxFlat.new(); sbb.bg_color=a[1]; sbb.set_corner_radius_all(26); sbb.set_border_width_all(4); sbb.border_color=Color(1,1,1)
-		for st in ["normal","hover","pressed"]: b.add_theme_stylebox_override(st,sbb)
-		b.text=a[0]; b.add_theme_font_override("font",ar); b.add_theme_font_size_override("font_size",24); b.add_theme_color_override("font_color",Color(0.1,0.1,0.25)); b.add_theme_color_override("font_hover_color",Color(0.1,0.1,0.25)); b.add_theme_color_override("font_pressed_color",Color(0.1,0.1,0.25))
-		var kk:int=a[2]; b.pressed.connect(func(): open_app(kk)); phone_layer.add_child(b)
+		var cx:=body.position.x+28+(ai%3)*100.0; var cy:=body.position.y+78+int(ai/3)*104.0; ai+=1
+		var ic:=Button.new(); ic.size=Vector2(76,76); ic.position=Vector2(cx,cy)
+		var sbb:=StyleBoxFlat.new(); sbb.bg_color=a[1]; sbb.set_corner_radius_all(20); sbb.set_border_width_all(0); sbb.shadow_size=4; sbb.shadow_color=Color(0,0,0,0.25)
+		for st in ["normal","hover","pressed"]: ic.add_theme_stylebox_override(st,sbb)
+		var kk:int=a[2]; ic.pressed.connect(func(): open_app(kk)); phone_layer.add_child(ic)
+		var g:Control=Control.new(); g.size=Vector2(76,76); g.mouse_filter=Control.MOUSE_FILTER_IGNORE; ic.add_child(g); var kind:String=a[3]
+		g.draw.connect(func(): draw_glyph(g,kind))
+		g.queue_redraw()
+		var t:=lbl(a[0],17,Vector2(cx-12,cy+78),Color(1,1,1)); t.size=Vector2(100,24); t.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER; t.add_theme_constant_override("outline_size",5); phone_layer.add_child(t)
 	var cb:=Button.new(); cb.text="إغلاق"; cb.size=Vector2(200,56); cb.position=body.position+Vector2(70,body.size.y-110); cb.add_theme_font_override("font",ar); cb.add_theme_font_size_override("font_size",26)
 	cb.pressed.connect(close_phone); phone_layer.add_child(cb)
 	travel_note=lbl("",24,body.position+Vector2(30,520),Color(0.1,0.1,0.3)); travel_note.size=Vector2(280,200); travel_note.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART; travel_note.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT; phone_layer.add_child(travel_note)
@@ -1029,7 +1045,7 @@ func build_phone():
 	var mbg:=ColorRect.new(); mbg.color=Color(0.96,0.93,0.85); mbg.size=vs; map_layer.add_child(mbg)
 	var mh:=vs.y-90.0; var mw:=mh*595.0/600.0; var mp:=Vector2(vs.x/2-mw/2,70)
 	var mt:=TextureRect.new(); mt.texture=img_tex("res://art/map.jpg"); mt.expand_mode=TextureRect.EXPAND_IGNORE_SIZE; mt.size=Vector2(mw,mh); mt.position=mp; map_layer.add_child(mt)
-	map_layer.add_child(lbl("خريطة تلة ساكورا",40,Vector2(vs.x/2-150,8),Color(0.9,0.3,0.4)))
+	map_layer.add_child(lbl("خريطة طوكيو",40,Vector2(vs.x/2-150,8),Color(0.9,0.3,0.4)))
 	var places=[["المدرسة","school",Vector2(160,70)],["البيت","home",Vector2(340,85)],["الكافيه","cafe",Vector2(180,315)],["السوبر ماركت","store",Vector2(500,380)],["الحديقة","park",Vector2(260,400)],["كونبيني","konbini",Vector2(330,290)],["المكتبة","library",Vector2(470,230)],["البوتيك","boutique",Vector2(105,235)]]
 	for p in places:
 		var b:=Button.new(); b.text=p[0]; b.size=Vector2(150,50); b.position=mp+p[2]*(mh/600.0)-Vector2(75,25)
@@ -1077,14 +1093,107 @@ func new_msgs()->Array:
 	return out
 func refresh_badge():
 	badge.visible=false
+var phone_time:Label
+func draw_glyph(g:Control,kind:String):
+	var w:=Color(1,1,1); var c:=Vector2(38,38)
+	match kind:
+		"msg":
+			g.draw_rect(Rect2(16,20,44,30),w,true); g.draw_colored_polygon(PackedVector2Array([Vector2(24,48),Vector2(24,60),Vector2(36,48)]),w)
+		"map":
+			g.draw_circle(Vector2(38,32),14,w); g.draw_colored_polygon(PackedVector2Array([Vector2(26,40),Vector2(50,40),Vector2(38,62)]),w); g.draw_circle(Vector2(38,32),6,Color(1,0.75,0.35))
+		"cam":
+			g.draw_rect(Rect2(14,26,48,32),w,true); g.draw_rect(Rect2(28,20,20,8),w,true); g.draw_circle(Vector2(38,42),11,Color(0.4,0.4,0.5)); g.draw_circle(Vector2(38,42),6,w)
+		"ai":
+			g.draw_colored_polygon(PackedVector2Array([Vector2(38,12),Vector2(46,30),Vector2(64,38),Vector2(46,46),Vector2(38,64),Vector2(30,46),Vector2(12,38),Vector2(30,30)]),w)
+		"box":
+			g.draw_rect(Rect2(16,26,44,34),w,true); g.draw_rect(Rect2(34,26,8,34),Color(0.45,0.7,1),true)
+		"bag":
+			g.draw_rect(Rect2(18,28,40,32),w,true); g.draw_arc(Vector2(38,28),9,PI,TAU,12,w,4.0)
+		"bars":
+			g.draw_rect(Rect2(16,42,10,18),w,true); g.draw_rect(Rect2(33,30,10,30),w,true); g.draw_rect(Rect2(50,18,10,42),w,true)
+		"heart":
+			g.draw_circle(Vector2(29,32),11,w); g.draw_circle(Vector2(47,32),11,w); g.draw_colored_polygon(PackedVector2Array([Vector2(19,38),Vector2(57,38),Vector2(38,62)]),w)
+		"shirt":
+			g.draw_colored_polygon(PackedVector2Array([Vector2(26,16),Vector2(50,16),Vector2(64,30),Vector2(55,38),Vector2(50,33),Vector2(50,60),Vector2(26,60),Vector2(26,33),Vector2(21,38),Vector2(12,30)]),w)
+		"check":
+			g.draw_polyline(PackedVector2Array([Vector2(18,40),Vector2(32,54),Vector2(58,24)]),w,8.0)
+		"gear":
+			g.draw_circle(c,20,w); g.draw_circle(c,9,Color(0.6,0.6,0.75))
+			for i in range(8): g.draw_circle(c+Vector2(24,0).rotated(i*PI/4.0),5,w)
 func open_phone():
 	mode='phone'; phone_layer.visible=true; refresh_badge()
+	if phone_time: var hm:=int(hud_min)%1440; phone_time.text='%02d:%02d'%[hm/60,hm%60]
 	var body:Control=phone_layer.get_node("body"); var y0:=body.position.y
 	phone_layer.position.y=700; var tw:=create_tween(); tw.tween_property(phone_layer,"position:y",0.0,0.25)
 func close_phone():
 	phone_layer.visible=false; mode='play'; phone_layer.position.y=0
 func open_map():
 	phone_layer.visible=false; map_layer.visible=true; mode='map'
+var ai_log:Label
+var ai_edit:LineEdit
+func show_camera():
+	phone_layer.visible=false; app_layer.visible=true; mode='phone'; app_head("الكاميرا",Color(0.18,0.18,0.25))
+	var vs:=get_viewport().get_visible_rect().size
+	app_layer.add_child(lbl("الكاميرا هتشتغل قريباً: هتصور أماكن طوكيو وتحفظ الصور.",30,Vector2(vs.x/2-300,vs.y/2-30),Color(1,1,0.9)))
+func show_ai():
+	phone_layer.visible=false; app_layer.visible=true; mode='phone'; app_head("البوت",Color(0.32,0.25,0.62))
+	var vs:=get_viewport().get_visible_rect().size
+	var lg:=Label.new(); lg.add_theme_font_override("font",ar); lg.add_theme_font_size_override("font_size",28); lg.add_theme_color_override("font_color",Color(1,1,1)); lg.position=Vector2(60,90); lg.size=Vector2(vs.x-120,vs.y-230); lg.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART; lg.text_direction=Control.TEXT_DIRECTION_RTL; lg.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT
+	lg.text="البوت: أهلاً! أنا صاحبك في طوكيو. اسألني أي حاجة."
+	app_layer.add_child(lg); ai_log=lg
+	var ed:=LineEdit.new(); ed.size=Vector2(vs.x-320,60); ed.position=Vector2(180,vs.y-90); ed.placeholder_text="اكتب رسالتك..."; ed.add_theme_font_override("font",ar); ed.add_theme_font_size_override("font_size",28); ed.text_direction=Control.TEXT_DIRECTION_RTL; app_layer.add_child(ed); ai_edit=ed
+	var sb2:=Button.new(); sb2.text="ارسل"; sb2.size=Vector2(130,60); sb2.position=Vector2(30,vs.y-90); sb2.add_theme_font_override("font",ar); sb2.add_theme_font_size_override("font_size",28)
+	sb2.pressed.connect(ai_send); ed.text_submitted.connect(func(_t): ai_send()); app_layer.add_child(sb2)
+func ar_norm(t:String)->String:
+	var r:=t.to_lower()
+	for p in ["أ","إ","آ"]: r=r.replace(p,"ا")
+	r=r.replace("ى","ي").replace("ة","ه").replace("ؤ","و").replace("ئ","ي")
+	for d in ["\u064b","\u064c","\u064d","\u064e","\u064f","\u0650","\u0651","\u0652","؟","?","!","،",".",","]: r=r.replace(d," ")
+	return r
+const AI_RULES:=[
+	[["ازيك","عامل ايه","اخبارك","ايه الاخبار","عامله ايه"],["الحمد لله تمام! وانت عامل ايه النهارده؟","كويس جداً، الجو في طوكيو حلو. وانت؟","تمام يا صاحبي، مبسوط اني بكلمك."]],
+	[["اهلا","مرحبا","هاي","السلام","صباح","مساء","هلا","hello","hi"],["اهلاً بيك! نورت طوكيو.","هاي! عامل ايه؟","اهلاً اهلاً! تحب نتكلم في ايه؟"]],
+	[["اسمك","انت مين","انتي مين","مين انت","اسمك ايه"],["انا البوت بتاع الموبايل. صاحبك اللي في جيبك دايماً.","انا البوت، بعرف كل حاجة عن اللعبة وطوكيو شوية."]],
+	[["طوكيو","اليابان","شيبويا"],["طوكيو مدينة كبيرة اوي. فيها أبراج وكونبيني ومحطات قطر في كل حتة.","شيبويا مشهورة بالمعبر الكبير. مرة تعدي فيه وسط ناس كتير هتحس انك في أنمي.","في طوكيو تقدر تلاقي كل حاجة: رامن، مكتبات، وكافيهات هادية."]],
+	[["مدرسه","دراسه","مذاكره","امتحان","فصل"],["المدرسة هنا مهمة. ذاكر كويس وهتبقى الطالب المثالي.","لو تعبت من المذاكرة خد استراحة في الكافيه، بس متتأخرش عن الفصل.","الامتحانات صعبة بس انت قدها."]],
+	[["نكته","اضحك","هزار","نكت","ضحكني"],["مرة ساكورا سألت القطة: انتي بتحبي ايه؟ قالت: ميو... طبعاً السمك!","ليه الطالب خد مظلة للمدرسة؟ علشان الدرس كان ممطر بالمعلومات!","قالوا للرامن: ليه انت دايماً سخن؟ قال: علشان بحب اللمة!"]],
+	[["ساكورا"],["ساكورا طالبة جديدة في المدرسة، شعرها بني وبتحب الدراسة والكافيهات.","ساكورا بطلة اللعبة. ممكن تتكلم معاها في الشارع."]],
+	[["كايتو"],["كايتو ولد رياضي ومرح، بيحب الكافيه وبيعرف يهدي الجو.","كايتو دايماً مبتسم. خليك صاحبه ومتزعلوش."]],
+	[["اياني","أياني"],["أياني بنت ذكية بتلبس نضارة وبتحب القراءة. اتكلم معاها في المكتبة.","أياني هادية بس لما تعرفها هتحبها."]],
+	[["هاروتو"],["هاروتو ولد لطيف وهادي. دايماً بيساعد اللي حواليه."]],
+	[["مومو"],["مومو هي القطة الصغيرة! بتتمشى في الشارع وتحب الأكل."]],
+	[["اكل","جعان","اكله","رامن","اونيجيري","قهوه","كيك"],["الأونيجيري في الكونبيني حلو وسعره قليل. القهوة في الكافيه هتديك طاقة.","جعان؟ روح المتجر واشتري أكل صحي، هتحس بطاقة اكتر.","الرامن اللذيذ في طوكيو لازم تجربه."]],
+	[["فلوس","مصروف","اشتري","شراء","سعر"],["هتجمع فلوس من المهام اليومية. افتح تطبيق المهام وشوف.","الفلوس بتيجي من المهام، وتقدر تشتري بيها اكل وهدايا."]],
+	[["مهمه","مهام","كويست"],["افتح تطبيق المهام في الموبايل. بتتجدد كل يوم.","المهام اليومية بتديك فلوس. اكمل كلها وهتبقى مبسوط."]],
+	[["صديق","اصحاب","علاقات","حب","هديه"],["اتكلم مع الشخصيات كل يوم وهتبقى صحابك أقرب. الهدية الصغيرة بتفرق كتير.","العلاقات بتقوى لما تتكلم وتدي هدايا. افتح تطبيق العلاقات وشوف القلوب."]],
+	[["طقس","جو","مطر","ثلج","شمس","برد"],["الجو في طوكيو بيتغير. لما تمطر خد مظلتك!","لما التلج ينزل الشارع بيبقى جميل اوي."]],
+	[["قطر","محطه","مترو"],["محطة شيبويا على يمين الشارع. القطر لسه مش شغال بس قريب هيبقى في.","القطر هيوصلك لقرى ومدن تانية في الإصدارات الجاية."]],
+	[["شكرا","تسلم","متشكر","ميرسي"],["العفو! ده واجبي.","تسلم انت كمان!","في أي وقت."]],
+	[["تعبان","زهقان","حزين","مضايق","وحيد"],["معلش، خد نفس عميق وروح الكافيه تشرب حاجة دافية. انا معاك.","لو زهقان، اتمشى في الشارع وكلم صحابك. هتحس بتحسن.","انا هنا لو عايز تتكلم. كل يوم وله حاجة حلوة."]],
+	[["مبسوط","فرحان","سعيد"],["حلو اوي! خليك كده.","فرحتك بتفرحني."]],
+	[["باي","سلام","مع السلامه","تصبح","نايم"],["مع السلامة! نتقابل قريب.","تصبح على خير! نام كويس علشان بكرة يوم جديد.","باي باي!"]],
+	[["لعبه","اللعبه","انمي"],["اللعبة عن يوم جديد في طوكيو. كل يوم فيه حاجة جديدة.","أنا بحب الأنمي زيك. اللعبة معمولة بنفس الجو."]]]
+func ai_reply(t:String)->String:
+	var n:=ar_norm(t); var best:=-1; var bs:=0
+	for i in range(AI_RULES.size()):
+		var sc:=0
+		for k in AI_RULES[i][0]:
+			var kn:=ar_norm(k).strip_edges()
+			if kn.contains(" "):
+				if n.contains(kn): sc+=2
+			else:
+				for w in n.split(" ",false):
+					if w.begins_with(kn) or (w.length()>2 and w.substr(1).begins_with(kn)): sc+=1; break
+		if sc>bs: bs=sc; best=i
+	if best<0: return "مش فاهم قصدك، اسألني حاجة تانية."
+	var rs:Array=AI_RULES[best][1]; return rs[randi()%rs.size()]
+func ai_send():
+	var t:=ai_edit.text.strip_edges()
+	if t=="": return
+	ai_edit.text=""
+	var lines:=ai_log.text.split("\n"); lines.append("أنا: "+t); lines.append("البوت: "+ai_reply(t))
+	while lines.size()>8: lines.remove_at(0)
+	ai_log.text="\n".join(lines); sfx('blip',1.1)
 func open_msgs():
 	phone_layer.visible=false; msg_layer.visible=true; mode='phone'
 	for c in msg_layer.get_children():
@@ -1367,6 +1476,9 @@ func app_btn(txt:String,pos:Vector2,sz:Vector2,col:Color,cb:Callable):
 func open_app(k:int):
 	sfx('click')
 	if k==0: open_map(); return
+	if k==8: open_msgs(); return
+	if k==9: show_camera(); return
+	if k==10: show_ai(); return
 	if k==3:
 		phone_layer.visible=false; mode='stats'; stats_layer.visible=true; stats_layer.get_meta('pc').queue_redraw(); return
 	phone_layer.visible=false; app_layer.visible=true; mode='phone'
