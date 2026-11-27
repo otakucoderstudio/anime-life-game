@@ -410,7 +410,7 @@ func add_glasses(g:Dictionary):
 
 func build_player():
 	player=Node3D.new(); add_child(player)
-	var g:=make_girl(Color(1,0.88,0.8),Color(0.36,0.2,0.12),Color(0.17,0.3,0.6),Color(0.17,0.3,0.6),Color(1,0.35,0.5))
+	var g:=load_char('girl_sakura',cmat(Color(0.99,0.82,0.7),Color(0.36,0.2,0.12),Color(0.13,0.15,0.3),Color(0.13,0.15,0.28),Color(0.78,0.1,0.17),Color(0.4,0.25,0.15)))
 	player.add_child(g.root); legl=g.legl; legr=g.legr; arml=g.arml; armr=g.armr
 	player.position=Vector3(0,0,2)
 	var cols=[[Color(1,0.85,0.75),Color(0.95,0.5,0.6),Color(1,0.7,0.8),Color(0.9,0.5,0.6),Color(1,1,0.4)],[Color(1,0.87,0.78),Color(0.2,0.55,0.55),Color(0.9,0.95,1),Color(0.7,0.4,0.6),Color(0.4,0.9,1)],[Color(0.95,0.8,0.7),Color(0.85,0.7,0.3),Color(1,0.9,0.6),Color(0.5,0.5,0.8),Color(1,0.5,0.3)]]
@@ -854,6 +854,9 @@ func _physics_process(_d):
 		if frames==30 and 'scene' in OS.get_cmdline_user_args(): player.position.z=-76
 		if frames==40 and 'choice' in OS.get_cmdline_user_args(): advance()
 		if frames==40 and 'stats' in OS.get_cmdline_user_args(): advance(); choose(0); mode='stats'; stats_layer.visible=true; stats_layer.get_meta('pc').queue_redraw()
+		if frames==30 and 'hero' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; ui.visible=false
+		if frames>=50 and frames<=59 and 'hero' in OS.get_cmdline_user_args():
+			joy_vec=Vector2.ZERO; get_tree().root.set_meta("x",true); cam.fov=30; cam.position=player.position+Vector3(0.5,2.05,-2.6); cam.look_at(player.position+Vector3(0,1.85,0))
 		if frames==59 and "front" in OS.get_cmdline_user_args():
 			cam.position=player.position+Vector3(0.9,2.0,-3.0); cam.fov=40; cam.look_at(player.position+Vector3(0,1.7,0)); get_tree().root.set_meta('x',true); player.rotation.y=2.9
 		if frames==30 and 'cast' in OS.get_cmdline_user_args():
