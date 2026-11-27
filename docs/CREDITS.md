@@ -12,3 +12,7 @@ CC0 1.0. https://3dassets.dev/packs/izakaya-alley-and-ramen-shop . Used for stre
 ## Kobo Assets - Free Low Poly Japanese Town Buildings
 https://kobo-assets.itch.io/japanese-town-buildings
 Free for personal and commercial projects. Credit "Assets by Kobo Assets". The pack says its models were built with AI-assisted Blender scripts. The raw files are NOT redistributed in this repo (licence forbids it); they are built into the APK only.
+
+## WAFU Sound Works - Japanese Rain Music Pack Vol.31 (free)
+https://wafusoundworks.itch.io/wafu-vol31-japanese-rain-music-pack
+Royalty-free, commercial OK, no credit required. Author states tracks were made with generative AI plus human editing. Raw audio not redistributed in this repo (licence); built into the APK only.
