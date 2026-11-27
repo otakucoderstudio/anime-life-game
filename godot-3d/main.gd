@@ -87,7 +87,7 @@ func _ready():
 	build_street()
 	build_player()
 	no_outline=false
-	cam=Camera3D.new(); cam.fov=55; cam.far=140.0; add_child(cam)
+	cam=Camera3D.new(); cam.fov=55; cam.far=300.0; add_child(cam)
 	build_ui()
 	var vg:=TextureRect.new(); vg.texture=load('res://art/vignette.png'); vg.expand_mode=TextureRect.EXPAND_IGNORE_SIZE; vg.size=get_viewport().get_visible_rect().size; vg.mouse_filter=Control.MOUSE_FILTER_IGNORE; ui.add_child(vg); ui.move_child(vg,0)
 	petal_fx()
@@ -162,6 +162,7 @@ func overlaps(a0:float,a1:float,gaps:Array)->bool:
 		if a1>g.x and a0<g.y: return true
 	return false
 func world_row(ns:bool,c:float,t:float,idx:int,sak:bool):
+	tokyo_tower(Vector3(4,0,-235))
 	var cols=[Color(0.9,0.84,0.72),Color(0.7,0.78,0.85),Color(0.86,0.7,0.62),Color(0.78,0.82,0.7),Color(0.92,0.9,0.86),Color(0.68,0.66,0.74)]
 	var accs=[Color(0.95,0.3,0.3),Color(0.25,0.55,0.95),Color(0.35,0.75,0.5),Color(0.95,0.7,0.2)]
 	for side in [-1,1]:
@@ -243,6 +244,16 @@ func planter(p:Vector3,i:int):
 	var gc:Color=[Color(0.3,0.68,0.34),Color(0.42,0.75,0.3),Color(0.25,0.6,0.4)][i%3]
 	mesh(self,sph(0.62),gc,p+Vector3(0,0.85,0),false,0.0)
 	if i%2==0: mesh(self,sph(0.14),[Color(1,0.5,0.7),Color(1,0.85,0.3),Color(1,1,1)][int(i/2)%3],p+Vector3(0.25,1.2,0.15),false,0.0)
+
+func tokyo_tower(p:Vector3):
+	var was:=batching; batching=false
+	for k in range(9):
+		var w:=11.0*pow(1.0-float(k)/9.0,1.6)+1.2
+		var c:=Color(0.9,0.2,0.1) if k%2==0 else Color(0.95,0.85,0.8)
+		box(self,Vector3(w,9.0,w*0.6),c,p+Vector3(0,float(k)*9.0+4.5,0),false)
+	box(self,Vector3(0.8,22.0,0.8),Color(0.95,0.3,0.2),p+Vector3(0,92.0,0),false)
+	box(self,Vector3(4.5,2,3.6),Color(1,0.95,0.9),p+Vector3(0,40.0,0),false)
+	batching=was
 
 func building(side:int,z:float,h:float,c:Color,i:int):
 	var cols=[Color(0.95,0.3,0.3),Color(0.25,0.55,0.95),Color(0.35,0.75,0.5),Color(0.95,0.7,0.2)]
@@ -448,7 +459,7 @@ func spawn_npcs():
 	var ka:=make_boy(Color(0.9,0.68,0.52),Color(0.42,0.24,0.12),true)
 	add_npc(ka.root,Vector3(1.5,0,-58),"front","",[["كايتو","يا باشا! أنا كايتو، قاعد جنبك في الفصل.","youssef_laugh"],["كايتو","متقلقش، هعرّفك على كل حاجة. أول حاجة: الكافيه بعد المدرسة عليّ!","youssef_smile"],["كايتو","بس أياني دي شكلها هتبقى منافستك الأولى، خلي بالك 😄","youssef_joy"]])
 	var ka2:=make_boy(Color(0.9,0.68,0.52),Color(0.42,0.24,0.12),true)
-	add_npc(ka2.root,Vector3(-1.5,0,-73),"cafe","",[["كايتو","ده كافيه الهدوء. أحلى قهوة في ساكورا هيل. تحب نقعد؟","youssef_joy",[["نقعد ونتكلم","العلاقات",10],["نذاكر سوا","الدراسة",10]]]])
+	add_npc(ka2.root,Vector3(-1.5,0,-73),"cafe","",[["كايتو","ده كافيه الهدوء. أحلى قهوة في طوكيو. تحب نقعد؟","youssef_joy",[["نقعد ونتكلم","العلاقات",10],["نذاكر سوا","الدراسة",10]]]])
 	var ay2:=make_girl(Color(1,0.88,0.8),Color(0.45,0.2,0.65),Color(0.17,0.3,0.6),Color(0.5,0.52,0.56),Color(0.85,0.1,0.15),true,true)
 	add_npc(ay2.root,Vector3(1.5,0,-88),"class","",[["أياني","ده فصلنا. أول امتحان بعد أسبوع، استعد.","rana_think",[["أذاكر معاها","الدراسة",10],["أنا هتصرف","الصحة",3]]]])
 	var cat:Node3D=load_char("cat",cmat(Color(1,0.95,0.9),Color(0.95,0.6,0.35),Color(1,1,1),Color(1,1,1),Color(1,1,1),Color(0.3,0.6,0.35))).root
@@ -467,7 +478,7 @@ func _nox():
 func build_ui():
 	var cl:=CanvasLayer.new(); add_child(cl); ui=cl
 	var f:Font=load("res://fonts/arabic.ttf")
-	var lb:=Label.new(); lb.text="شارع الحياة"; lb.add_theme_font_override("font",f); lb.add_theme_font_size_override("font_size",34)
+	var lb:=Label.new(); lb.text="شيبويا، طوكيو"; lb.add_theme_font_override("font",f); lb.add_theme_font_size_override("font_size",34)
 	lb.add_theme_color_override("font_outline_color",Color(0.3,0.1,0.4)); lb.add_theme_constant_override("outline_size",10)
 	lb.position=Vector2(24,20); lb.text_direction=Control.TEXT_DIRECTION_RTL; cl.add_child(lb)
 	hud_time=Label.new(); hud_time.add_theme_font_override("font",f); hud_time.add_theme_font_size_override("font_size",20); hud_time.add_theme_color_override("font_color",Color(1,1,1))
@@ -531,7 +542,7 @@ func pick(who:String):
 		player.get_child(0).queue_free()
 		var g:=make_boy(Color(1,0.88,0.8),Color(0.1,0.15,0.4),false)
 		player.add_child(g.root); legl=g.legl; legr=g.legr; arml=g.arml; armr=g.armr
-	start_scene('room','',[[ 'أنا','يوم جديد في ساكورا هيل... أول يوم في المدرسة الجديدة.',who,[]],['أنا','أفطر الأول ولا أنزل بدري؟',who,[['أفطر وأروق','الصحة',8],['أنزل بدري','الدراسة',8]]]])
+	start_scene('room','',[[ 'أنا','يوم جديد في طوكيو... أول يوم في المدرسة الجديدة.',who,[]],['أنا','أفطر الأول ولا أنزل بدري؟',who,[['أفطر وأروق','الصحة',8],['أنزل بدري','الدراسة',8]]]])
 func build_scene_ui():
 	var vs:=get_viewport().get_visible_rect().size
 	scene_layer=Control.new(); scene_layer.size=vs; scene_layer.visible=false; ui.add_child(scene_layer)
@@ -1030,7 +1041,7 @@ func build_phone():
 	{"id":"m5","from":"كايتو","text":"الصيف جه! تعالى نروح نلعب كورة في الحديقة","after":10080,"face":"youssef_joy","bg":"ex_hill","lines":[["كايتو","الصيف بدأ يا باشا! الجو حر بس الحديقة حلوة.","youssef_laugh"],["كايتو","هات مية وتعالى نلعب شوية.","youssef_joy",[["أروح ألعب","الصحة",10],["أقعد في الكافيه","العلاقات",6]]]]},
 	{"id":"m6","from":"هدى","text":"وصل كتب جديدة في مكتبة النور. تعالى شوفهم","after":14400,"face":"rana_calm","bg":"in_room","lines":[["هدى","وصلتني كتب جديدة النهاردة، بتاعة حكايات وقصص.","rana_calm"],["هدى","لو جيت المكتبة هسيبلك تقرا الأول.","rana_smile",[["أروح أقرا","الدراسة",8],["بعدين","المجتمع",2]]]]},
 	{"id":"m7","from":"مومو","text":"مياو مياو! مومو ضاعت في الخريف وسط الورق!","after":18000,"face":"youssef_joy","bg":"in_room","lines":[["أنا","مومو مش في مكانها. دورت عليها في الورق الأحمر والبرتقالي.","%s"],["أنا","لقيتها نايمة تحت الشجرة! 🐱","%s",[["أحملها وأرجعها","الصحة",6],["أصورها","المجتمع",5]]]]},
-	{"id":"m8","from":"أياني","text":"أول تلج النهاردة! تعالى المدرسة نعمل رجل تلج","after":30240,"face":"rana_smile","bg":"school_front","lines":[["أياني","التلج نزل! أول مرة أشوفه بالشكل ده في ساكورا هيل.","rana_smile"],["أياني","تعالى نعمل رجل تلج قدام المدرسة، من غير ما حد يشوفنا 😄","rana_smile",[["أروح معاها","العلاقات",10],["أستنى جوا","الصحة",3]]]]}]
+	{"id":"m8","from":"أياني","text":"أول تلج النهاردة! تعالى المدرسة نعمل رجل تلج","after":30240,"face":"rana_smile","bg":"school_front","lines":[["أياني","التلج نزل! أول مرة أشوفه بالشكل ده في طوكيو.","rana_smile"],["أياني","تعالى نعمل رجل تلج قدام المدرسة، من غير ما حد يشوفنا 😄","rana_smile",[["أروح معاها","العلاقات",10],["أستنى جوا","الصحة",3]]]]}]
 	refresh_badge()
 func new_msgs()->Array:
 	var out:=[]
@@ -1362,7 +1373,7 @@ func rel_scene(who:String,lv:int)->Array:
 	match who+str(lv):
 		"كايتو3": return [["كايتو","عارف يا باشا؟ بقالي زمان ماليش صاحب أرتاح معاه كده.",f],["كايتو","من النهاردة انت صاحبي الأصلي. لو احتجت أي حاجة أنا موجود.",f]]
 		"كايتو6": return [["كايتو","أنا مش بقول ده لحد: انت أعز صاحب ليّ هنا. هعملك مفاجأة في الكافيه قريب.","youssef_joy"],["كايتو","بس متقولش لأياني، هتسخر مني 😄","youssef_laugh"]]
-		"كايتو10": return [["كايتو","لو مكنتش جيت ساكورا هيل كنت لسه زي ما أنا. شكراً إنك بقيت جزء من يومي.","youssef_smile"],["كايتو","[نهاية الصداقة: ما بينكم رباط حقيقي]","youssef_joy"]]
+		"كايتو10": return [["كايتو","لو مكنتش جيت طوكيو كنت لسه زي ما أنا. شكراً إنك بقيت جزء من يومي.","youssef_smile"],["كايتو","[نهاية الصداقة: ما بينكم رباط حقيقي]","youssef_joy"]]
 		"أياني3": return [["أياني","بصراحة... اتفاجئت إنك مش زي ما توقعت. مش وحش.",f2],["أياني","لسه المنافسة قايمة، بس هسيبك تذاكر معايا لو حبيت.","rana_smile"]]
 		"أياني6": return [["أياني","كنت فاكرة إني بحب أبقى الأولى لوحدي. بس معاك الدراسة بقت أحلى.","rana_calm"],["أياني","متفهمش غلط. ده مجرد اعتراف بالموهبة.","rana_think"]]
 		"أياني10": return [["أياني","أنا... مش بعرف أقول حاجات زي دي. بس وجودك بقى حاجة مهمة في أيامي.","rana_close"],["أياني","[نهاية المنافسة اللطيفة: بقيتوا أقرب من أي حد]","rana_smile"]]
@@ -1401,9 +1412,9 @@ func show_year_end():
 	app_head("السنة الأولى",Color(0.9,0.55,0.45)); var vs:=get_viewport().get_visible_rect().size
 	var best:String="كايتو"; for k in aff.keys(): if aff[k]>aff[best]: best=k
 	var bs:String="الدراسة"; for k in stats.keys(): if k!='الفلوس' and stats[k]>stats[bs]: bs=k
-	var ttl:String={"الدراسة":"الطالب المثالي","العلاقات":"قلب الفصل","الصحة":"بطل الطاقة","المجتمع":"نجم الحي"}.get(bs,"طالب ساكورا هيل")
+	var ttl:String={"الدراسة":"الطالب المثالي","العلاقات":"قلب الفصل","الصحة":"بطل الطاقة","المجتمع":"نجم الحي"}.get(bs,"طالب طوكيو")
 	var y:=100.0
-	app_layer.add_child(lbl("عدّت سنة كاملة في ساكورا هيل!",36,Vector2(vs.x/2-230,y),Color(1,1,0.9))); y+=70
+	app_layer.add_child(lbl("عدّت سنة كاملة في طوكيو!",36,Vector2(vs.x/2-230,y),Color(1,1,0.9))); y+=70
 	app_layer.add_child(lbl("لقبك: "+ttl,40,Vector2(vs.x/2-170,y),Color(1,0.95,0.6))); y+=75
 	app_layer.add_child(lbl("أقرب صاحب ليك: %s (%d/10 قلوب)"%[best,aff[best]],30,Vector2(vs.x/2-240,y),Color(1,1,1))); y+=60
 	var epi:String={"كايتو":"كايتو وعدك إنكم تفضلوا أصحاب حتى بعد التخرج.","أياني":"أياني كتبتلك رسالة طويلة وقالتلك إنك أحسن حاجة حصلتلها السنة دي.","هاروتو":"هاروتو قالك: السنة الجاية أنا اللي هسبقك!","ساكورا":"ساكورا حطت ورقة ساكورا في كتابك عشان تفتكر السنة دي."}.get(best,"صحابك في الحي مش هينسوك.")
