@@ -306,6 +306,8 @@ func build_street():
 		sakura(Vector3(-5.9,0,-float(i)*9.5-1),i) if i%2==0 else null
 		if i%2==0: pglb("lamp",Vector3(5.7,0.1,-float(i)*9.5-8.6),0.0)
 		else: pglb("lamp",Vector3(-5.7,0.1,-float(i)*9.5-3.0),180.0)
+		if i%2==0: solids.append([Vector2(-5.9,-float(i)*9.5-1),0.35]); solids.append([Vector2(5.7,-float(i)*9.5-8.6),0.22])
+		else: solids.append([Vector2(-5.7,-float(i)*9.5-3.0),0.22])
 		sakura(Vector3(5.9,0,-float(i)*9.5-6),i+3) if i%2==1 else null
 		if i%3==0:
 			bike(Vector3(-6.3,0.2,-float(i)*9.5-4),90,Color(0.3,0.5,0.8)); bike(Vector3(-6.3,0.2,-float(i)*9.5-5.0),90,Color(0.85,0.4,0.4))
