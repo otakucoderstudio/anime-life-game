@@ -601,7 +601,7 @@ func check_triggers():
 		return
 	for n in npcs:
 		var d:Vector3=player.position-n.n.position
-		if Vector2(d.x,d.z).length()<3.2 and not scene_done.has(n.key):
+		if Vector2(d.x,d.z).length()<3.2 and not scene_done.has(n.key) and (n.key!='momo' or n.n.visible):
 			n.n.rotation.y=atan2(d.x,d.z)
 			start_scene(n.key,n.bg,n.lines)
 	if false: start_scene('konbini',"",[["البائع","أهلاً! عروض النهاردة على الأونيجيري.","youssef_smile",[["أشتري (ادفع ٥ فلوس)","الفلوس",-5],["مش دلوقتي","الصحة",2]]]])
@@ -766,7 +766,8 @@ func _process(dt):
 		if save_t>15.0: save_t=0.0; save_game()
 	for n in npcs:
 		n.n.visible=in_room=='' and player.position.distance_to(n.n.position)<14.0
-		if n.key=='momo' and n.n.visible:
+		if n.key=='momo' and (fmod(hud_min/60.0,24.0)<5.0 or fmod(hud_min/60.0,24.0)>=23.0): n.n.visible=false
+		elif n.key=='momo' and n.n.visible:
 			var mt:float=Time.get_ticks_msec()*0.0006
 			var mx:float=1.8+1.6*sin(mt); n.n.position=Vector3(mx,0.05*absf(sin(mt*9.0)),-12.0)
 			n.n.rotation.y=(1.57 if cos(mt)>0 else -1.57)
@@ -893,7 +894,7 @@ func _physics_process(_d):
 		if frames==30 and 'talk' in OS.get_cmdline_user_args(): start_scene('w1','',npcs[5].lines)
 		if frames==20 and 'momo' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(0,0,-6)
 		if frames==20 and 'bench' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; energy=2; player.position=Vector3(20.0,0,-7.2)
-		if frames==20 and ('night' in OS.get_cmdline_user_args() or 'deep' in OS.get_cmdline_user_args()): scene_layer.visible=false; mode='play'; hud_min=(2.0 if 'deep' in OS.get_cmdline_user_args() else 22.0)*60.0; env_t=0.0; player.position=Vector3(0,0,-14)
+		if frames==20 and ('night' in OS.get_cmdline_user_args() or 'deep' in OS.get_cmdline_user_args()): scene_layer.visible=false; mode='play'; player.position=Vector3(0,0,-6); hud_min=(2.0 if 'deep' in OS.get_cmdline_user_args() else 22.0)*60.0; env_t=0.0; player.position=Vector3(0,0,-8)
 		if frames==20 and 'rain' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; player.position=Vector3(0,0,-6); env_t=0.0
 		if frames==20 and 'street' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(0,0,-20)
 		if frames==20 and 'park' in OS.get_cmdline_user_args(): scene_layer.visible=false; mode='play'; phone_btn.visible=true; player.position=Vector3(34.5,0,-4.5)
